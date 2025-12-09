@@ -383,9 +383,9 @@
 
                         <!-- Password Tab -->
                         <div class="tab-pane fade" id="password-panel">
-                            <div class="mb-3"><input type="password" id="old-pass" class="form-control"
+                            <div class="mb-3"><input type="password" id="manage-old-pass" class="form-control"
                                     placeholder="Old Password"></div>
-                            <div class="mb-3"><input type="password" id="new-pass" class="form-control"
+                            <div class="mb-3"><input type="password" id="manage-new-pass" class="form-control"
                                     placeholder="New Password"></div>
                             <button class="btn btn-warning" id="btn-change-pass">Update Password</button>
                         </div>
@@ -637,12 +637,25 @@
                 const newP = $('#manage-new-pass').val();
                 if (!oldP || !newP) return;
 
-                const res = await AdminManager.changePassword(oldP, newP);
-                if (res.status === 'success') {
-                    alert("Password Changed! Please login again.");
-                    AdminManager.logout();
-                } else {
-                    alert(res.message);
+                const btn = $(this);
+                const originalText = btn.text();
+                btn.text('Updating...').prop('disabled', true);
+
+                showUpdate(); // SHOW
+
+                try {
+                    const res = await AdminManager.changePassword(oldP, newP);
+                    if (res.status === 'success') {
+                        alert("Password Changed! Please login again.");
+                        AdminManager.logout();
+                    } else {
+                        alert(res.message);
+                    }
+                } catch (e) {
+                    alert("Error: " + e.message);
+                } finally {
+                    btn.text(originalText).prop('disabled', false);
+                    hideUpdate(); // HIDE
                 }
             });
 
