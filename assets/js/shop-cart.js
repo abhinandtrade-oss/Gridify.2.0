@@ -1,7 +1,10 @@
 /* Shop, Cart, and Checkout Logic */
 
 const CART_KEY = 'ridda_cart';
-const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwB90DHy11h3yyZaSTJ1Q-gPJhjEspF-eG9Pwp268i4hynoj4HQ1-M9lz79eZUOXKfRAA/exec';
+// Check if APP_SCRIPT_URL is already defined in window (from product-manager.js), otherwise define it locally
+const API_URL = (typeof window.APP_SCRIPT_URL !== 'undefined')
+    ? window.APP_SCRIPT_URL
+    : 'https://script.google.com/macros/s/AKfycbwB90DHy11h3yyZaSTJ1Q-gPJhjEspF-eG9Pwp268i4hynoj4HQ1-M9lz79eZUOXKfRAA/exec';
 
 // --- Cart State Management ---
 
@@ -526,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // Fetch coupons from Cloud
-                const response = await fetch(`${APP_SCRIPT_URL}?action=getCoupons`);
+                const response = await fetch(`${API_URL}?action=getCoupons`);
                 const coupons = await response.json();
 
                 // Find match
