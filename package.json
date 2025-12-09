@@ -1,0 +1,18 @@
+{
+  "name": "gridify-2-0",
+  "version": "1.0.0",
+  "description": "Gridify 2.0 - Portfolio and Agency Website",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "build": "echo \"No build step required\""
+  },
+  "keywords": ["cloudflare", "workers", "portfolio"],
+  "author": "abhinandtrade-oss",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250101.0",
+    "wrangler": "^3.54.0"
+  }
+}
