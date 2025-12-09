@@ -19,15 +19,21 @@ function saveCart(cart) {
 
 function updateCartCount() {
     const count = getCart().reduce((sum, item) => sum + item.quantity, 0);
+
+    // Desktop Badge
     const badge = document.getElementById('nav-cart-count');
     if (badge) {
         badge.textContent = count;
-        // Optional: Hide badge if 0
-        if (count === 0) {
-            badge.classList.add('d-none');
-        } else {
-            badge.classList.remove('d-none');
-        }
+        if (count === 0) badge.classList.add('d-none');
+        else badge.classList.remove('d-none');
+    }
+
+    // Mobile Badge
+    const mobileBadge = document.getElementById('mobile-cart-count');
+    if (mobileBadge) {
+        mobileBadge.textContent = count;
+        if (count === 0) mobileBadge.classList.add('d-none');
+        else mobileBadge.classList.remove('d-none');
     }
 }
 
