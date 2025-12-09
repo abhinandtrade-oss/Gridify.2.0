@@ -1,9 +1,13 @@
-name = "portfolio"
-compatibility_date = "2025-12-10"
+name = "gridify-2-0"
+type = "javascript"
+workers_dev = true
+compatibility_date = "2025-12-09"
+
+# Main worker script
 main = "src/index.js"
 
+# Serve static assets from the repository root
 [env.production]
-route = "gridify-2-0.abhinandsofficial.workers.dev"
-
-[assets]
-directory = "."
+name = "gridify-2-0"
+route = "*"
+zone_name = "gridify.in"
