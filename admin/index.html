@@ -164,6 +164,57 @@
             box-shadow: 0 0 0 3px rgba(61, 114, 252, 0.1);
             border-color: #3d72fc;
         }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .admin-header .container {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .admin-header div {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .table-card .d-flex.flex-wrap {
+                flex-direction: column;
+                align-items: stretch !important;
+                gap: 15px;
+            }
+
+            .table-card h4 {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            .table-card input#searchInput,
+            .table-card select#categoryFilter {
+                width: 100% !important;
+                margin-bottom: 10px;
+            }
+
+            .table-card .d-flex.gap-2 {
+                flex-direction: column;
+            }
+
+            .table-card button {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            /* Adjust table for mobile */
+            .table-responsive {
+                border: 0;
+            }
+
+            /* Optional: Card view for table rows (advanced) or just scroll */
+            /* Keeping scroll for simplicity, but ensuring min-width */
+            .table {
+                min-width: 600px;
+            }
+        }
     </style>
 </head>
 
