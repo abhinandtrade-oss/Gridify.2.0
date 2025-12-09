@@ -596,17 +596,26 @@
                 });
             }
 
-            $('#btn-create-user').on('click', async function () {
-                const newUser = $('#new-username-input').val();
+            $('#btn-add-user').on('click', async function () {
+                const newUser = $('#new-user-name').val();
                 if (!newUser) return;
 
-                const pass = await AdminManager.addUser(newUser);
-                if (pass) {
-                    $('#new-user-msg').removeClass('d-none').text(`User Created! Password: ${pass}`);
-                    $('#new-username-input').val('');
-                    loadUsers();
-                } else {
-                    alert("Failed to create user");
+                const btn = $(this);
+                btn.prop('disabled', true).text('Creating...');
+
+                try {
+                    const pass = await AdminManager.addUser(newUser);
+                    if (pass) {
+                        alert(`User Created!\nUsername: ${newUser}\nPassword: ${pass}`);
+                        $('#new-user-name').val('');
+                        loadUsers();
+                    } else {
+                        alert("Failed to create user. Check console for details.");
+                    }
+                } catch (e) {
+                    alert("Error: " + e.message);
+                } finally {
+                    btn.prop('disabled', false).text('Create User');
                 }
             });
 
