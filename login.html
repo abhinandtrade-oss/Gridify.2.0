@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Gridify - Admin Login</title>
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" href="assets/images/logos/favicon.png" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <style>
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+            background-image: url('assets/images/banner/banner.jpg'); /* Reuse banner if available or just black */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .login-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+        }
+        .login-box {
+            position: relative;
+            background: #111;
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .form-group label {
+            color: #ccc;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+        }
+        .form-control:focus {
+            background: #222;
+            color: #fff;
+            border-color: #007bff; /* Or theme color */
+            box-shadow: none;
+        }
+        .error-msg {
+            color: #ff4d4d;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-box" data-aos="fade-up">
+            <div class="text-center mb-30">
+                 <a href="index.html"><img src="assets/images/logos/logo.png" alt="Logo" style="max-height: 50px;"></a>
+                 <h4 class="mt-4 text-white">Admin Login</h4>
+            </div>
+            
+            <form id="loginForm">
+                <div class="form-group mb-20">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group mb-30">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="theme-btn w-100" id="loginBtn">
+                    <span>Login</span>
+                </button>
+                <div class="error-msg" id="errorMsg">Invalid username or password</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Jquery -->
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <!-- AOS -->
+    <script src="assets/js/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
+    <!-- Auth Manager -->
+    <script src="assets/js/auth-manager.js"></script>
+
+    <script>
+        // Check if already logged in
+        if (AuthManager.isLoggedIn()) {
+            window.location.href = 'list.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+            const btn = document.getElementById('loginBtn');
+
+            // Simple loading state
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>Verifying...</span>';
+            btn.disabled = true;
+
+            const isValid = await AuthManager.login(user, pass);
+
+            if (isValid) {
+                window.location.href = 'list.html';
+            } else {
+                errorMsg.style.display = 'block';
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
