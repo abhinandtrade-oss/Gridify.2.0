@@ -467,7 +467,7 @@ function setupCheckoutPage() {
         // 3. Show Loading State
         const originalBtnText = placeOrderBtn.innerHTML;
         placeOrderBtn.disabled = true;
-        placeOrderBtn.innerHTML = '<span>Processing...</span>';
+        placeOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
 
         // 4. Submit via Fetch
         fetch(checkoutForm.action, {
