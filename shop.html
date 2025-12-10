@@ -366,13 +366,15 @@
     <!--  AOS Animation -->
     <script src="assets/js/aos.js"></script>
     <!-- Custom script -->
-    <script src="assets/js/script.js?v=1.1"></script>
+    <script src="assets/js/script.js"></script>
 
     <!-- Product Manager -->
-    <script src="assets/js/product-manager.js"></script>
+    <script type="module" src="assets/js/shop-cart.js"></script>
 
     <!-- Shop Page Logic -->
-    <script>
+    <script type="module">
+        import ProductManager from './assets/js/product-manager.js';
+
         $(document).ready(async function () {
             const container = $('#product-grid');
             let allProducts = [];
@@ -477,12 +479,16 @@
                                             <span class="price text-primary">₹${p.price}</span>
                                         </div>
                                         <div class="btn-group w-100 mt-3">
-                                            <button class="theme-btn add-to-cart-btn me-2" data-id="${p.id}"
+                                            <button class="theme-btn add-to-cart-btn me-2" 
+                                                onclick="window.addToCartClick(this)"
+                                                data-id="${p.id}"
                                                 data-title="${p.itemName}" data-price="${p.price}"
                                                 data-image="${p.image}" data-hover="Add to Cart">
                                                 <span>Add to Cart</span>
                                             </button>
-                                            <button class="theme-btn style-two view-details-btn" data-id="${p.id}"
+                                            <button class="theme-btn style-two view-details-btn" 
+                                                onclick="window.openDetailsClick(this)"
+                                                data-id="${p.id}"
                                                 data-title="${p.itemName}" data-price="${p.price}"
                                                 data-image="${p.image}" data-category="${p.itemCategory}"
                                                 data-description="${p.description}"
@@ -575,7 +581,7 @@
         });
     </script>
 
-    <script src="assets/js/shop-cart.js?v=1.1"></script>
+
 
     <!-- Product Details Modal -->
     <div class="modal fade" id="productDetailsModal" tabindex="-1" aria-hidden="true">
