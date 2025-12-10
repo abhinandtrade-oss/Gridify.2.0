@@ -481,9 +481,12 @@
     <!-- Bootstrap -->
     <script src="../assets/js/bootstrap.min.js"></script>
     <!-- Product Manager Logic -->
-    <script src="../assets/js/product-manager.js"></script>
-    <script src="../assets/js/admin-manager.js"></script>
-    <script>
+    <script type="module" src="../assets/js/product-manager.js"></script>
+    <script type="module" src="../assets/js/admin-manager.js"></script>
+    <script type="module">
+        import { AdminManager } from '../assets/js/admin-manager.js';
+        import ProductManager from '../assets/js/product-manager.js';
+
         $(document).ready(function () {
             // --- Network Status Logic ---
             function updateOnlineStatus() {
