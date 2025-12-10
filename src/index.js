@@ -15,23 +15,21 @@ export default {
       pathname = pathname.slice(0, -1);
     }
 
+    // 1. Redirect .html requests to clean URLs
+    // This must happen BEFORE defaulting to /index.html for root, otherwise we loop.
+    if (pathname.endsWith('.html')) {
+      let cleanPath = pathname.slice(0, -5);
+      if (cleanPath === '/index') cleanPath = '/';
+      // If cleanPath is empty string (shouldn't be due to leading slash), make it /
+      if (cleanPath === '') cleanPath = '/';
+
+      url.pathname = cleanPath;
+      return Response.redirect(url.toString(), 301);
+    }
+
     // Default to index.html for root path
     if (pathname === '' || pathname === '/') {
       pathname = '/index.html';
-    }
-
-    // 1. Redirect .html requests to clean URLs (except index.html if it was explicitly requested? 
-    // Usually index.html should be redirected to / but our logic above handles / -> /index.html internally.
-    // If incoming is /index.html, we should redirect to /. 
-    // If incoming is /about.html, redirect to /about.
-    if (pathname.endsWith('.html')) {
-        let cleanPath = pathname.slice(0, -5);
-        if (cleanPath === '/index') cleanPath = '/';
-        // If cleanPath is empty string (shouldn't be due to leading slash), make it /
-        if (cleanPath === '') cleanPath = '/';
-        
-        url.pathname = cleanPath;
-        return Response.redirect(url.toString(), 301);
     }
 
     // Block access to sensitive paths
@@ -49,12 +47,12 @@ export default {
       // If path has no extension, assume .html (or directory index)
       let fetchPath = pathname;
       let isCleanUrl = false;
-      
+
       // Basic check for extension: does the last segment contain a dot?
       const lastSegment = pathname.split('/').pop();
       if (!lastSegment.includes('.')) {
-          isCleanUrl = true;
-          fetchPath = pathname + '.html'; // Try appending .html first
+        isCleanUrl = true;
+        fetchPath = pathname + '.html'; // Try appending .html first
       }
 
       // Construct GitHub raw content URL
@@ -66,15 +64,15 @@ export default {
 
       // If clean URL and 404, might be a directory -> try /index.html
       if (!response.ok && response.status === 404 && isCleanUrl) {
-          console.log(`Clean URL ${fetchPath} failed, trying directory index...`);
-          const dirIndexPath = pathname + '/index.html';
-          const dirIndexUrl = `${GITHUB_RAW}/${GITHUB_REPO}/${BRANCH}${dirIndexPath}`;
-          const dirResponse = await fetch(dirIndexUrl);
-          
-          if (dirResponse.ok) {
-              response = dirResponse;
-              fetchPath = dirIndexPath; // Update for content-type detection
-          }
+        console.log(`Clean URL ${fetchPath} failed, trying directory index...`);
+        const dirIndexPath = pathname + '/index.html';
+        const dirIndexUrl = `${GITHUB_RAW}/${GITHUB_REPO}/${BRANCH}${dirIndexPath}`;
+        const dirResponse = await fetch(dirIndexUrl);
+
+        if (dirResponse.ok) {
+          response = dirResponse;
+          fetchPath = dirIndexPath; // Update for content-type detection
+        }
       }
 
       if (!response.ok) {
