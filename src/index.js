@@ -20,6 +20,20 @@ export default {
       pathname = '/index.html';
     }
 
+    // 1. Redirect .html requests to clean URLs (except index.html if it was explicitly requested? 
+    // Usually index.html should be redirected to / but our logic above handles / -> /index.html internally.
+    // If incoming is /index.html, we should redirect to /. 
+    // If incoming is /about.html, redirect to /about.
+    if (pathname.endsWith('.html')) {
+        let cleanPath = pathname.slice(0, -5);
+        if (cleanPath === '/index') cleanPath = '/';
+        // If cleanPath is empty string (shouldn't be due to leading slash), make it /
+        if (cleanPath === '') cleanPath = '/';
+        
+        url.pathname = cleanPath;
+        return Response.redirect(url.toString(), 301);
+    }
+
     // Block access to sensitive paths
     if (
       pathname.includes('src/') ||
@@ -31,15 +45,42 @@ export default {
     }
 
     try {
+      // 2. Determine fetch path for GitHub
+      // If path has no extension, assume .html (or directory index)
+      let fetchPath = pathname;
+      let isCleanUrl = false;
+      
+      // Basic check for extension: does the last segment contain a dot?
+      const lastSegment = pathname.split('/').pop();
+      if (!lastSegment.includes('.')) {
+          isCleanUrl = true;
+          fetchPath = pathname + '.html'; // Try appending .html first
+      }
+
       // Construct GitHub raw content URL
-      const githubUrl = `${GITHUB_RAW}/${GITHUB_REPO}/${BRANCH}${pathname}`;
+      let githubUrl = `${GITHUB_RAW}/${GITHUB_REPO}/${BRANCH}${fetchPath}`;
       console.log(`Fetching: ${githubUrl}`);
 
       // Fetch from GitHub
-      const response = await fetch(githubUrl);
+      let response = await fetch(githubUrl);
+
+      // If clean URL and 404, might be a directory -> try /index.html
+      if (!response.ok && response.status === 404 && isCleanUrl) {
+          console.log(`Clean URL ${fetchPath} failed, trying directory index...`);
+          const dirIndexPath = pathname + '/index.html';
+          const dirIndexUrl = `${GITHUB_RAW}/${GITHUB_REPO}/${BRANCH}${dirIndexPath}`;
+          const dirResponse = await fetch(dirIndexUrl);
+          
+          if (dirResponse.ok) {
+              response = dirResponse;
+              fetchPath = dirIndexPath; // Update for content-type detection
+          }
+      }
 
       if (!response.ok) {
-        // If not found, try to serve 404.html
+        // If still not found, try to serve 404.html
+        // Use recursive logic or just fetch 404? 
+        // Existing logic for 404:
         if (response.status === 404 && pathname !== '/404.html') {
           const notFoundUrl = `${GITHUB_RAW}/${GITHUB_REPO}/${BRANCH}/404.html`;
           const notFoundResponse = await fetch(notFoundUrl);
@@ -56,25 +97,25 @@ export default {
         });
       }
 
-      // Determine content type based on file extension
+      // Determine content type based on fetchPath (the actual file served)
       let contentType = 'text/plain';
-      if (pathname.endsWith('.html')) {
+      if (fetchPath.endsWith('.html')) {
         contentType = 'text/html; charset=utf-8';
-      } else if (pathname.endsWith('.css')) {
+      } else if (fetchPath.endsWith('.css')) {
         contentType = 'text/css; charset=utf-8';
-      } else if (pathname.endsWith('.js')) {
+      } else if (fetchPath.endsWith('.js')) {
         contentType = 'application/javascript; charset=utf-8';
-      } else if (pathname.endsWith('.json')) {
+      } else if (fetchPath.endsWith('.json')) {
         contentType = 'application/json; charset=utf-8';
-      } else if (pathname.endsWith('.png')) {
+      } else if (fetchPath.endsWith('.png')) {
         contentType = 'image/png';
-      } else if (pathname.endsWith('.jpg') || pathname.endsWith('.jpeg')) {
+      } else if (fetchPath.endsWith('.jpg') || fetchPath.endsWith('.jpeg')) {
         contentType = 'image/jpeg';
-      } else if (pathname.endsWith('.gif')) {
+      } else if (fetchPath.endsWith('.gif')) {
         contentType = 'image/gif';
-      } else if (pathname.endsWith('.svg')) {
+      } else if (fetchPath.endsWith('.svg')) {
         contentType = 'image/svg+xml';
-      } else if (pathname.endsWith('.webp')) {
+      } else if (fetchPath.endsWith('.webp')) {
         contentType = 'image/webp';
       }
 
