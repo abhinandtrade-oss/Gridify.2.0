@@ -172,57 +172,6 @@
             box-shadow: 0 0 0 3px rgba(61, 114, 252, 0.1);
             border-color: #3d72fc;
         }
-
-        /* Mobile Optimization */
-        @media (max-width: 768px) {
-            .admin-header .container {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-
-            .admin-header div {
-                justify-content: center;
-                width: 100%;
-            }
-
-            .table-card .d-flex.flex-wrap {
-                flex-direction: column;
-                align-items: stretch !important;
-                gap: 15px;
-            }
-
-            .table-card h4 {
-                text-align: center;
-                margin-bottom: 10px;
-            }
-
-            .table-card input#searchInput,
-            .table-card select#categoryFilter {
-                width: 100% !important;
-                margin-bottom: 10px;
-            }
-
-            .table-card .d-flex.gap-2 {
-                flex-direction: column;
-            }
-
-            .table-card button {
-                width: 100%;
-                margin-bottom: 5px;
-            }
-
-            /* Adjust table for mobile */
-            .table-responsive {
-                border: 0;
-            }
-
-            /* Optional: Card view for table rows (advanced) or just scroll */
-            /* Keeping scroll for simplicity, but ensuring min-width */
-            .table {
-                min-width: 600px;
-            }
-        }
     </style>
 </head>
 
@@ -250,6 +199,10 @@
                 </div>
                 <div id="loginError" class="text-danger small mb-3 text-center d-none">Invalid credentials</div>
                 <button type="submit" class="theme-btn w-100 justify-content-center">Login</button>
+                <div class="text-center mt-3">
+                    <a href="#" id="setupAdminLink" class="small text-muted" style="text-decoration: none;">Setup
+                        Initial Admin</a>
+                </div>
             </form>
         </div>
     </div>
@@ -272,13 +225,21 @@
         <main class="container mb-5">
             <div class="table-card">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-                    <h4 class="mb-0">All Products</h4>
-                    <div class="d-flex gap-2">
+                    <ul class="nav nav-pills mb-3" id="mainAdminTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-view="products">Products</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-view="orders">Orders</button>
+                        </li>
+                    </ul>
+
+                    <!-- Product Controls (Hidden when Order tab active) -->
+                    <div class="d-flex gap-2" id="productControls">
                         <input type="text" id="searchInput" class="form-control" placeholder="Search products..."
                             style="width: 250px;">
                         <select id="categoryFilter" class="form-select" style="width: 150px;">
                             <option value="">All Categories</option>
-                            <!-- Populated by JS -->
                         </select>
                         <button class="btn btn-outline-primary me-2" id="btn-management">
                             <i class="fas fa-cogs me-2"></i>Management
@@ -292,7 +253,7 @@
 
                 <div class="table-responsive">
                     <table class="table align-middle">
-                        <thead class="bg-light">
+                        <thead class="bg-light" id="productThead">
                             <tr>
                                 <th>Image</th>
                                 <th>Name</th>
@@ -305,6 +266,20 @@
                         <tbody id="productTableBody">
                             <!-- Rows rendered by JS -->
                         </tbody>
+
+                        <!-- Order Table Header (Hidden by default) -->
+                        <thead class="bg-light d-none" id="orderThead">
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Details</th>
+                                <th>Total</th>
+                                <th>Order Status</th>
+                                <th>Payment Status</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderTableBody" class="d-none"></tbody>
                     </table>
                 </div>
 
@@ -442,9 +417,9 @@
 
                         <!-- Password Tab -->
                         <div class="tab-pane fade" id="password-panel">
-                            <div class="mb-3"><input type="password" id="manage-old-pass" class="form-control"
+                            <div class="mb-3"><input type="password" id="old-pass" class="form-control"
                                     placeholder="Old Password"></div>
-                            <div class="mb-3"><input type="password" id="manage-new-pass" class="form-control"
+                            <div class="mb-3"><input type="password" id="new-pass" class="form-control"
                                     placeholder="New Password"></div>
                             <button class="btn btn-warning" id="btn-change-pass">Update Password</button>
                         </div>
@@ -481,6 +456,8 @@
     <!-- Bootstrap -->
     <script src="../assets/js/bootstrap.min.js"></script>
     <!-- Product Manager Logic -->
+    <script type="module" src="../assets/js/product-manager.js"></script>
+    <script type="module" src="../assets/js/admin-manager.js"></script>
     <script type="module">
         import { AdminManager } from '../assets/js/admin-manager.js';
         import ProductManager from '../assets/js/product-manager.js';
@@ -529,6 +506,16 @@
 
             $('#logoutBtn, #btn-logout').click(function () {
                 AdminManager.logout();
+            });
+
+            // Setup Admin Link
+            $('#setupAdminLink').click(async function (e) {
+                e.preventDefault();
+                const btn = $(this);
+                btn.text('Setting up...');
+                const res = await AdminManager.setupInitialAdmin();
+                alert(res.message);
+                btn.text('Setup Initial Admin');
             });
 
             function initAdminUI(session) {
@@ -693,15 +680,18 @@
 
             // Password
             $('#btn-change-pass').on('click', async function () {
-                const oldP = $('#manage-old-pass').val();
-                const newP = $('#manage-new-pass').val();
-                if (!oldP || !newP) return;
+                const oldP = $('#old-pass').val();
+                const newP = $('#new-pass').val();
 
+                if (!oldP || !newP) {
+                    alert("Please enter both old and new passwords.");
+                    return;
+                }
+
+                // UI Feedback
                 const btn = $(this);
                 const originalText = btn.text();
-                btn.text('Updating...').prop('disabled', true);
-
-                showUpdate(); // SHOW
+                btn.prop('disabled', true).text('Updating...');
 
                 try {
                     const res = await AdminManager.changePassword(oldP, newP);
@@ -714,8 +704,7 @@
                 } catch (e) {
                     alert("Error: " + e.message);
                 } finally {
-                    btn.text(originalText).prop('disabled', false);
-                    hideUpdate(); // HIDE
+                    btn.prop('disabled', false).text(originalText);
                 }
             });
 
@@ -788,6 +777,7 @@
                         : '<span class="status-badge status-inactive">Inactive</span>';
 
                     let imgSrc = p.image;
+                    // Fix image paths for admin subdirectory
                     if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('../')) {
                         imgSrc = '../' + imgSrc;
                     }
@@ -927,6 +917,7 @@
             $('#previewBtn').click(function () {
                 let url = $('#prodImage').val();
                 if (url) {
+                    // Fix preview path
                     if (!url.startsWith('http') && !url.startsWith('../')) {
                         url = '../' + url;
                     }
@@ -969,6 +960,149 @@
                 } finally {
                     btn.text(originalText).prop('disabled', false);
                     hideUpdate(); // HIDE
+                }
+            });
+
+
+            // --- Tab Switching Logic ---
+            $('#mainAdminTabs button').on('click', function () {
+                $('#mainAdminTabs button').removeClass('active');
+                $(this).addClass('active');
+
+                const view = $(this).data('view');
+                if (view === 'products') {
+                    $('#productControls').removeClass('d-none');
+                    $('#productThead, #productTableBody').removeClass('d-none');
+                    $('#orderThead, #orderTableBody').addClass('d-none');
+                } else {
+                    $('#productControls').addClass('d-none');
+                    $('#productThead, #productTableBody').addClass('d-none');
+                    $('#orderThead, #orderTableBody').removeClass('d-none');
+                    renderOrders();
+                }
+            });
+
+            // --- Order Logic ---
+            async function renderOrders() {
+                const tbody = $('#orderTableBody');
+                tbody.html('<tr><td colspan="7" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>');
+
+                try {
+                    const orders = await AdminManager.getOrders();
+                    tbody.empty();
+
+                    if (orders.length === 0) {
+                        tbody.html('<tr><td colspan="7" class="text-center py-5">No orders found.</td></tr>');
+                        return;
+                    }
+
+                    orders.forEach(o => {
+                        const date = new Date(o.orderDate).toLocaleString();
+                        const itemsList = o.items.map(i => `<div class="small">• ${i.title} (x${i.quantity})</div>`).join('');
+
+                        // Status Options
+                        const statusOptions = ['New', 'Processing', 'Completed', 'Cancelled'].map(s =>
+                            `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`
+                        ).join('');
+
+                        // Payment Status Options (Default to Pending if undefined)
+                        const pStatus = o.paymentStatus || 'Pending';
+                        const payOptions = ['Pending', 'Paid', 'Failed', 'Refunded'].map(s =>
+                            `<option value="${s}" ${pStatus === s ? 'selected' : ''}>${s}</option>`
+                        ).join('');
+
+                        const row = `
+                            <tr>
+                                <td class="small text-muted">${date}</td>
+                                <td>
+                                    <div class="fw-bold">${o['first-name']} ${o['last-name']}</div>
+                                    <div class="small text-muted">${o.email}</div>
+                                    <div class="small text-muted">${o.number}</div>
+                                </td>
+                                <td>
+                                    <div class="small">${o['street-name']}, ${o.city}</div>
+                                    <div class="small text-muted">${o.paymentMethod}</div>
+                                </td>
+                                <td class="fw-bold text-success">₹${o.totalAmount}</td>
+                                
+                                <td>
+                                    <select class="form-select form-select-sm order-status-select text-white" 
+                                            data-id="${o.id}" 
+                                            style="width: 130px; background-color: ${getStatusColor(o.status)}; border:none;">
+                                        ${statusOptions}
+                                    </select>
+                                </td>
+                                
+                                <td>
+                                    <select class="form-select form-select-sm payment-status-select text-white" 
+                                            data-id="${o.id}" 
+                                            style="width: 110px; background-color: ${getPaymentColor(pStatus)}; border:none;">
+                                        ${payOptions}
+                                    </select>
+                                </td>
+
+                                <td>${itemsList}</td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                } catch (e) {
+                    console.error("Render Orders Error", e);
+                    tbody.html('<tr><td colspan="7" class="text-center text-danger">Error loading orders.</td></tr>');
+                }
+            }
+
+            function getStatusColor(status) {
+                switch (status) {
+                    case 'New': return '#0d6efd'; // Blue
+                    case 'Processing': return '#ffc107'; // Yellow
+                    case 'Completed': return '#198754'; // Green
+                    case 'Cancelled': return '#dc3545'; // Red
+                    default: return '#6c757d'; // Grey
+                }
+            }
+
+            function getPaymentColor(status) {
+                switch (status) {
+                    case 'Pending': return '#ffc107';
+                    case 'Paid': return '#198754';
+                    case 'Failed': return '#dc3545';
+                    case 'Refunded': return '#0dcaf0';
+                    default: return '#6c757d';
+                }
+            }
+
+            // Update Order Status Event
+            $(document).on('change', '.order-status-select', async function () {
+                const id = $(this).data('id');
+                const newStatus = $(this).val();
+                const select = $(this);
+
+                select.prop('disabled', true);
+                try {
+                    await AdminManager.updateOrderStatus(id, newStatus);
+                    select.css('background-color', getStatusColor(newStatus));
+                } catch (e) {
+                    alert("Failed to update status: " + e.message);
+                } finally {
+                    select.prop('disabled', false);
+                }
+            });
+
+            // Update Payment Status Event
+            $(document).on('change', '.payment-status-select', async function () {
+                const id = $(this).data('id');
+                const newStatus = $(this).val();
+                const select = $(this);
+
+                select.prop('disabled', true);
+                try {
+                    await AdminManager.updatePaymentStatus(id, newStatus);
+                    select.css('background-color', getPaymentColor(newStatus));
+                } catch (e) {
+                    alert("Failed to update status: " + e.message);
+                } finally {
+                    select.prop('disabled', false);
                 }
             });
 
