@@ -477,22 +477,23 @@ body {
     html {
         margin: 0;
         padding: 0;
-        height: auto;
-        overflow: visible;
         background: white;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     .app-container {
         display: block;
+        background: white;
         height: auto;
         overflow: visible;
-        background: white;
     }
 
     /* Hide UI elements */
     .no-print,
     .editor-panel,
-    .mobile-tabs {
+    .mobile-tabs,
+    .app-footer {
         display: none !important;
     }
 
@@ -502,34 +503,25 @@ body {
         padding: 0;
         margin: 0;
         background: white;
-        height: auto;
         width: 100%;
+        height: auto;
         overflow: visible;
         position: static;
-        /* Reset any flex/absolute positioning */
     }
 
     .resume-paper {
-        margin: 0;
-        padding: 15mm 20mm;
-        /* Keep margins */
-        box-shadow: none;
         width: 100%;
-        height: auto;
-        /* Allow growth */
-        min-height: 0;
-        background: white;
+        margin: 0;
+        padding: 10mm 15mm;
+        /* Adjusted margins for print */
+        box-shadow: none;
+        border: none;
         transform: none !important;
-        /* Remove any scale */
+        background: white;
     }
 
     /* Pagination / Breaks */
-    .r-section {
-        page-break-inside: avoid;
-        break-inside: avoid;
-    }
-
-    /* Allow breaks inside long lists if needed, but prefer keeping blocks together */
+    .r-section,
     .r-item-block {
         page-break-inside: avoid;
         break-inside: avoid;
@@ -585,6 +577,13 @@ body {
 
 /* Mobile Responsive Override */
 @media (max-width: 768px) {
+    body {
+        height: auto;
+        overflow-y: auto;
+        /* Enable vertical scolling */
+        overflow-x: hidden;
+    }
+
     .app-container {
         flex-direction: column;
         height: auto;
@@ -604,7 +603,16 @@ body {
         height: auto;
         overflow: visible;
         border-right: none;
+        padding: 1rem;
+        /* Reduced padding for mobile */
         padding-bottom: 80px;
+        display: block;
+        /* Default visible */
+    }
+
+    /* Stack form grid on mobile */
+    .form-grid {
+        grid-template-columns: 1fr;
     }
 
     .preview-panel {
@@ -612,20 +620,12 @@ body {
         /* Hidden by default */
         width: 100%;
         height: auto;
-        overflow: visible;
+        overflow-x: auto;
+        /* Allow horizontal scroll for A4 */
         padding: 0;
         justify-content: center;
-        /* Center paper */
-    }
-
-    .resume-paper {
-        width: 100%;
-        max-width: 210mm;
-        /* Limit width */
-        padding: 5mm;
-        min-height: auto;
-        box-shadow: none;
-        margin: 0 auto;
+        background: #525659;
+        /* Better contrast on mobile */
     }
 
     /* When preview is active */
@@ -635,7 +635,7 @@ body {
 
     .app-container.show-preview .preview-panel {
         display: flex;
-        /* Flex to center */
+        padding: 20px 0;
     }
 }
 
