@@ -1,10 +1,8 @@
 ﻿@charset "UTF-8";
 /*----------------------------------------------------------------------
-    Template Name: Ridda - Web Design & SEO HTML Template
-    Template URI: https://webtend.net/demo/html/ravelo/
-    Author: WebTend
-    Author URI:  https://webtend.net/
-    Version: 1.0
+    Site Name: Gridify
+    developed by : Abhinand & Abhijith
+    Version: 2.0
 
     Note: This is Main Style CSS File. */
 /*----------------------------------------------------------------------
@@ -8914,3 +8912,4 @@ blockquote {
 .toggle-switch.active .toggle-ball {
     transform: translateX(28px);
 }
+
