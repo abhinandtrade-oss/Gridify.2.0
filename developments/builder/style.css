@@ -45,7 +45,7 @@ body {
 .app-container {
     display: flex;
     height: 100vh;
-    width: 100vw;
+    width: 100%;
     background-color: var(--bg-dark);
 }
 
@@ -55,7 +55,8 @@ body {
     min-width: 380px;
     background: var(--panel-dark);
     padding: 2rem;
-    overflow-y: auto;
+    overflow: auto;
+    /* Changed from overflow-y to allow horizontal if needed */
     border-right: 1px solid var(--border-dark);
     color: var(--text-primary);
 }
@@ -227,7 +228,8 @@ body {
     background-color: #0f172a;
     /* Slate 900 for high contrast with paper */
     padding: 1rem;
-    overflow-y: auto;
+    overflow: auto;
+    /* Changed from overflow-y to allow horizontal scroll */
     display: flex;
     justify-content: center;
 }
@@ -477,23 +479,22 @@ body {
     html {
         margin: 0;
         padding: 0;
+        height: auto;
+        overflow: visible;
         background: white;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
     }
 
     .app-container {
         display: block;
-        background: white;
         height: auto;
         overflow: visible;
+        background: white;
     }
 
     /* Hide UI elements */
     .no-print,
     .editor-panel,
-    .mobile-tabs,
-    .app-footer {
+    .mobile-tabs {
         display: none !important;
     }
 
@@ -503,25 +504,34 @@ body {
         padding: 0;
         margin: 0;
         background: white;
-        width: 100%;
         height: auto;
+        width: 100%;
         overflow: visible;
         position: static;
+        /* Reset any flex/absolute positioning */
     }
 
     .resume-paper {
-        width: 100%;
         margin: 0;
-        padding: 10mm 15mm;
-        /* Adjusted margins for print */
+        padding: 15mm 20mm;
+        /* Keep margins */
         box-shadow: none;
-        border: none;
-        transform: none !important;
+        width: 100%;
+        height: auto;
+        /* Allow growth */
+        min-height: 0;
         background: white;
+        transform: none !important;
+        /* Remove any scale */
     }
 
     /* Pagination / Breaks */
-    .r-section,
+    .r-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Allow breaks inside long lists if needed, but prefer keeping blocks together */
     .r-item-block {
         page-break-inside: avoid;
         break-inside: avoid;
@@ -577,17 +587,26 @@ body {
 
 /* Mobile Responsive Override */
 @media (max-width: 768px) {
+
+    html,
     body {
-        height: auto;
-        overflow-y: auto;
-        /* Enable vertical scolling */
-        overflow-x: hidden;
+        height: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        /* Prevent horizontal sway */
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scrolling iOS */
     }
 
     .app-container {
         flex-direction: column;
-        height: auto;
-        overflow: visible;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 100vh;
+        overflow: visible !important;
     }
 
     .mobile-tabs {
@@ -595,37 +614,38 @@ body {
         position: sticky;
         top: 0;
         z-index: 100;
+        background: var(--bg-dark);
+        /* Ensure background is opaque for sticky */
     }
 
     .editor-panel {
         width: 100%;
-        min-width: 0;
-        height: auto;
-        overflow: visible;
+        min-width: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
         border-right: none;
-        padding: 1rem;
-        /* Reduced padding for mobile */
         padding-bottom: 80px;
-        display: block;
-        /* Default visible */
-    }
-
-    /* Stack form grid on mobile */
-    .form-grid {
-        grid-template-columns: 1fr;
     }
 
     .preview-panel {
         display: none;
         /* Hidden by default */
         width: 100%;
-        height: auto;
-        overflow-x: auto;
-        /* Allow horizontal scroll for A4 */
+        height: auto !important;
+        overflow: visible !important;
         padding: 0;
         justify-content: center;
-        background: #525659;
-        /* Better contrast on mobile */
+        /* Center paper */
+    }
+
+    .resume-paper {
+        width: 100%;
+        max-width: 210mm;
+        /* Limit width */
+        padding: 5mm;
+        min-height: auto;
+        box-shadow: none;
+        margin: 0 auto;
     }
 
     /* When preview is active */
@@ -635,7 +655,7 @@ body {
 
     .app-container.show-preview .preview-panel {
         display: flex;
-        padding: 20px 0;
+        /* Flex to center */
     }
 }
 
