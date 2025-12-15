@@ -12,13 +12,15 @@
     <!-- Favicon Icon -->
     <link rel="shortcut icon" href="assets/images/logos/favicon.png" type="image/x-icon">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        rel="stylesheet">
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <!-- Main Style -->
     <link rel="stylesheet" href="assets/css/style.css">
-    
+
     <style>
         .login-wrapper {
             min-height: 100vh;
@@ -26,17 +28,23 @@
             align-items: center;
             justify-content: center;
             background-color: #000;
-            background-image: url('assets/images/banner/banner.jpg'); /* Reuse banner if available or just black */
+            background-image: url('assets/images/banner/banner.jpg');
+            /* Reuse banner if available or just black */
             background-size: cover;
             background-position: center;
             position: relative;
         }
+
         .login-wrapper::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
         }
+
         .login-box {
             position: relative;
             background: #111;
@@ -45,23 +53,28 @@
             width: 100%;
             max-width: 400px;
             border: 1px solid #333;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
+
         .form-group label {
             color: #ccc;
             margin-bottom: 8px;
         }
+
         .form-control {
             background: #222;
             border: 1px solid #444;
             color: #fff;
         }
+
         .form-control:focus {
             background: #222;
             color: #fff;
-            border-color: #007bff; /* Or theme color */
+            border-color: #007bff;
+            /* Or theme color */
             box-shadow: none;
         }
+
         .error-msg {
             color: #ff4d4d;
             font-size: 14px;
@@ -76,10 +89,11 @@
     <div class="login-wrapper">
         <div class="login-box" data-aos="fade-up">
             <div class="text-center mb-30">
-                 <a href="index.html"><img src="assets/images/logos/logo.png" alt="Logo" style="max-height: 50px;"></a>
-                 <h4 class="mt-4 text-white">Admin Login</h4>
+                <a href="index.html"><img src="assets/images/logos/logo.png" alt="Logo"
+                        style="width: 100px; height: 100px; object-fit: contain;"></a>
+                <h4 class="mt-4 text-white">Admin Login</h4>
             </div>
-            
+
             <form id="loginForm">
                 <div class="form-group mb-20">
                     <label for="username">Username</label>
@@ -113,9 +127,9 @@
             window.location.href = 'list.html';
         }
 
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
-            
+
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
             const errorMsg = document.getElementById('errorMsg');
@@ -139,4 +153,5 @@
     </script>
 
 </body>
+
 </html>
