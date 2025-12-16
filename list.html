@@ -164,6 +164,14 @@
             box-shadow: 0 0 0 3px rgba(61, 114, 252, 0.1);
             border-color: #3d72fc;
         }
+
+        .hover-lift {
+            transition: transform 0.2s;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
     </style>
 </head>
 
@@ -192,10 +200,61 @@
                 <div id="loginError" class="text-danger small mb-3 text-center d-none">Invalid credentials</div>
                 <button type="submit" class="theme-btn w-100 justify-content-center">Login</button>
                 <div class="text-center mt-3">
-                    <a href="#" id="setupAdminLink" class="small text-muted" style="text-decoration: none;">Setup
-                        Initial Admin</a>
+                    <a href="#" id="setupAdminLink" class="small text-muted" style="text-decoration: none;"></a>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Selection (Hidden by default) -->
+    <div id="dashboardSelection" class="d-none"
+        style="min-height: 100vh; background: #f4f7fa; display: flex; align-items: center; justify-content: center;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold">Welcome, <span id="dashUsername" class="text-primary">User</span>!</h1>
+                <p class="text-muted">Select a workspace to continue.</p>
+                <button id="dashLogoutBtn" class="btn btn-outline-danger btn-sm mt-2">Logout</button>
+            </div>
+
+            <div class="row justify-content-center g-4">
+                <!-- Admin Panel Card -->
+                <div class="col-md-4 col-lg-3 d-none" id="cardAdminPanel">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                        <div class="mb-3">
+                            <i class="fas fa-user-cog fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="mb-3">Admin Panel</h4>
+                        <p class="text-muted small mb-4">Manage products, orders, coupons, and system users.</p>
+                        <button class="btn btn-primary w-100" id="btnGoAdmin">Access Panel</button>
+                    </div>
+                </div>
+
+                <!-- Scanner Card -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                        <div class="mb-3">
+                            <i class="fas fa-file-invoice fa-3x text-info"></i>
+                        </div>
+                        <h4 class="mb-3">Resume Scanner</h4>
+                        <p class="text-muted small mb-4">Beta Feature: AI-powered resume scanning and scoring.</p>
+                        <a href="developments/Scanner/index.html" class="btn btn-outline-info w-100"
+                            target="_self">Launch Beta</a>
+                    </div>
+                </div>
+
+                <!-- Builder Card -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                        <div class="mb-3">
+                            <i class="fas fa-pencil-ruler fa-3x text-success"></i>
+                        </div>
+                        <h4 class="mb-3">Resume Builder</h4>
+                        <p class="text-muted small mb-4">Beta Feature: Create ATS-friendly resumes easily.</p>
+                        <a href="developments/builder/index.html" class="btn btn-outline-success w-100"
+                            target="_self">Launch Beta</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -419,9 +478,15 @@
                         <!-- Users Tab -->
                         <div class="tab-pane fade" id="users-panel">
                             <div class="row g-2 mb-3 align-items-end">
-                                <div class="col-md-8"><input type="text" id="new-user-name" class="form-control"
+                                <div class="col-md-5"><input type="text" id="new-user-name" class="form-control"
                                         placeholder="New Username"></div>
-                                <div class="col-md-4"><button class="btn btn-success w-100" id="btn-add-user">Create
+                                <div class="col-md-4">
+                                    <select id="new-user-role" class="form-select">
+                                        <option value="admin">Admin</option>
+                                        <option value="early-access">Early Access</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3"><button class="btn btn-success w-100" id="btn-add-user">Create
                                         User</button></div>
                             </div>
                             <p class="text-muted small">New users will get a random password.</p>
@@ -472,7 +537,7 @@
             // --- Authentication (AdminManager) ---
             const session = AdminManager.getSession();
             if (session) {
-                initAdminUI(session);
+                showDashboard(session);
             }
 
             $('#loginForm').on('submit', async function (e) {
@@ -488,7 +553,7 @@
                 const result = await AdminManager.login(u, p);
 
                 if (result.success) {
-                    initAdminUI(AdminManager.getSession());
+                    showDashboard(AdminManager.getSession());
                 } else {
                     alert(result.message);
                     $('#loginError').removeClass('d-none').text(result.message);
@@ -496,7 +561,7 @@
                 btn.text(originalText).prop('disabled', false);
             });
 
-            $('#logoutBtn, #btn-logout').click(function () {
+            $('#logoutBtn, #btn-logout, #dashLogoutBtn').click(function () {
                 AdminManager.logout();
             });
 
@@ -510,8 +575,35 @@
                 btn.text('Setup Initial Admin');
             });
 
+            function showDashboard(session) {
+                $('#loginSection').addClass('d-none');
+                $('#adminSection').addClass('d-none');
+                $('#dashboardSelection').removeClass('d-none').addClass('d-flex');
+
+                $('#dashUsername').text(session.username);
+
+                // Role Check
+                if (session.role === 'admin') {
+                    $('#cardAdminPanel').removeClass('d-none');
+                } else {
+                    $('#cardAdminPanel').addClass('d-none');
+                }
+            }
+
+            // Dashboard Actions
+            $('#btnGoAdmin').click(function () {
+                const session = AdminManager.getSession();
+                if (session && session.role === 'admin') {
+                    initAdminUI(session);
+                } else {
+                    alert("Unauthorized Access");
+                    window.location.reload();
+                }
+            });
+
             function initAdminUI(session) {
                 $('#loginSection').addClass('d-none');
+                $('#dashboardSelection').addClass('d-none').removeClass('d-flex');
                 $('#adminSection').removeClass('d-none');
 
                 // Initialize Auto Logout
@@ -637,13 +729,14 @@
 
             $('#btn-add-user').on('click', async function () {
                 const newUser = $('#new-user-name').val();
+                const newRole = $('#new-user-role').val();
                 if (!newUser) return;
 
                 const btn = $(this);
                 btn.prop('disabled', true).text('Creating...');
 
                 try {
-                    const pass = await AdminManager.addUser(newUser);
+                    const pass = await AdminManager.addUser(newUser, newRole);
                     if (pass) {
                         alert(`User Created!\nUsername: ${newUser}\nPassword: ${pass}`);
                         $('#new-user-name').val('');
