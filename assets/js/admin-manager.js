@@ -118,7 +118,7 @@ class AdminManager {
         }
     }
 
-    static async addUser(newUser) {
+    static async addUser(newUser, role = 'admin') {
         const newPass = Math.random().toString(36).slice(-8);
         const session = this.getSession();
 
@@ -131,12 +131,10 @@ class AdminManager {
             if (!snap.empty) throw new Error("User already exists");
 
             // Add user
-            // We use the username as Document ID for easier lookups/updates if we want, 
-            // or let Firestore generate ID. Let's use Firestore ID but store username fields.
             await addDoc(collection(db, USERS_COLLECTION), {
                 username: newUser,
                 password: newPass, // Storing plaintext as requested/migrated
-                role: 'admin',
+                role: role,
                 status: 'active',
                 createdAt: new Date().toISOString()
             });
