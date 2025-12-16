@@ -14,7 +14,7 @@
     if (!session || (session.role !== 'admin' && session.role !== 'early-access')) {
         // If we are not in the list.html page (to avoid infinite loop if logic was different)
         // Redirect to list.html
-        window.location.href = '../../list.html';
+        window.location.href = '../../login/';
     }
 
     // Auto logout on reload -> Clears session when page is unloaded
