@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="description" content="Gridify Admin Portal">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Gridify - Product Management</title>
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" href="../assets/images/logos/favicon.png" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../assets/css/fontawesome-5.14.0.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <script>
+        // Remove .html extension from URL
+        if (window.location.pathname.endsWith("index.html")) {
+            var newPath = window.location.pathname.replace(/index\.html$/, "");
+            window.history.replaceState(null, "", newPath);
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f4f7fa;
+            color: #333;
+        }
+
+        /* Login Styles */
+        .login-wrapper {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header h3 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        /* Admin Styles */
+        .admin-header {
+            background: white;
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        .admin-title {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .product-img-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-inactive {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+
+        .table-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 3px;
+            transition: all 0.3s;
+            border: none;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #3d72fc;
+        }
+
+        .btn-edit:hover {
+            background-color: #2a5bdc;
+        }
+
+        .btn-delete {
+            background-color: #ff4757;
+        }
+
+        .btn-delete:hover {
+            background-color: #e0404e;
+        }
+
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #f0f0f0;
+            padding: 20px 30px;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 0 3px rgba(61, 114, 252, 0.1);
+            border-color: #3d72fc;
+        }
+
+        .hover-lift {
+            transition: transform 0.2s;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Offline Alert -->
+    <div id="offlineAlert" class="alert alert-danger fixed-top m-0 rounded-0 text-center d-none" style="z-index: 9999;">
+        <i class="fas fa-wifi-slash me-2"></i> <strong>Offline Mode:</strong> No internet connection. Changes will be
+        saved locally and sync when online.
+    </div>
+
+    <!-- Login Dialog (Visible by default) -->
+    <div id="loginSection" class="login-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <h3>Admin Login</h3>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" id="username" class="form-control" placeholder="Enter username" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+                </div>
+                <div id="loginError" class="text-danger small mb-3 text-center d-none">Invalid credentials</div>
+                <button type="submit" class="theme-btn w-100 justify-content-center">Login</button>
+                <div class="text-center mt-3">
+                    <a href="#" id="setupAdminLink" class="small text-muted" style="text-decoration: none;"></a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Selection (Hidden by default) -->
+    <div id="dashboardSelection" class="d-none"
+        style="min-height: 100vh; background: #f4f7fa; display: flex; align-items: center; justify-content: center;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold">Welcome, <span id="dashUsername" class="text-primary">User</span>!</h1>
+                <p class="text-muted">Select a workspace to continue.</p>
+                <button id="dashLogoutBtn" class="btn btn-outline-danger btn-sm mt-2">Logout</button>
+            </div>
+
+            <div class="row justify-content-center g-4">
+                <!-- Admin Panel Card -->
+                <div class="col-md-4 col-lg-3 d-none" id="cardAdminPanel">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                        <div class="mb-3">
+                            <i class="fas fa-user-cog fa-3x text-primary"></i>
+                        </div>
+                        <h4 class="mb-3">Admin Panel</h4>
+                        <p class="text-muted small mb-4">Manage products, orders, coupons, and system users.</p>
+                        <button class="btn btn-primary w-100" id="btnGoAdmin">Access Panel</button>
+                    </div>
+                </div>
+
+                <!-- Scanner Card -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                        <div class="mb-3">
+                            <i class="fas fa-file-invoice fa-3x text-info"></i>
+                        </div>
+                        <h4 class="mb-3">Resume Scanner</h4>
+                        <p class="text-muted small mb-4">Beta Feature: AI-powered resume scanning and scoring.</p>
+                        <a href="../developments/Scanner/index.html" class="btn btn-outline-info w-100"
+                            target="_self">Launch Beta</a>
+                    </div>
+                </div>
+
+                <!-- Builder Card -->
+                <div class="col-md-4 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                        <div class="mb-3">
+                            <i class="fas fa-pencil-ruler fa-3x text-success"></i>
+                        </div>
+                        <h4 class="mb-3">Resume Builder</h4>
+                        <p class="text-muted small mb-4">Beta Feature: Create ATS-friendly resumes easily.</p>
+                        <a href="../developments/builder/index.html" class="btn btn-outline-success w-100"
+                            target="_self">Launch Beta</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Interface (Hidden by default) -->
+    <div id="adminSection" class="d-none">
+        <header class="admin-header">
+            <div class="container d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <h1 class="admin-title">Product Manager</h1>
+                    <span id="syncStatus" class="badge bg-warning text-dark d-none">Syncing...</span>
+                </div>
+                <div>
+                    <a href="../shop.html" class="btn btn-outline-dark me-2" target="_blank">View Shop</a>
+                    <button id="logoutBtn" class="btn btn-danger">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mb-5">
+            <div class="table-card">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+                    <ul class="nav nav-pills mb-3" id="mainAdminTabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-view="products">Products</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-view="orders">Orders</button>
+                        </li>
+                    </ul>
+
+                    <!-- Product Controls (Hidden when Order tab active) -->
+                    <div class="d-flex gap-2" id="productControls">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search products..."
+                            style="width: 250px;">
+                        <select id="categoryFilter" class="form-select" style="width: 150px;">
+                            <option value="">All Categories</option>
+                        </select>
+                        <button class="btn btn-outline-primary me-2" id="btn-management">
+                            <i class="fas fa-cogs me-2"></i>Management
+                        </button>
+                        <button class="theme-btn btn-small" data-bs-toggle="modal" data-bs-target="#productModal"
+                            onclick="resetForm()">
+                            <i class="fas fa-plus me-2"></i> Add New
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead class="bg-light" id="productThead">
+                            <tr>
+                                <th>Image</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <!-- Rows rendered by JS -->
+                        </tbody>
+
+                        <!-- Order Table Header (Hidden by default) -->
+                        <thead class="bg-light d-none" id="orderThead">
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Details</th>
+                                <th>Total</th>
+                                <th>Order Status</th>
+                                <th>Payment Status</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderTableBody" class="d-none"></tbody>
+                    </table>
+                </div>
+
+                <div id="noResults" class="text-center py-5 d-none">
+                    <p class="text-muted">No products found matching your criteria.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Product Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Add New Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="prodId">
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Product Name *</label>
+                                <input type="text" id="prodName" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category *</label>
+                                <input type="text" id="prodCategory" class="form-control" list="categoryOptions"
+                                    required>
+                                <datalist id="categoryOptions">
+                                    <option value="Website">
+                                    <option value="Package">
+                                    <option value="Addons">
+                                    <option value="UI/UX">
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Price (₹) *</label>
+                                <input type="number" id="prodPrice" class="form-control" min="0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Active Status</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="prodActive" checked>
+                                    <label class="form-check-label" for="prodActive">Visible in Shop</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Image URL *</label>
+                            <div class="input-group">
+                                <input type="text" id="prodImage" class="form-control"
+                                    placeholder="assets/images/products/..." required>
+                                <button class="btn btn-outline-secondary" type="button" id="previewBtn">Preview</button>
+                            </div>
+                            <small class="text-muted">Enter a URL or path to an image file.</small>
+                            <div id="imagePreview" class="mt-2 d-none">
+                                <img src="" alt="Preview" style="height: 100px; border-radius: 8px;">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea id="prodDesc" class="form-control" rows="4"></textarea>
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="theme-btn btn-small">Save Product</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Modal -->
+    <div class="modal fade" id="managementModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">System Management</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs mb-3" id="manageTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="coupons-tab" data-bs-toggle="tab"
+                                data-bs-target="#coupons-panel" type="button">Coupons</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" id="password-tab" data-bs-toggle="tab"
+                                data-bs-target="#password-panel" type="button">Change Password</button>
+                        </li>
+                        <li class="nav-item" id="users-tab-li" style="display: none;">
+                            <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-panel"
+                                type="button">All Users</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <!-- Coupons Tab -->
+                        <div class="tab-pane fade show active" id="coupons-panel">
+                            <div class="row g-2 mb-3 align-items-end">
+                                <div class="col-md-3"><input type="text" id="new-coupon-code" class="form-control"
+                                        placeholder="Code (e.g. SALE10)"></div>
+                                <div class="col-md-3">
+                                    <select id="new-coupon-type" class="form-select">
+                                        <option value="percent">Percentage (%)</option>
+                                        <option value="fixed">Fixed Amount (₹)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3"><input type="number" id="new-coupon-value" class="form-control"
+                                        placeholder="Value"></div>
+                                <div class="col-md-3"><button class="btn btn-primary w-100" id="btn-add-coupon">Add
+                                        Coupon</button></div>
+                            </div>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Type</th>
+                                        <th>Value</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="coupon-list-body"></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Password Tab -->
+                        <div class="tab-pane fade" id="password-panel">
+                            <div class="mb-3"><input type="password" id="old-pass" class="form-control"
+                                    placeholder="Old Password"></div>
+                            <div class="mb-3"><input type="password" id="new-pass" class="form-control"
+                                    placeholder="New Password"></div>
+                            <button class="btn btn-warning" id="btn-change-pass">Update Password</button>
+                        </div>
+
+                        <!-- Users Tab -->
+                        <div class="tab-pane fade" id="users-panel">
+                            <div class="row g-2 mb-3 align-items-end">
+                                <div class="col-md-5"><input type="text" id="new-user-name" class="form-control"
+                                        placeholder="New Username"></div>
+                                <div class="col-md-4">
+                                    <select id="new-user-role" class="form-select">
+                                        <option value="admin">Admin</option>
+                                        <option value="early-access">Early Access</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3"><button class="btn btn-success w-100" id="btn-add-user">Create
+                                        User</button></div>
+                            </div>
+                            <p class="text-muted small">New users will get a random password.</p>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="user-list-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery -->
+    <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../assets/js/bootstrap.min.js"></script>
+    <!-- Product Manager Logic -->
+    <script type="module" src="../assets/js/product-manager.js"></script>
+    <script type="module" src="../assets/js/admin-manager.js"></script>
+    <script type="module">
+        import { AdminManager } from '../assets/js/admin-manager.js';
+        import ProductManager from '../assets/js/product-manager.js';
+
+        $(document).ready(function () {
+            // --- Network Status Logic ---
+            function updateOnlineStatus() {
+                if (navigator.onLine) {
+                    $('#offlineAlert').addClass('d-none');
+                    $('#syncStatus').text('Syncing...').removeClass('bg-danger').addClass('bg-warning');
+                } else {
+                    $('#offlineAlert').removeClass('d-none');
+                    $('#syncStatus').text('Offline').removeClass('bg-warning').addClass('bg-danger').removeClass('d-none');
+                }
+            }
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus();
+
+            // --- Authentication (AdminManager) ---
+            const session = AdminManager.getSession();
+            if (session) {
+                showDashboard(session);
+            }
+
+            $('#loginForm').on('submit', async function (e) {
+                e.preventDefault();
+                const u = $('#username').val();
+                const p = $('#password').val();
+
+                // Show verifying state
+                const btn = $(this).find('button');
+                const originalText = btn.text();
+                btn.text("Verifying...").prop('disabled', true);
+
+                const result = await AdminManager.login(u, p);
+
+                if (result.success) {
+                    showDashboard(AdminManager.getSession());
+                } else {
+                    alert(result.message);
+                    $('#loginError').removeClass('d-none').text(result.message);
+                }
+                btn.text(originalText).prop('disabled', false);
+            });
+
+            $('#logoutBtn, #btn-logout, #dashLogoutBtn').click(function () {
+                AdminManager.logout();
+            });
+
+            // Setup Admin Link
+            $('#setupAdminLink').click(async function (e) {
+                e.preventDefault();
+                const btn = $(this);
+                btn.text('Setting up...');
+                const res = await AdminManager.setupInitialAdmin();
+                alert(res.message);
+                btn.text('Setup Initial Admin');
+            });
+
+            function showDashboard(session) {
+                $('#loginSection').addClass('d-none');
+                $('#adminSection').addClass('d-none');
+                $('#dashboardSelection').removeClass('d-none').addClass('d-flex');
+
+                $('#dashUsername').text(session.username);
+
+                // Role Check
+                if (session.role === 'admin') {
+                    $('#cardAdminPanel').removeClass('d-none');
+                } else {
+                    $('#cardAdminPanel').addClass('d-none');
+                }
+            }
+
+            // Dashboard Actions
+            $('#btnGoAdmin').click(function () {
+                const session = AdminManager.getSession();
+                if (session && session.role === 'admin') {
+                    initAdminUI(session);
+                } else {
+                    alert("Unauthorized Access");
+                    window.location.reload();
+                }
+            });
+
+            function initAdminUI(session) {
+                $('#loginSection').addClass('d-none');
+                $('#dashboardSelection').addClass('d-none').removeClass('d-flex');
+                $('#adminSection').removeClass('d-none');
+
+                // Initialize Auto Logout
+                AdminManager.initAutoLogout();
+
+                // Load Products
+                renderProducts();
+                populateFilters();
+
+                // Setup specific UI role checks
+                if (session.username === 'abhinand') {
+                    $('#users-tab-li').show();
+                }
+            }
+
+            // --- Management Modal Logic ---
+            var managementModalObj = null; // Store instance
+
+            $('#btn-management').on('click', function () {
+                console.log("Management Button Clicked");
+                const modalEl = document.getElementById('managementModal');
+                if (modalEl) {
+                    if (!managementModalObj) {
+                        try {
+                            managementModalObj = new bootstrap.Modal(modalEl);
+                        } catch (e) { console.error("Modal Init Error", e); }
+                    }
+                    if (managementModalObj) managementModalObj.show();
+
+                    console.log("Loading Coupons...");
+                    loadCoupons().catch(err => {
+                        console.error("Failed to load coupons:", err);
+                        alert("Error loading management data: " + err.message);
+                    });
+                } else {
+                    console.error("Management Modal Element NOT found!");
+                }
+            });
+
+            // Tabs
+            $('#coupons-tab').on('click', loadCoupons);
+            $('#users-tab').on('click', loadUsers);
+
+            // Coupons
+            async function loadCoupons() {
+                try {
+                    const coupons = await AdminManager.getCoupons();
+                    console.log("Coupons loaded:", coupons);
+                    const tbody = $('#coupon-list-body');
+                    tbody.empty();
+
+                    if (!Array.isArray(coupons)) {
+                        console.error("Coupons response is not an array:", coupons);
+                        return;
+                    }
+
+                    coupons.forEach(c => {
+                        const row = `<tr>
+                            <td>${c.code}</td>
+                            <td>${c.type}</td>
+                            <td>${c.value}</td>
+                            <td><button class="btn btn-sm btn-danger" onclick="deleteCoupon('${c.code}')">Delete</button></td>
+                        </tr>`;
+                        tbody.append(row);
+                    });
+                } catch (e) {
+                    console.error("Error in loadCoupons:", e);
+                    throw e; // Propagate to caller
+                }
+            }
+
+            $('#btn-add-coupon').on('click', async function () {
+                const code = $('#new-coupon-code').val();
+                const type = $('#new-coupon-type').val();
+                const value = $('#new-coupon-value').val();
+                if (!code || !value) return;
+
+                const btn = $(this);
+                btn.prop('disabled', true).text('Adding...');
+
+                try {
+                    await AdminManager.addCoupon(code, type, value);
+                    $('#new-coupon-code').val('');
+                    $('#new-coupon-value').val('');
+                    await loadCoupons();
+                } catch (e) {
+                    alert("Error adding coupon: " + e.message);
+                } finally {
+                    btn.prop('disabled', false).text('Add Coupon');
+                }
+            });
+
+            window.deleteCoupon = async function (code) {
+                if (confirm("Delete this coupon?")) {
+                    await AdminManager.deleteCoupon(code);
+                    loadCoupons();
+                }
+            }
+
+            // Users
+            async function loadUsers() {
+                const users = await AdminManager.getUsers();
+                const tbody = $('#user-list-body');
+                tbody.empty();
+                users.forEach(u => {
+                    if (u.username === 'abhinand') return;
+
+                    const statusBtn = u.status === 'active'
+                        ? `<button class="btn btn-sm btn-warning" onclick="toggleUser('${u.username}')">Suspend</button>`
+                        : `<button class="btn btn-sm btn-success" onclick="toggleUser('${u.username}')">Activate</button>`;
+
+                    const deleteBtn = `<button class="btn btn-sm btn-danger custom-user-delete" onclick="deleteUser('${u.username}')">Delete</button>`;
+
+                    const row = `<tr>
+                        <td>${u.username}</td>
+                        <td>${u.role}</td>
+                        <td>${u.status}</td>
+                        <td>${statusBtn} ${deleteBtn}</td>
+                    </tr>`;
+                    tbody.append(row);
+                });
+            }
+
+            $('#btn-add-user').on('click', async function () {
+                const newUser = $('#new-user-name').val();
+                const newRole = $('#new-user-role').val();
+                if (!newUser) return;
+
+                const btn = $(this);
+                btn.prop('disabled', true).text('Creating...');
+
+                try {
+                    const pass = await AdminManager.addUser(newUser, newRole);
+                    if (pass) {
+                        alert(`User Created!\nUsername: ${newUser}\nPassword: ${pass}`);
+                        $('#new-user-name').val('');
+                        loadUsers();
+                    } else {
+                        alert("Failed to create user. Check console for details.");
+                    }
+                } catch (e) {
+                    alert("Error: " + e.message);
+                } finally {
+                    btn.prop('disabled', false).text('Create User');
+                }
+            });
+
+            window.toggleUser = async function (u) {
+                await AdminManager.toggleUserStatus(u);
+                loadUsers();
+            }
+
+            window.deleteUser = async function (u) {
+                if (confirm(`Delete user ${u}?`)) {
+                    await AdminManager.deleteUser(u);
+                    loadUsers();
+                }
+            }
+
+            // Password
+            $('#btn-change-pass').on('click', async function () {
+                const oldP = $('#old-pass').val();
+                const newP = $('#new-pass').val();
+
+                if (!oldP || !newP) {
+                    alert("Please enter both old and new passwords.");
+                    return;
+                }
+
+                // UI Feedback
+                const btn = $(this);
+                const originalText = btn.text();
+                btn.prop('disabled', true).text('Updating...');
+
+                try {
+                    const res = await AdminManager.changePassword(oldP, newP);
+                    if (res.status === 'success') {
+                        alert("Password Changed! Please login again.");
+                        AdminManager.logout();
+                    } else {
+                        alert(res.message);
+                    }
+                } catch (e) {
+                    alert("Error: " + e.message);
+                } finally {
+                    btn.prop('disabled', false).text(originalText);
+                }
+            });
+
+
+            // --- Product Management Logic ---
+            let productModal;
+
+            // Initialize Modal
+            try {
+                productModal = new bootstrap.Modal(document.getElementById('productModal'));
+            } catch (e) { console.log('Bootstrap modal init error', e); }
+
+            // Render Products with Stale-while-revalidate strategy
+            async function renderProducts(isBackgroundSync = false) {
+                const tbody = $('#productTableBody');
+                const syncBadge = $('#syncStatus');
+
+                // 1. Try to show local data IMMEDIATELY (if not a background sync update)
+                if (!isBackgroundSync) {
+                    const localData = ProductManager.getLocalProducts();
+                    if (localData.length > 0) {
+                        renderTableRows(localData);
+                        // Show "Syncing..." indicator
+                        if (syncBadge.length) syncBadge.removeClass('d-none').text('Syncing with cloud...');
+                    } else {
+                        // No local data, show full spinner
+                        tbody.html('<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">Loading products from cloud...</div></td></tr>');
+                    }
+                }
+
+                try {
+                    // 2. Fetch Fresh Data from Cloud
+                    // This updates localStorage internally too
+                    const cloudProducts = await ProductManager.getAllProducts();
+
+                    // 3. Re-render with fresh data
+                    renderTableRows(cloudProducts);
+
+                    if (syncBadge.length) syncBadge.addClass('d-none'); // Hide syncing badge
+
+                } catch (e) {
+                    console.error("Cloud Error", e);
+                    // If we have local data, we just stay on that and maybe show error toast
+                    // If we had nothing, show error
+                    if (tbody.children().length === 0 || tbody.text().includes('Loading')) {
+                        tbody.html('<tr><td colspan="6" class="text-center text-danger py-4">Error loading products. Please check your internet connection.</td></tr>');
+                    }
+                }
+            }
+
+            // Helper to render the table rows from a data array
+            function renderTableRows(products) {
+                const tbody = $('#productTableBody');
+                const searchTerm = $('#searchInput').val().toLowerCase();
+                const categoryFilter = $('#categoryFilter').val();
+
+                tbody.empty();
+
+                let matches = 0;
+
+                products.forEach(p => {
+                    // Filter Logic
+                    if (searchTerm && !p.itemName.toLowerCase().includes(searchTerm)) return;
+                    if (categoryFilter && p.itemCategory !== categoryFilter) return;
+
+                    matches++;
+
+                    const statusBadge = p.isActive
+                        ? '<span class="status-badge status-active">Active</span>'
+                        : '<span class="status-badge status-inactive">Inactive</span>';
+
+                    let imgSrc = p.image;
+                    // Fix image paths for admin subdirectory
+                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('../')) {
+                        imgSrc = '../' + imgSrc;
+                    }
+
+                    const row = `
+                        <tr>
+                            <td><img src="${imgSrc}" class="product-img-preview" alt="img" onerror="this.src='../assets/images/logos/favicon.png'"></td>
+                            <td>
+                                <div class="fw-bold">${p.itemName}</div>
+                                <div class="small text-muted">ID: ${p.id}</div>
+                            </td>
+                            <td><span class="badge bg-light text-dark border">${p.itemCategory}</span></td>
+                            <td class="fw-bold">₹${p.price}</td>
+                            <td>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input toggle-status" type="checkbox" data-id="${p.id}" ${p.isActive ? 'checked' : ''}>
+                                    <label class="form-check-label">${statusBadge}</label>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <button class="action-btn btn-edit" data-id="${p.id}" title="Edit"><i class="fas fa-pen"></i></button>
+                                <button class="action-btn btn-delete" data-id="${p.id}" title="Delete"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+
+                if (matches === 0) {
+                    $('#noResults').removeClass('d-none');
+                } else {
+                    $('#noResults').addClass('d-none');
+                }
+            }
+
+            // Populate Category Filter
+            async function populateFilters() {
+                const products = await ProductManager.getAllProducts();
+                const categories = [...new Set(products.map(p => p.itemCategory))];
+                const select = $('#categoryFilter');
+                select.find('option:gt(0)').remove();
+                categories.forEach(c => {
+                    select.append(`<option value="${c}">${c}</option>`);
+                });
+            }
+
+            // Event Listeners for Filters
+            $('#searchInput').on('keyup', renderProducts);
+            $('#categoryFilter').on('change', renderProducts);
+
+            // --- Update Indicator Logic ---
+            const updateIndicator = $('<div id="updateIndicator" class="alert alert-info fixed-top m-0 rounded-0 text-center d-none" style="z-index: 9999;"><i class="fas fa-sync fa-spin me-2"></i> Processing Update...</div>');
+            $('body').prepend(updateIndicator);
+
+            function showUpdate() { updateIndicator.removeClass('d-none'); }
+            function hideUpdate() { updateIndicator.addClass('d-none'); }
+
+            // Toggle Status
+            $(document).on('change', '.toggle-status', async function () {
+                const id = $(this).data('id');
+                const checkbox = $(this);
+                checkbox.prop('disabled', true);
+
+                showUpdate(); // SHOW
+
+                try {
+                    await ProductManager.toggleStatus(id);
+                    renderProducts();
+                } catch (e) {
+                    console.error(e);
+                    alert("Update failed: " + e.message);
+                } finally {
+                    hideUpdate(); // HIDE
+                }
+            });
+
+            // Delete Product
+            $(document).on('click', '.btn-delete', async function () {
+                if (confirm('Are you sure you want to delete this product?')) {
+                    const btn = $(this);
+                    const originalHtml = btn.html();
+                    btn.html('<span class="spinner-border spinner-border-sm"></span>').prop('disabled', true);
+                    const id = btn.data('id');
+
+                    showUpdate(); // SHOW
+
+                    try {
+                        await ProductManager.deleteProduct(id);
+                        renderProducts();
+                        populateFilters();
+                    } catch (e) {
+                        alert("Delete failed: " + e.message);
+                        btn.html(originalHtml).prop('disabled', false);
+                    } finally {
+                        hideUpdate(); // HIDE
+                    }
+                }
+            });
+
+            // Add/Edit Product
+            window.resetForm = function () {
+                $('#productForm')[0].reset();
+                $('#prodId').val('');
+                $('#modalTitle').text('Add New Product');
+                $('#prodActive').prop('checked', true);
+                $('#imagePreview').addClass('d-none');
+            };
+
+            $(document).on('click', '.btn-edit', function () {
+                const id = $(this).data('id').toString();
+                const products = ProductManager.getLocalProducts();
+                const p = products.find(x => String(x.id) === id);
+
+                if (p) {
+                    $('#modalTitle').text('Edit Product');
+                    $('#prodId').val(p.id);
+                    $('#prodName').val(p.itemName);
+                    $('#prodCategory').val(p.itemCategory);
+                    $('#prodPrice').val(p.price);
+                    $('#prodImage').val(p.image);
+                    $('#prodDesc').val(p.description);
+                    $('#prodActive').prop('checked', p.isActive);
+
+                    // Show preview
+                    $('#imagePreview').removeClass('d-none');
+                    let imgSrc = p.image;
+                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('../')) {
+                        imgSrc = '../' + imgSrc;
+                    }
+                    $('#imagePreview img').attr('src', imgSrc);
+
+                    productModal.show();
+                }
+            });
+
+            // Image Preview Logic
+            $('#previewBtn').click(function () {
+                let url = $('#prodImage').val();
+                if (url) {
+                    // Fix preview path
+                    if (!url.startsWith('http') && !url.startsWith('../')) {
+                        url = '../' + url;
+                    }
+                    $('#imagePreview').removeClass('d-none');
+                    $('#imagePreview img').attr('src', url);
+                }
+            });
+
+            $('#prodImage').on('input', function () {
+                // Optional
+            });
+
+            // Save Product
+            $('#productForm').on('submit', async function (e) {
+                e.preventDefault();
+                const btn = $(this).find('button[type="submit"]');
+                const originalText = btn.text();
+                btn.text('Saving...').prop('disabled', true);
+
+                showUpdate(); // SHOW
+
+                try {
+                    const productData = {
+                        id: $('#prodId').val(),
+                        itemName: $('#prodName').val(),
+                        itemCategory: $('#prodCategory').val(),
+                        price: parseFloat($('#prodPrice').val()),
+                        description: $('#prodDesc').val(),
+                        image: $('#prodImage').val(),
+                        isActive: $('#prodActive').is(':checked')
+                    };
+
+                    await ProductManager.saveProduct(productData);
+                    productModal.hide();
+                    renderProducts();
+                    populateFilters();
+                } catch (error) {
+                    console.error(error);
+                    alert('Error saving product: ' + error.message);
+                } finally {
+                    btn.text(originalText).prop('disabled', false);
+                    hideUpdate(); // HIDE
+                }
+            });
+
+
+            // --- Tab Switching Logic ---
+            $('#mainAdminTabs button').on('click', function () {
+                $('#mainAdminTabs button').removeClass('active');
+                $(this).addClass('active');
+
+                const view = $(this).data('view');
+                if (view === 'products') {
+                    $('#productControls').removeClass('d-none');
+                    $('#productThead, #productTableBody').removeClass('d-none');
+                    $('#orderThead, #orderTableBody').addClass('d-none');
+                } else {
+                    $('#productControls').addClass('d-none');
+                    $('#productThead, #productTableBody').addClass('d-none');
+                    $('#orderThead, #orderTableBody').removeClass('d-none');
+                    renderOrders();
+                }
+            });
+
+            // --- Order Logic ---
+            async function renderOrders() {
+                const tbody = $('#orderTableBody');
+                tbody.html('<tr><td colspan="7" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>');
+
+                try {
+                    const orders = await AdminManager.getOrders();
+                    tbody.empty();
+
+                    if (orders.length === 0) {
+                        tbody.html('<tr><td colspan="7" class="text-center py-5">No orders found.</td></tr>');
+                        return;
+                    }
+
+                    orders.forEach(o => {
+                        const date = new Date(o.orderDate).toLocaleString();
+                        const itemsList = o.items.map(i => `<div class="small">• ${i.title} (x${i.quantity})</div>`).join('');
+
+                        // Status Options
+                        const statusOptions = ['New', 'Processing', 'Completed', 'Cancelled'].map(s =>
+                            `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`
+                        ).join('');
+
+                        // Payment Status Options (Default to Pending if undefined)
+                        const pStatus = o.paymentStatus || 'Pending';
+                        const payOptions = ['Pending', 'Paid', 'Failed', 'Refunded'].map(s =>
+                            `<option value="${s}" ${pStatus === s ? 'selected' : ''}>${s}</option>`
+                        ).join('');
+
+                        const row = `
+                            <tr>
+                                <td class="small text-muted">${date}</td>
+                                <td>
+                                    <div class="fw-bold">${o['first-name']} ${o['last-name']}</div>
+                                    <div class="small text-muted">${o.email}</div>
+                                    <div class="small text-muted">${o.number}</div>
+                                </td>
+                                <td>
+                                    <div class="small">${o['street-name']}, ${o.city}</div>
+                                    <div class="small text-muted">${o.paymentMethod}</div>
+                                </td>
+                                <td class="fw-bold text-success">₹${o.totalAmount}</td>
+                                
+                                <td>
+                                    <select class="form-select form-select-sm order-status-select text-white" 
+                                            data-id="${o.id}" 
+                                            style="width: 130px; background-color: ${getStatusColor(o.status)}; border:none;">
+                                        ${statusOptions}
+                                    </select>
+                                </td>
+                                
+                                <td>
+                                    <select class="form-select form-select-sm payment-status-select text-white" 
+                                            data-id="${o.id}" 
+                                            style="width: 110px; background-color: ${getPaymentColor(pStatus)}; border:none;">
+                                        ${payOptions}
+                                    </select>
+                                </td>
+
+                                <td>${itemsList}</td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                } catch (e) {
+                    console.error("Render Orders Error", e);
+                    tbody.html('<tr><td colspan="7" class="text-center text-danger">Error loading orders.</td></tr>');
+                }
+            }
+
+            function getStatusColor(status) {
+                switch (status) {
+                    case 'New': return '#0d6efd'; // Blue
+                    case 'Processing': return '#ffc107'; // Yellow
+                    case 'Completed': return '#198754'; // Green
+                    case 'Cancelled': return '#dc3545'; // Red
+                    default: return '#6c757d'; // Grey
+                }
+            }
+
+            function getPaymentColor(status) {
+                switch (status) {
+                    case 'Pending': return '#ffc107';
+                    case 'Paid': return '#198754';
+                    case 'Failed': return '#dc3545';
+                    case 'Refunded': return '#0dcaf0';
+                    default: return '#6c757d';
+                }
+            }
+
+            // Update Order Status Event
+            $(document).on('change', '.order-status-select', async function () {
+                const id = $(this).data('id');
+                const newStatus = $(this).val();
+                const select = $(this);
+
+                select.prop('disabled', true);
+                try {
+                    await AdminManager.updateOrderStatus(id, newStatus);
+                    select.css('background-color', getStatusColor(newStatus));
+                } catch (e) {
+                    alert("Failed to update status: " + e.message);
+                } finally {
+                    select.prop('disabled', false);
+                }
+            });
+
+            // Update Payment Status Event
+            $(document).on('change', '.payment-status-select', async function () {
+                const id = $(this).data('id');
+                const newStatus = $(this).val();
+                const select = $(this);
+
+                select.prop('disabled', true);
+                try {
+                    await AdminManager.updatePaymentStatus(id, newStatus);
+                    select.css('background-color', getPaymentColor(newStatus));
+                } catch (e) {
+                    alert("Failed to update status: " + e.message);
+                } finally {
+                    select.prop('disabled', false);
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>
