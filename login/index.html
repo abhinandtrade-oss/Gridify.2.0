@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Title -->
-    <title>Gridify - Login</title>
+    <title>Gridify - Product Management</title>
     <!-- Favicon Icon -->
     <link rel="shortcut icon" href="../assets/images/logos/favicon.png" type="image/x-icon">
     <!-- Google Fonts -->
@@ -222,6 +222,8 @@
                 <h1 class="fw-bold">Welcome, <span id="dashUsername" class="text-primary">User</span>!</h1>
                 <p class="text-muted">Select a workspace to continue.</p>
                 <button id="dashLogoutBtn" class="btn btn-outline-danger btn-sm mt-2">Logout</button>
+                <button id="dashChangePassBtn" class="btn btn-outline-secondary btn-sm mt-2 ms-2">Change
+                    Password</button>
             </div>
 
             <div class="row justify-content-center g-4">
@@ -260,6 +262,33 @@
                         <p class="text-muted small mb-4">Beta Feature: Create ATS-friendly resumes easily.</p>
                         <a href="../developments/builder/index.html" class="btn btn-outline-success w-100"
                             target="_self">Launch Beta</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Change Password Modal -->
+    <div class="modal fade" id="userChangePasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Old Password</label>
+                        <input type="password" id="user-old-pass" class="form-control"
+                            placeholder="Enter current password">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New Password</label>
+                        <input type="password" id="user-new-pass" class="form-control" placeholder="Enter new password">
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-light me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" id="btn-user-save-pass">Update Password</button>
                     </div>
                 </div>
             </div>
@@ -581,6 +610,49 @@
                 const res = await AdminManager.setupInitialAdmin();
                 alert(res.message);
                 btn.text('Setup Initial Admin');
+            });
+
+            // Show Change Password Modal
+            $('#dashChangePassBtn').click(function () {
+                const modalEl = document.getElementById('userChangePasswordModal');
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+
+                // Clear inputs
+                $('#user-old-pass').val('');
+                $('#user-new-pass').val('');
+            });
+
+            // Handle Change Password Submit
+            $('#btn-user-save-pass').click(async function () {
+                const oldP = $('#user-old-pass').val();
+                const newP = $('#user-new-pass').val();
+
+                if (!oldP || !newP) {
+                    alert("Please enter both old and new passwords.");
+                    return;
+                }
+
+                const btn = $(this);
+                const originalText = btn.text();
+                btn.prop('disabled', true).text('Updating...');
+
+                try {
+                    const res = await AdminManager.changePassword(oldP, newP);
+                    if (res.status === 'success') {
+                        alert("Password Changed! Please login again.");
+                        $('#userChangePasswordModal').modal('hide');
+                        // Note: Bootstrap 5 .modal('hide') might not work on the element directly if not using jQuery wrapper for BS methods or might need instance.hide().
+                        // Let's rely on reload which logout does.
+                        AdminManager.logout();
+                    } else {
+                        alert(res.message);
+                        btn.prop('disabled', false).text(originalText);
+                    }
+                } catch (e) {
+                    alert("Error: " + e.message);
+                    btn.prop('disabled', false).text(originalText);
+                }
             });
 
             function showDashboard(session) {
