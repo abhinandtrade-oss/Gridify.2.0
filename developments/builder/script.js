@@ -500,24 +500,85 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* --- 8. GOOGLE SHEETS INTEGRATION --- */
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjz5Vg4whvxDa6wdE1-OY3F7LHEwqzr3W03LqLF08h9XcU_SctuPTlHAgjlkFNEgdPqQ/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwa-o23BceevxUgQHY686Y0weLKUQeVm0QHafp5gY8wqYYtfEttiEWX4c6KPsohBFoxkA/exec';
+
+    // Helper to get all dynamic values
+    const getDynamicValues = (containerId, fieldMap) => {
+        const container = document.getElementById(containerId);
+        if (!container) return [];
+        const items = [];
+        container.querySelectorAll('.dynamic-item').forEach(item => {
+            const obj = {};
+            Object.keys(fieldMap).forEach(key => {
+                const el = item.querySelector(fieldMap[key]);
+                obj[key] = el ? el.value : '';
+            });
+            items.push(obj);
+        });
+        return items;
+    };
 
     const collectData = () => {
-        // Collect skills from dynamic list
+        // Collect skills
         const skillNodes = document.querySelectorAll('#skillsContainer .skill-name');
         const skillsList = Array.from(skillNodes).map(input => input.value).filter(val => val.trim() !== '').join(', ');
 
         return {
             type: 'builder',
+            // Personal & Profile
             fullName: getValue('#fullName'),
             jobTitle: getValue('#jobTitle'),
             email: getValue('#email'),
             phone: getValue('#phone'),
             location: getValue('#location'),
+            linkedin: getValue('#linkedin'),
+            website: getValue('#website'),
+            nationality: getValue('#nationality'),
+            // Meta
+            industry: getValue('#industry'),
+            totalExp: getValue('#totalExp'), // ID check: logic used .r-total-exp but input id?
+            // Checking input IDs from staticFields map: 
+            // 'totalExp': '.r-total-exp' is target. Input ID is same usually? 
+            // Wait, previous code used `getValue('#totalExp')`? No, staticFields keys are IDs.
+            // Let's use the known IDs from staticFields keys.
+            currentRole: getValue('#r-role'), // wait, key in staticFields is 'currentRole', selector is '.r-role'. ID is likely 'currentRole' or similar?
+            geoPref: getValue('#geoPref'), // Assuming IDs match keys if not standard
+
+            // Text Areas
             summary: getValue('#summary'),
+
+            // Dynamic Lists (Full Objects)
             skills: skillsList,
-            experienceCount: document.querySelectorAll('#experienceContainer .dynamic-item').length,
-            educationCount: document.querySelectorAll('#educationContainer .dynamic-item').length
+            experience: getDynamicValues('experienceContainer', {
+                title: '.exp-title', company: '.exp-company', dept: '.exp-dept',
+                start: '.exp-start', end: '.exp-end', loc: '.exp-loc',
+                type: '.exp-type', desc: '.exp-desc', tech: '.exp-tech'
+            }),
+            education: getDynamicValues('educationContainer', {
+                degree: '.edu-degree', school: '.edu-school',
+                grade: '.edu-grade', gradeType: '.edu-grade-type',
+                start: '.edu-start', end: '.edu-end', loc: '.edu-loc'
+            }),
+            projects: getDynamicValues('projectsContainer', {
+                title: '.proj-name', role: '.proj-role', link: '.proj-link',
+                tech: '.proj-tech', desc: '.proj-desc'
+            }),
+            achievements: getDynamicValues('achievementsContainer', {
+                title: '.ach-title', year: '.ach-year'
+            }),
+            certifications: getValue('#certifications'), // Text area
+            languages: getDynamicValues('languagesContainer', {
+                name: '.lang-name', level: '.lang-level'
+            }),
+            hobbies: getValue('#hobbies'), // Text area
+            references: getDynamicValues('referencesContainer', {
+                name: '.ref-name', role: '.ref-role', org: '.ref-org', contact: '.ref-contact'
+            }),
+            declaration: {
+                text: getValue('#declaration'),
+                date: getValue('#declDate'),
+                place: getValue('#declPlace')
+            }
         };
     };
 
