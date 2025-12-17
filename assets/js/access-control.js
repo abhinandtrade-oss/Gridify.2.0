@@ -10,16 +10,49 @@
     }
 
     const session = getSession();
-    // Allow 'admin' and 'early-access' roles
-    if (!session || (session.role !== 'admin' && session.role !== 'early-access')) {
-        // If we are not in the list.html page (to avoid infinite loop if logic was different)
-        // Redirect to list.html
+
+    // 1. No Session -> Redirect Login
+    if (!session) {
+        // preserve query params if needed? Nah.
+        window.location.href = '../../login/';
+        return;
+    }
+
+    // 2. Admin Role -> Access All
+    if (session.role === 'admin') {
+        // Allowed
+    } else if (session.role === 'user') {
+        // 3. User Role -> Check Allowed Programs based on Path
+        const path = window.location.pathname.toLowerCase();
+        const allowed = session.allowedPrograms || []; // e.g. ['builder', 'scanner']
+
+        let isAuthorized = false;
+
+        // Check path against allowed keywords
+        if (path.includes('builder')) {
+            if (allowed.includes('builder')) isAuthorized = true;
+        } else if (path.includes('scanner')) {
+            if (allowed.includes('scanner')) isAuthorized = true;
+        } else {
+            // Dashboard or other pages? 
+            // If they are in /developments/ but not builder/scanner?
+            // Assume strict check for the known apps.
+            if (path.includes('developments')) {
+                // strict
+            } else {
+                isAuthorized = true; // access to shared assets/pages?
+            }
+        }
+
+        if (!isAuthorized) {
+            alert("You do not have access to this feature.");
+            window.location.href = '../../login/';
+        }
+
+    } else {
+        // Unknown role or 'early-access' legacy?
+        // Treat as unauthorized for now to force new flow
         window.location.href = '../../login/';
     }
 
-    // Auto logout on reload -> Clears session when page is unloaded
-    // This effectively logs out the user from this tab when they reload or close/navigate away.
-    window.addEventListener('beforeunload', function () {
-        sessionStorage.removeItem(ADMIN_STORAGE_KEY);
-    });
 })();
