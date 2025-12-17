@@ -31,7 +31,7 @@
                 <p>Build a parser-friendly resume. Mandatory fields are marked with *.</p>
                 <div class="header-actions">
                     <button id="downloadPdfBtn" class="btn-primary">Download PDF</button>
-                    <button id="showToolsBtn" class="btn-secondary" style="margin-left: 10px;">Image Tools</button>
+                    <!--button id="showToolsBtn" class="btn-secondary" style="margin-left: 10px;">Image Tools</button-->
 
                     <div id="validationStatus" class="validation-status"></div>
                 </div>
@@ -81,7 +81,7 @@
                             <div style="display: flex; gap: 5px;">
                                 <input type="url" id="photo" placeholder="https://example.com/photo.jpg" style="flex:1">
                                 <button type="button" id="uploadShortcutBtn" class="btn-secondary" title="Upload Image"
-                                    style="padding: 0 100px;">☁️Upload Image</button>
+                                    style="padding: 0 25px;">☁️Upload Image</button>
                             </div>
                             <small style="font-size: 0.75rem; color: #e74c3c;">Skipping the photo keeps your resume more
                                 ATS friendly.</small>
@@ -323,6 +323,10 @@
                         </div>
                         <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">This URL has
                             been saved to your records.</p>
+
+                        <div style="text-align:center; margin-top: 1.5rem;">
+                            <button id="uploadAnotherBtn" class="btn-secondary">Upload Another Image</button>
+                        </div>
                     </div>
 
                     <button id="backToEditorBtn" class="btn-secondary" style="margin-top: 3rem;">&larr; Back to
