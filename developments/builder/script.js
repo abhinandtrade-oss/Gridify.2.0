@@ -499,4 +499,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     });
 
+    /* --- 8. GOOGLE SHEETS INTEGRATION --- */
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjz5Vg4whvxDa6wdE1-OY3F7LHEwqzr3W03LqLF08h9XcU_SctuPTlHAgjlkFNEgdPqQ/exec';
+
+    const collectData = () => {
+        // Collect skills from dynamic list
+        const skillNodes = document.querySelectorAll('#skillsContainer .skill-name');
+        const skillsList = Array.from(skillNodes).map(input => input.value).filter(val => val.trim() !== '').join(', ');
+
+        return {
+            type: 'builder',
+            fullName: getValue('#fullName'),
+            jobTitle: getValue('#jobTitle'),
+            email: getValue('#email'),
+            phone: getValue('#phone'),
+            location: getValue('#location'),
+            summary: getValue('#summary'),
+            skills: skillsList,
+            experienceCount: document.querySelectorAll('#experienceContainer .dynamic-item').length,
+            educationCount: document.querySelectorAll('#educationContainer .dynamic-item').length
+        };
+    };
+
+    const sendToSheet = (data) => {
+        // Silent save, mostly
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            keepalive: true,
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(result => {
+                if (result.result !== 'success') {
+                    console.error('Sheet Error:', result);
+                } else {
+                    console.log('Auto-saved to Sheets');
+                }
+            })
+            .catch(error => {
+                console.error('Network Error during auto-save:', error);
+            });
+    };
+
+    const downloadBtn = document.getElementById('downloadPdfBtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', (e) => {
+            let isValid = validateResume();
+
+            if (isValid) {
+                const data = collectData();
+                sendToSheet(data);
+
+                // Small delay to ensure network request starts before print dialog freezes context
+                setTimeout(() => {
+                    window.print();
+                }, 500);
+            } else {
+                // If invalid, just print? Or alert?
+                // Logic says just print, but maybe show alert?
+                alert('Resume has missing fields. Saving skipped, but you can still print.');
+                window.print();
+            }
+        });
+    }
+
+
 });
