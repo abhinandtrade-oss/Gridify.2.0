@@ -222,30 +222,15 @@ body {
     transform: scale(1.1);
 }
 
-
-/* key changes in style.css */
-.preview-panel {
-    display: block; /* Robust vertical scrolling */
-    overflow-y: auto;
-    /* ... */
-}
-.resume-paper {
-    height: auto; /* Grows with content */
-    margin: 0 auto; /* Centers horizontally in the block parent */
-    /* ... */
-}
-
-
 /* RIGHT PANEL: PREVIEW */
 .preview-panel {
     flex: 1;
     background-color: #0f172a;
     /* Slate 900 for high contrast with paper */
     padding: 1rem;
-    overflow: auto;
-    /* Changed from overflow-y to allow horizontal scroll */
-    display: flex;
-    justify-content: center;
+    overflow-y: auto; /* Ensure vertical scroll works reliably */
+    display: block;   /* Changed from flex to block to allow natural document flow */
+    position: relative;
 }
 
 /* ... (Resume Paper styles unchanged - intended to be white) ... */
@@ -289,6 +274,8 @@ body {
     background: white;
     width: 210mm;
     min-height: 297mm;
+    height: auto; /* Allow growth */
+    margin: 0 auto; /* Center horizontally */
     padding: 15mm 20mm;
     /* Standard margins */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -298,6 +285,7 @@ body {
     line-height: 1.5;
     font-size: 11pt;
     /* Standard ATS size */
+    overflow: hidden; /* Contain floats if any, though flex is used inside */
 }
 
 /* Resume Core Styles */
@@ -703,4 +691,3 @@ body {
         display: none;
     }
 }
-
