@@ -179,6 +179,8 @@ body {
     font-size: 0.95rem;
     color: var(--text-primary);
     outline: none;
+    width: 100%;
+    /* Ensure they fill container */
 }
 
 .form-group input:focus,
@@ -729,4 +731,37 @@ body {
     border: 2px solid var(--border-dark);
     background: white;
     /* to see transparent images clearly */
+}
+
+/* Responsive Shortcut Button */
+.shortcut-btn {
+    padding: 0.5rem 0.8rem !important;
+    /* Override standard padding if needed */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 42px;
+    /* Match input height approx */
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    .shortcut-btn .btn-text {
+        display: none;
+    }
+
+    .shortcut-btn {
+        padding: 0.5rem !important;
+    }
+}
+
+/* Fix Mobile Form Grids (Education, etc) */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .form-group.full {
+        grid-column: span 1 !important;
+    }
 }
