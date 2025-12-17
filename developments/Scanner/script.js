@@ -54,22 +54,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Global storage for filename and raw content
-    window.uploadedFileName = "Unknown File";
-    window.rawFileContent = "";
-
     // File Upload Logic
     const fileInput = document.getElementById('cv-upload');
     if (fileInput) {
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if (!file) return;
+            const fileNameDisplay = document.getElementById('file-name-display');
 
-            window.uploadedFileName = file.name; // Capture filename
+            if (!file) {
+                if (fileNameDisplay) fileNameDisplay.textContent = "Supported formats: PDF, DOCX, TXT";
+                return;
+            }
 
+            // Update UI to show loading
+            if (fileNameDisplay) fileNameDisplay.textContent = `Reading ${file.name}...`;
             const textarea = document.getElementById('cv-input');
+            const analyzeBtn = document.getElementById('analyze-btn');
+
             textarea.value = "Reading file...";
             textarea.disabled = true;
+            if (analyzeBtn) analyzeBtn.disabled = true;
+            if (analyzeBtn) analyzeBtn.innerHTML = '<span class="icon">⏳</span> Reading...';
 
             try {
                 let text = "";
@@ -81,15 +86,38 @@ document.addEventListener('DOMContentLoaded', () => {
                     text = await readText(file);
                 }
 
+                text = text.trim();
+
+                if (!text) {
+                    throw new Error("No readable text found. If this is a scanned PDF, please use a text-based PDF.");
+                }
+
                 textarea.value = text;
-                window.rawFileContent = text; // Capture raw content
+                if (fileNameDisplay) fileNameDisplay.textContent = `Ready: ${file.name}`;
+                if (fileNameDisplay) fileNameDisplay.style.color = "var(--success-color)";
+
+                // Auto-enable analysis
+                if (analyzeBtn) {
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.innerHTML = '<span class="icon">⚙️</span> EXECUTE SCREENING';
+                }
+
             } catch (err) {
                 console.error(err);
                 alert("Error reading file: " + err.message);
                 textarea.value = "";
-                window.rawFileContent = "";
+                if (fileNameDisplay) fileNameDisplay.textContent = "Error reading file. Try another.";
+                if (fileNameDisplay) fileNameDisplay.style.color = "var(--danger-color)";
             } finally {
                 textarea.disabled = false;
+                if (textarea.value === "Reading file...") textarea.value = ""; // Clear if stuck
+
+                // Ensure button is back to normal if error or done
+                if (analyzeBtn && !textarea.value) {
+                    analyzeBtn.disabled = false; // Let them try clicking to see the empty error if they want, or keep disabled? 
+                    // Actually, if no text, runAnalysis will show alert. Better to reset text.
+                    analyzeBtn.innerHTML = '<span class="icon">⚙️</span> EXECUTE SCREENING';
+                }
             }
         });
     }
@@ -114,15 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4. Recommendations Phase
         const recommendations = generateRecommendations(matchResults, parsedCV);
 
-        // Store for saving
-        window.lastScanData = { matchResults, analysis, recommendations, parsedCV };
-
-        // Auto-save
-        autoSaveReport(window.lastScanData);
-
         // Render Results
         renderResults(matchResults, analysis, recommendations, parsedCV);
-
 
         // UI Transition
         inputSection.style.display = 'none'; // Or keep it but scroll down. Let's hide for focus.
@@ -462,45 +483,4 @@ async function readDocx(file) {
     const arrayBuffer = await file.arrayBuffer();
     const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
     return result.value;
-}
-
-// --- Google Sheets Integration ---
-// --- Google Sheets Integration ---
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwa-o23BceevxUgQHY686Y0weLKUQeVm0QHafp5gY8wqYYtfEttiEWX4c6KPsohBFoxkA/exec';
-
-function autoSaveReport(d) {
-    if (!d) return;
-
-    // Prepare data payload
-    const data = {
-        type: 'scanner',
-        fileName: window.uploadedFileName || 'N/A',
-        extractedEmail: (d.parsedCV.emails && d.parsedCV.emails.length > 0) ? d.parsedCV.emails[0] : 'N/A',
-        finalScore: d.matchResults.finalScore,
-        breakdown: d.matchResults.breakdown,
-        missingKeywords: d.analysis.weaknesses.join('; '),
-        recommendations: d.recommendations.map(r => r.text).join('; '),
-        rawContent: window.rawFileContent || ''
-    };
-
-    console.log('Auto-saving report...');
-
-    fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => response.json())
-        .then(result => {
-            if (result.result !== 'success') {
-                console.error('Sheet Error:', result);
-            } else {
-                console.log('Report auto-saved successfully.');
-            }
-        })
-        .catch(error => {
-            console.error('Network Error during auto-save:', error);
-        });
 }
