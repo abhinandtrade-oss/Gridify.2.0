@@ -15,6 +15,8 @@ const USERS_COLLECTION = 'users';
 const COUPONS_COLLECTION = 'coupons';
 
 class AdminManager {
+    static GAS_URL = 'https://script.google.com/macros/s/AKfycbz1YjSVMjZYuouVG62jeCqaIUzyvXa_YNPYQQ2f_WegU0hVqzRWMDrnDICfjev-i69Ksw/exec';
+
     static async login(username, password) {
         try {
             console.log(`Attempting login for ${username}...`);
@@ -30,15 +32,14 @@ class AdminManager {
                 user = doc.data();
             });
 
-            // In a real app, use hashed passwords! 
-            // For data migration parity, we are comparing plaintext if that's what was used, 
-            // or simply accepting that this is a basic implementation.
             if (user.password === password) {
                 if (user.status !== 'active') {
                     return { success: false, message: "Account suspended" };
                 }
-                this.startSession(user.username, user.role);
-                return { success: true };
+
+                // Success
+                this.startSession(user.username, user.role, user.allowedPrograms || []);
+                return { success: true, role: user.role };
             } else {
                 return { success: false, message: "Invalid password" };
             }
@@ -48,10 +49,11 @@ class AdminManager {
         }
     }
 
-    static startSession(username, role) {
+    static startSession(username, role, allowedPrograms = []) {
         const session = {
             username: username,
             role: role,
+            allowedPrograms: allowedPrograms,
             loginTime: Date.now(),
             lastActivity: Date.now()
         };
@@ -71,8 +73,8 @@ class AdminManager {
     }
 
     static initAutoLogout() {
-        console.log("AutoLogout Initialized");
-        // Activity Listeners
+        if (window.autoLogoutInterval) clearInterval(window.autoLogoutInterval);
+
         ['click', 'mousemove', 'keypress'].forEach(evt => {
             document.addEventListener(evt, () => {
                 const session = this.getSession();
@@ -83,16 +85,11 @@ class AdminManager {
             });
         });
 
-        // Check Interval
-        setInterval(() => {
+        window.autoLogoutInterval = setInterval(() => {
             const session = this.getSession();
             if (session) {
                 const now = Date.now();
-                if (now % 30000 < 5000) console.log("Checking session...", (now - session.lastActivity) / 1000, "s Activity");
-
                 if (now - session.lastActivity > SESSION_TIMEOUT) {
-                    console.warn("Session Expired!");
-                    alert("Session expired due to inactivity.");
                     this.logout();
                 }
             }
@@ -102,8 +99,7 @@ class AdminManager {
     // --- USER MANAGEMENT ---
     static async getUsers() {
         const session = this.getSession();
-        // Basic role check
-        if (!session || session.username !== 'abhinand') return [];
+        if (!session || session.role !== 'admin') return [];
 
         try {
             const querySnapshot = await getDocs(collection(db, USERS_COLLECTION));
@@ -118,28 +114,27 @@ class AdminManager {
         }
     }
 
-    static async addUser(newUser, role = 'admin') {
-        const newPass = Math.random().toString(36).slice(-8);
+    // Creates a new user (Admin or Normal User)
+    static async addUser(username, password, role, allowedPrograms = []) {
         const session = this.getSession();
-
-        if (!session || session.username !== 'abhinand') throw new Error("Unauthorized");
+        // Allow any admin to create users
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
 
         try {
-            // Check if user exists
-            const q = query(collection(db, USERS_COLLECTION), where("username", "==", newUser));
+            const q = query(collection(db, USERS_COLLECTION), where("username", "==", username));
             const snap = await getDocs(q);
             if (!snap.empty) throw new Error("User already exists");
 
-            // Add user
             await addDoc(collection(db, USERS_COLLECTION), {
-                username: newUser,
-                password: newPass, // Storing plaintext as requested/migrated
+                username: username,
+                password: password,
                 role: role,
+                allowedPrograms: allowedPrograms,
                 status: 'active',
                 createdAt: new Date().toISOString()
             });
 
-            return newPass;
+            return true;
         } catch (e) {
             console.error("Add User Error", e);
             throw e;
@@ -147,11 +142,12 @@ class AdminManager {
     }
 
     static async toggleUserStatus(targetUser) {
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
+
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", targetUser));
             const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) return;
 
             querySnapshot.forEach(async (d) => {
                 const data = d.data();
@@ -163,16 +159,85 @@ class AdminManager {
         }
     }
 
-    static async deleteUser(targetUser) {
+    static async updateUserDetails(targetUser, role, programs) {
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
+
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", targetUser));
             const querySnapshot = await getDocs(q);
 
+            if (querySnapshot.empty) throw new Error("User not found");
+
+            querySnapshot.forEach(async (d) => {
+                await updateDoc(doc(db, USERS_COLLECTION, d.id), {
+                    role: role,
+                    allowedPrograms: programs
+                });
+            });
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    // --- DEFAULTS MANAGEMENT ---
+    static async saveDefaultPrograms(programs) {
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
+
+        try {
+            // 1. Save Global Defaults
+            const docRef = doc(db, 'settings', 'global');
+            await setDoc(docRef, { defaultPrograms: programs }, { merge: true });
+
+            // 2. Retroactively Update ALL Existing 'user' role accounts
+            const q = query(collection(db, USERS_COLLECTION), where("role", "==", "user"));
+            const querySnapshot = await getDocs(q);
+
+            const updatePromises = [];
+            querySnapshot.forEach((d) => {
+                updatePromises.push(updateDoc(doc(db, USERS_COLLECTION, d.id), { allowedPrograms: programs }));
+            });
+
+            await Promise.all(updatePromises);
+            console.log(`Updated ${updatePromises.length} existing users with new defaults.`);
+
+        } catch (e) {
+            console.error("Save Defaults Error", e);
+            throw e;
+        }
+    }
+
+    static async getDefaultPrograms() {
+        try {
+            const docRef = doc(db, 'settings', 'global');
+            const d = await getDoc(docRef);
+            if (d.exists()) {
+                const data = d.data().defaultPrograms || [];
+                console.log("Defaults fetched:", data);
+                return data;
+            }
+            console.log("No default settings doc found.");
+            return [];
+        } catch (e) {
+            console.error("Get Defaults Error (likely permissions):", e);
+            return [];
+        }
+    }
+
+    static async deleteUser(targetUser) {
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
+
+        try {
+            const q = query(collection(db, USERS_COLLECTION), where("username", "==", targetUser));
+            const querySnapshot = await getDocs(q);
             querySnapshot.forEach(async (d) => {
                 await deleteDoc(doc(db, USERS_COLLECTION, d.id));
             });
         } catch (e) {
             console.error("Delete User Error", e);
+            throw e;
         }
     }
 
@@ -181,29 +246,100 @@ class AdminManager {
         if (!session) return { status: 'error', message: 'No session' };
 
         try {
-            // Find user doc
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", session.username));
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) return { status: 'error', message: 'User not found' };
-
+            const snap = await getDocs(q);
             let userDoc = null;
-            querySnapshot.forEach((d) => { userDoc = d; });
+            snap.forEach((d) => { userDoc = d; });
 
-            if (userDoc.data().password !== oldPass) {
+            if (!userDoc || userDoc.data().password !== oldPass) {
                 return { status: 'error', message: 'Incorrect old password' };
             }
 
             await updateDoc(doc(db, USERS_COLLECTION, userDoc.id), { password: newPass });
             return { status: 'success' };
-
         } catch (e) {
-            console.error("Change Password Error", e);
             return { status: 'error', message: e.message };
         }
     }
 
-    // --- COUPON MANAGEMENT ---
+    // --- OTP LOGIC (GAS) ---
+
+    static async sendOtp(email) {
+        try {
+            const response = await fetch(this.GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'send_otp', email: email })
+            });
+            const data = await response.json();
+            return data;
+        } catch (e) {
+            return { result: 'error', error: e.toString() };
+        }
+    }
+
+    static async verifyOtp(email, otp) {
+        try {
+            const response = await fetch(this.GAS_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'verify_otp', email: email, otp: otp })
+            });
+            const data = await response.json();
+            return data;
+        } catch (e) {
+            return { result: 'error', error: e.toString() };
+        }
+    }
+
+    static async registerUser(email, password) {
+        try {
+            const q = query(collection(db, USERS_COLLECTION), where("username", "==", email));
+            const snap = await getDocs(q);
+            if (!snap.empty) return { success: false, message: "User already exists" };
+
+            // Fetch Defaults
+            const defaults = await this.getDefaultPrograms();
+            console.log(`Registering user ${email} with defaults:`, defaults);
+
+            await addDoc(collection(db, USERS_COLLECTION), {
+                username: email,
+                password: password,
+                role: 'user',
+                allowedPrograms: defaults,
+                status: 'active',
+                createdAt: new Date().toISOString()
+            });
+            return { success: true };
+        } catch (e) {
+            return { success: false, message: e.toString() };
+        }
+    }
+
+    static async resetPassword(email, newPass) {
+        try {
+            const q = query(collection(db, USERS_COLLECTION), where("username", "==", email));
+            const snap = await getDocs(q);
+            if (snap.empty) return { success: false, message: "User not found" };
+
+            let id;
+            snap.forEach(d => id = d.id);
+
+            await updateDoc(doc(db, USERS_COLLECTION, id), { password: newPass });
+            return { success: true };
+        } catch (e) {
+            return { success: false, message: e.toString() };
+        }
+    }
+
+    // --- DATA SYNC ---
+    static async getLatestData(email, sheetName = 'builder') {
+        const response = await fetch(this.GAS_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: 'fetch_data', email: email, sheetName: sheetName })
+        });
+        return await response.json();
+    }
+
+    // --- UTILS ---
     static async getCoupons() {
         try {
             const querySnapshot = await getDocs(collection(db, COUPONS_COLLECTION));
@@ -213,89 +349,34 @@ class AdminManager {
             });
             return coupons;
         } catch (e) {
-            console.error("Get Coupons Error", e);
             return [];
         }
     }
 
     static async addCoupon(code, type, value) {
-        try {
-            // Check for duplicate code
-            const q = query(collection(db, COUPONS_COLLECTION), where("code", "==", code));
-            const snap = await getDocs(q);
-            if (!snap.empty) throw new Error("Coupon code already exists");
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
 
-            await addDoc(collection(db, COUPONS_COLLECTION), {
-                code: code,
-                type: type,
-                value: Number(value),
-                status: 'active',
-                createdAt: new Date().toISOString()
-            });
-        } catch (e) {
-            console.error("Add Coupon Error", e);
-            throw e;
-        }
+        const q = query(collection(db, COUPONS_COLLECTION), where("code", "==", code));
+        const snap = await getDocs(q);
+        if (!snap.empty) throw new Error("Code exists");
+
+        await addDoc(collection(db, COUPONS_COLLECTION), {
+            code, type, value: Number(value), status: 'active', createdAt: new Date().toISOString()
+        });
     }
 
     static async deleteCoupon(code) {
-        try {
-            const q = query(collection(db, COUPONS_COLLECTION), where("code", "==", code));
-            const snap = await getDocs(q);
-            snap.forEach(async (d) => {
-                await deleteDoc(doc(db, COUPONS_COLLECTION, d.id));
-            });
-        } catch (e) {
-            console.error("Delete Coupon Error", e);
-        }
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
+
+        const q = query(collection(db, COUPONS_COLLECTION), where("code", "==", code));
+        const snap = await getDocs(q);
+        snap.forEach(async (d) => {
+            await deleteDoc(doc(db, COUPONS_COLLECTION, d.id));
+        });
     }
 
-    // --- ORDER MANAGEMENT ---
-    static async getOrders() {
-        try {
-            const ordersRef = collection(db, 'orders');
-            // Note: Firestore requires an index for sorting. If it fails, check console for link to create index.
-            // For now, we will fetch then sort in JS to avoid index requirement blocking.
-            const snap = await getDocs(ordersRef);
-            let orders = [];
-            snap.forEach(d => {
-                orders.push({ id: d.id, ...d.data() });
-            });
-            // Sort Descending by Date
-            orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
-            return orders;
-        } catch (e) {
-            console.error("Get Orders Error", e);
-            return [];
-        }
-    }
-
-    static async updateOrderStatus(orderId, newStatus) {
-        try {
-            const orderRef = doc(db, 'orders', orderId);
-            await updateDoc(orderRef, { status: newStatus });
-            return true;
-        } catch (e) {
-            console.error("Update Order Status Error", e);
-            throw e;
-        }
-    }
-
-    static async updatePaymentStatus(orderId, newStatus) {
-        try {
-            const orderRef = doc(db, 'orders', orderId);
-            await updateDoc(orderRef, { paymentStatus: newStatus });
-            return true;
-        } catch (e) {
-            console.error("Update Payment Status Error", e);
-            throw e;
-        }
-    }
-
-    /**
-     * Seeds the database with the initial 'abhinand' admin user.
-     * Only works if the user does not exist.
-     */
     static async setupInitialAdmin() {
         const username = "abhinand";
         const password = "admin123";
@@ -312,13 +393,13 @@ class AdminManager {
                 username: username,
                 password: password,
                 role: 'admin',
+                allowedPrograms: ['builder', 'scanner', 'admin'],
                 status: 'active',
                 createdAt: new Date().toISOString()
             });
 
-            return { success: true, message: `Admin created! User: ${username}, Pass: ${password}` };
+            return { success: true, message: `Admin created!` };
         } catch (e) {
-            console.error("Setup Admin Error", e);
             return { success: false, message: "Error: " + e.message };
         }
     }
