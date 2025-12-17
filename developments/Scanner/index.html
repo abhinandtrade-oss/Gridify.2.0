@@ -202,6 +202,18 @@
         </footer>
     </div>
 
+    <!-- Unreadable File Modal -->
+    <div id="error-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-icon">⚠️</div>
+            <h3>File Not Readable</h3>
+            <p>We couldn't extract text from this file. It might be an image-only PDF or scanned document.</p>
+            <p>Please upload a <strong>text-based PDF</strong> or DOCX for analysis.</p>
+            <button class="btn-primary" id="close-modal-btn">Got it</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 
