@@ -54,12 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Global storage for filename and raw content
+    window.uploadedFileName = "Unknown File";
+    window.rawFileContent = "";
+
     // File Upload Logic
     const fileInput = document.getElementById('cv-upload');
     if (fileInput) {
         fileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
+            window.uploadedFileName = file.name; // Capture filename
 
             const textarea = document.getElementById('cv-input');
             textarea.value = "Reading file...";
@@ -76,11 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 textarea.value = text;
-                // Auto-analyze if JD is present? Maybe not. Let user verify text.
+                window.rawFileContent = text; // Capture raw content
             } catch (err) {
                 console.error(err);
                 alert("Error reading file: " + err.message);
                 textarea.value = "";
+                window.rawFileContent = "";
             } finally {
                 textarea.disabled = false;
             }
@@ -107,8 +114,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // 4. Recommendations Phase
         const recommendations = generateRecommendations(matchResults, parsedCV);
 
+        // Store for saving
+        window.lastScanData = { matchResults, analysis, recommendations, parsedCV };
+
+        // Auto-save
+        autoSaveReport(window.lastScanData);
+
         // Render Results
         renderResults(matchResults, analysis, recommendations, parsedCV);
+
 
         // UI Transition
         inputSection.style.display = 'none'; // Or keep it but scroll down. Let's hide for focus.
@@ -448,4 +462,45 @@ async function readDocx(file) {
     const arrayBuffer = await file.arrayBuffer();
     const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
     return result.value;
+}
+
+// --- Google Sheets Integration ---
+// --- Google Sheets Integration ---
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjz5Vg4whvxDa6wdE1-OY3F7LHEwqzr3W03LqLF08h9XcU_SctuPTlHAgjlkFNEgdPqQ/exec';
+
+function autoSaveReport(d) {
+    if (!d) return;
+
+    // Prepare data payload
+    const data = {
+        type: 'scanner',
+        fileName: window.uploadedFileName || 'N/A',
+        extractedEmail: (d.parsedCV.emails && d.parsedCV.emails.length > 0) ? d.parsedCV.emails[0] : 'N/A',
+        finalScore: d.matchResults.finalScore,
+        breakdown: d.matchResults.breakdown,
+        missingKeywords: d.analysis.weaknesses.join('; '),
+        recommendations: d.recommendations.map(r => r.text).join('; '),
+        rawContent: window.rawFileContent || ''
+    };
+
+    console.log('Auto-saving report...');
+
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => response.json())
+        .then(result => {
+            if (result.result !== 'success') {
+                console.error('Sheet Error:', result);
+            } else {
+                console.log('Report auto-saved successfully.');
+            }
+        })
+        .catch(error => {
+            console.error('Network Error during auto-save:', error);
+        });
 }
