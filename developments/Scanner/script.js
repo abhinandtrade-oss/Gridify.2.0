@@ -466,7 +466,7 @@ async function readDocx(file) {
 
 // --- Google Sheets Integration ---
 // --- Google Sheets Integration ---
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjz5Vg4whvxDa6wdE1-OY3F7LHEwqzr3W03LqLF08h9XcU_SctuPTlHAgjlkFNEgdPqQ/exec';
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwa-o23BceevxUgQHY686Y0weLKUQeVm0QHafp5gY8wqYYtfEttiEWX4c6KPsohBFoxkA/exec';
 
 function autoSaveReport(d) {
     if (!d) return;
