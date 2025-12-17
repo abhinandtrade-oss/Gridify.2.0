@@ -794,5 +794,226 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    /* --- 10. IMAGE UPLOAD TOOL --- */
+    const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTfcGr8fa2c7kwwSzuDwMRPUMnzRhepBQCnetFLHNqjkuaUaaXAIuhACJsS3lk_lBq/exec';
+
+    const tabTools = document.getElementById('tabTools');
+    const showToolsBtn = document.getElementById('showToolsBtn');
+    const backToEditorBtn = document.getElementById('backToEditorBtn');
+    const uploadShortcutBtn = document.getElementById('uploadShortcutBtn');
+
+    // Elements
+    const resumeForm = document.getElementById('resumeForm');
+    const uploadSection = document.getElementById('uploadSection');
+    const editorPanel = document.getElementById('editorPanel');
+
+    // Toggle Functions
+    const showUploadInterface = () => {
+        resumeForm.style.display = 'none';
+        uploadSection.style.display = 'block';
+
+        // Mobile Tab State
+        if (tabTools) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            tabTools.classList.add('active');
+        }
+    };
+
+    const showEditorInterface = () => {
+        resumeForm.style.display = 'block';
+        uploadSection.style.display = 'none';
+
+        // Mobile Tab State
+        if (tabTools && tabEdit) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            tabEdit.classList.add('active');
+        }
+    };
+
+    // Listeners
+    let isShortcutUpload = false;
+
+    if (showToolsBtn) {
+        showToolsBtn.addEventListener('click', () => {
+            isShortcutUpload = false;
+            showUploadInterface();
+        });
+    }
+
+    if (uploadShortcutBtn) {
+        uploadShortcutBtn.addEventListener('click', () => {
+            isShortcutUpload = true;
+            showUploadInterface();
+        });
+    }
+
+    if (backToEditorBtn) backToEditorBtn.addEventListener('click', showEditorInterface);
+
+    // Mobile Tab Logic Update
+    if (tabTools) {
+        tabTools.addEventListener('click', () => {
+            isShortcutUpload = false; // Tab always acts like Tools button
+            // Switch to Editor Panel view first (if in Preview)
+            appContainer.classList.remove('show-preview');
+            if (tabPreview) tabPreview.classList.remove('active');
+
+            showUploadInterface();
+        });
+    }
+
+    // Also update existing tabs to switch back to form
+    if (tabEdit) {
+        // Intercept existing click to ensure form is shown
+        const originalClick = tabEdit.onclick; // not using onclick property, using addEventListener.
+        // We add a new listener. Events fire in order.
+        tabEdit.addEventListener('click', () => {
+            showEditorInterface();
+        });
+    }
+
+
+    /* --- Upload Logic --- */
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('imageInput');
+    const uploadPreview = document.getElementById('uploadPreview');
+    const previewImg = document.getElementById('previewImg');
+    const confirmUploadBtn = document.getElementById('confirmUploadBtn');
+    const cancelUploadBtn = document.getElementById('cancelUploadBtn');
+    const uploadLoader = document.getElementById('uploadLoader');
+    const uploadResult = document.getElementById('uploadResult');
+    const resultUrl = document.getElementById('resultUrl');
+    const copyUrlBtn = document.getElementById('copyUrlBtn');
+
+    let currentFile = null;
+
+    // Drag & Drop
+    if (dropZone) {
+        dropZone.addEventListener('click', () => imageInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--accent-color)';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-dark)';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-dark)';
+            const files = e.dataTransfer.files;
+            if (files.length) handleFileSelect(files[0]);
+        });
+    }
+
+    if (imageInput) {
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFileSelect(e.target.files[0]);
+        });
+    }
+
+    const handleFileSelect = (file) => {
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file.');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            alert('File is too large. Max 5MB.');
+            return;
+        }
+
+        currentFile = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            previewImg.src = e.target.result;
+            dropZone.style.display = 'none';
+            uploadPreview.style.display = 'block';
+            uploadResult.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    };
+
+    if (cancelUploadBtn) {
+        cancelUploadBtn.addEventListener('click', () => {
+            currentFile = null;
+            previewImg.src = '';
+            dropZone.style.display = 'block';
+            uploadPreview.style.display = 'none';
+            imageInput.value = ''; // Reset input
+        });
+    }
+
+    if (confirmUploadBtn) {
+        confirmUploadBtn.addEventListener('click', () => {
+            if (!currentFile) return;
+
+            uploadPreview.style.display = 'none';
+            uploadLoader.style.display = 'block';
+
+            const reader = new FileReader();
+            reader.readAsDataURL(currentFile);
+            reader.onload = function () {
+                const base64Data = reader.result.split(',')[1]; // Remove header
+                const payload = {
+                    image: base64Data,
+                    mimeType: currentFile.type
+                };
+
+                fetch(UPLOAD_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        uploadLoader.style.display = 'none';
+                        if (data.result === 'success') {
+                            uploadResult.style.display = 'block';
+                            resultUrl.value = data.url;
+
+                            // AUTO-FILL LOGIC
+                            const photoInput = document.getElementById('photo');
+                            if (photoInput) {
+                                photoInput.value = data.url;
+                                photoInput.dispatchEvent(new Event('input'));
+                                // Optional: Alert user visually
+                                const resultLabel = uploadResult.querySelector('label');
+                                if (resultLabel) resultLabel.textContent = "Image URL (Auto-applied to Resume):";
+                            }
+
+                            // Conditional Redirect
+                            if (isShortcutUpload) {
+                                setTimeout(() => {
+                                    showEditorInterface();
+                                }, 1000); // 1s delay to show success state
+                            }
+
+                        } else {
+                            alert('Upload Failed: ' + data.message);
+                            // Show retry
+                            uploadPreview.style.display = 'block';
+                        }
+                    })
+                    .catch(err => {
+                        uploadLoader.style.display = 'none';
+                        alert('Network Error: ' + err.message);
+                        uploadPreview.style.display = 'block';
+                    });
+            };
+        });
+    }
+
+    if (copyUrlBtn) {
+        copyUrlBtn.addEventListener('click', () => {
+            resultUrl.select();
+            document.execCommand('copy'); // Fallback or use navigator.clipboard
+            // navigator.clipboard.writeText(resultUrl.value);
+            const originalText = copyUrlBtn.textContent;
+            copyUrlBtn.textContent = 'Copied!';
+            setTimeout(() => copyUrlBtn.textContent = originalText, 2000);
+        });
+    }
+
     loadUserData();
 });
