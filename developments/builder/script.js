@@ -1,1019 +1,673 @@
-document.addEventListener('DOMContentLoaded', () => {
+<!DOCTYPE html>
+<html lang="en">
 
-    /* --- HELPERS --- */
-    const setText = (selector, val) => {
-        const el = document.querySelector(selector);
-        if (el) el.textContent = val;
-    };
+<head>
+    <script src="../../assets/js/access-control.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gridify - ATS Friendly Resume Maker</title>
+    <link rel="icon"
+        href="https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1763557833531-72kzoeqt2o2-1763557832622_0lvanx_g.png">
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@300;400;700&display=swap"
+        rel="stylesheet">
+</head>
 
-    // Safely get value or empty string
-    const getValue = (selector) => {
-        const el = document.querySelector(selector);
-        return el ? el.value : '';
-    };
+<body>
 
-    /* --- 1. STATIC FIELDS LISTENER --- */
-    // Map Input ID -> Preview Selector
-    const staticFields = {
-        'fullName': ['.r-name', '.r-name-sign'],
-        'jobTitle': '.r-title',
-        'email': '.r-email',
-        'phone': '.r-phone',
-        'location': '.r-location',
-        'linkedin': '.r-linkedin',
-        'website': '.r-website',
-        'nationality': '.r-nationality',
-        'photo': '#rPhoto', // Special handling
-        // Profile Meta
-        'industry': '.r-industry',
-        'totalExp': '.r-total-exp',
-        'currentRole': '.r-role',
-        'geoPref': '.r-geo',
-        // Text Areas
-        'summary': '.r-summary-text',
-        'certifications': '.r-certs-text',
-        'hobbies': '.r-hobbies-text',
-        'declaration': '.r-declaration-text',
-        // Declaration Meta
-        'declDate': '.r-decl-date',
-        'declPlace': '.r-decl-place'
-    };
+    <div class="app-container">
+        <!-- MOBILE TABS (Visible only on < 768px via CSS) -->
+        <div class="mobile-tabs no-print">
+            <button class="tab-btn active" id="tabEdit">Editor</button>
+            <button class="tab-btn" id="tabPreview">Preview</button>
+            <button class="tab-btn" id="tabTools">Tools</button>
+        </div>
 
-    const attachStaticListeners = () => {
-        Object.keys(staticFields).forEach(id => {
-            const input = document.getElementById(id);
-            if (!input) return;
+        <!-- LEFT SIDE: EDITOR form -->
+        <div class="editor-panel no-print" id="editorPanel">
+            <header class="editor-header">
+                <h1>ATS Resume Builder</h1>
+                <p>Build a parser-friendly resume. Mandatory fields are marked with *.</p>
+                <div class="header-actions">
+                    <button id="downloadPdfBtn" class="btn-primary">Download PDF</button>
+                    <!--button id="showToolsBtn" class="btn-secondary" style="margin-left: 10px;">Image Tools</button-->
 
-            input.addEventListener('input', () => {
-                const targets = staticFields[id];
-                const val = input.value;
+                    <div id="validationStatus" class="validation-status"></div>
+                </div>
+            </header>
 
-                if (id === 'photo') {
-                    const img = document.querySelector(targets);
-                    const container = document.getElementById('rPhotoContainer');
-                    if (img && container) {
-                        img.src = val;
-                        container.style.display = val ? 'block' : 'none';
-                        // Adjust header alignment if needed
-                        document.querySelector('.r-header-content').style.textAlign = val ? 'left' : 'center';
-                        document.querySelector('.r-name').style.textAlign = val ? 'left' : 'center';
-                        document.querySelector('.r-title').style.textAlign = val ? 'left' : 'center';
-                        document.querySelector('.r-contact-info').style.textAlign = val ? 'left' : 'center';
-                        document.querySelector('.r-profile-meta').style.textAlign = val ? 'left' : 'center';
-                    }
-                } else if (Array.isArray(targets)) {
-                    targets.forEach(t => setText(t, val));
-                } else {
-                    setText(targets, val);
-                }
+            <form id="resumeForm">
 
-                checkVisibility();
-            });
-        });
-    };
-
-    /* --- 2. DYNAMIC LIST MANAGER --- */
-    // Generic function to handle Add/Remove/Update of list items
-    const setupDynamicSection = (containerId, buttonId, templateId, renderCallback) => {
-        const container = document.getElementById(containerId);
-        const button = document.getElementById(buttonId);
-        const template = document.getElementById(templateId);
-
-        if (!container || !button || !template) return;
-
-        const addItem = () => {
-            const clone = template.content.cloneNode(true);
-            container.appendChild(clone);
-            const newItem = container.lastElementChild;
-
-            // Listeners for inputs
-            newItem.querySelectorAll('input, textarea, select').forEach(inp => {
-                inp.addEventListener('input', renderCallback);
-            });
-            // Remove button
-            newItem.querySelector('.remove-btn').addEventListener('click', () => {
-                newItem.remove();
-                renderCallback();
-            });
-
-            renderCallback(); // Initial empty render/check
-        };
-
-        button.addEventListener('click', addItem);
-    };
-
-    /* --- 3. RENDER FUNCTIONS --- */
-
-    // Skills: Output as "Skill, Skill, Skill" (Comma Separated List)
-    const renderSkills = () => {
-        const container = document.getElementById('skillsContainer');
-        const output = document.getElementById('r-skills-list');
-        const items = container.querySelectorAll('.dynamic-item');
-        const allSkills = [];
-
-        items.forEach(item => {
-            const name = item.querySelector('.skill-name').value.trim();
-            const level = item.querySelector('.skill-level').value;
-
-            if (name) {
-                // Format: "Name (Level)" or just "Name"
-                const text = level ? `${name} (${level})` : name;
-                allSkills.push(text);
-            }
-        });
-
-        // Build HTML: Simple flat list
-        // output.innerHTML = allSkills.join(', '); 
-        // Better for wrapping: create spans or just text? Text is fine.
-        output.textContent = allSkills.join(', ');
-
-        checkVisibility();
-    };
-
-    // Experience
-    const renderExperience = () => {
-        const container = document.getElementById('experienceContainer');
-        const output = document.getElementById('r-experience-list');
-        output.innerHTML = '';
-
-        container.querySelectorAll('.dynamic-item').forEach(item => {
-            const title = item.querySelector('.exp-title').value;
-            const company = item.querySelector('.exp-company').value;
-            const dept = item.querySelector('.exp-dept').value;
-            const start = item.querySelector('.exp-start').value;
-            const end = item.querySelector('.exp-end').value;
-            const loc = item.querySelector('.exp-loc').value;
-            const type = item.querySelector('.exp-type').value;
-            const desc = item.querySelector('.exp-desc').value; // Bullets expected
-            const tech = item.querySelector('.exp-tech').value;
-
-            if (title || company) {
-                const div = document.createElement('div');
-                div.className = 'r-item-block';
-                // Layout: Title (Bold) ......... Date (Right)
-                //         Company | Dept, Location (Type)
-                //         Desc
-                //         Tech
-                const subDetails = [company, dept, loc, type].filter(x => x).join(', ');
-
-                div.innerHTML = `
-                    <div class="r-row-split">
-                        <span class="r-bold">${title}</span>
-                        <span class="r-date">${start} ${(start && end) ? '-' : ''} ${end}</span>
+                <!-- 0. Configuration -->
+                <section class="form-section config-section">
+                    <h2>Configuration</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>CV Type</label>
+                            <select id="cvType">
+                                <option value="experienced">Experienced</option>
+                                <option value="fresher">Fresher</option>
+                                <option value="academic">Academic</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Summary Type</label>
+                            <select id="summaryType">
+                                <option value="summary">Professional Summary</option>
+                                <option value="objective">Career Objective</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>References Display</label>
+                            <select id="refDisplay">
+                                <option value="list">Show List</option>
+                                <option value="request">"Available on Request"</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="r-row-split r-sub">
-                        <span>${subDetails}</span>
+                </section>
+
+                <!-- 1. Personal Information (Mandatory) -->
+                <section class="form-section">
+                    <h2>1. Personal Information <span class="req">*</span></h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="fullName" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Photo URL (Optional)</label>
+                            <div style="display: flex; gap: 5px;">
+                                <input type="url" id="photo" placeholder="https://example.com/photo.jpg" style="flex:1">
+                                <button type="button" id="uploadShortcutBtn" class="btn-secondary" title="Upload Image"
+                                    style="padding: 0 25px;">☁️Upload Image</button>
+                            </div>
+                            <small style="font-size: 0.75rem; color: #e74c3c;">Skipping the photo keeps your resume more
+                                ATS friendly.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Target Job Title / Headline *</label>
+                            <input type="text" id="jobTitle" placeholder="Senior Software Engineer" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address *</label>
+                            <input type="email" id="email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="phone" placeholder="+1 234 567 890" required>
+                        </div>
+                        <div class="form-group full">
+                            <label>Location (City, Country) *</label>
+                            <input type="text" id="location" placeholder="New York, USA" required>
+                        </div>
+                        <div class="form-group">
+                            <label>LinkedIn URL</label>
+                            <input type="url" id="linkedin" placeholder="linkedin.com/in/johndoe">
+                        </div>
+                        <div class="form-group">
+                            <label>Portfolio / GitHub URL</label>
+                            <input type="url" id="website" placeholder="github.com/johndoe">
+                        </div>
+                        <!-- Nationality removed or optional if needed, but not in strict list. keeping hidden or removing if strictly following 'Minimal' prompt? User said 15-17 fields. I'll keep it as optional but outside the main grid if possible, or just leave it since it was there. I'll leave it out for now to strict adherence to the list "Personal Info: 5" -->
                     </div>
-                    ${desc ? `<div class="r-desc whitespace-pre">${desc}</div>` : ''}
-                    ${tech ? `<div class="r-tech"><strong>Tech:</strong> ${tech}</div>` : ''}
-                 `;
-                output.appendChild(div);
-            }
-        });
-        checkVisibility();
-    };
+                </section>
 
-    // Education
-    const renderEducation = () => {
-        const container = document.getElementById('educationContainer');
-        const output = document.getElementById('r-education-list');
-        output.innerHTML = '';
-
-        container.querySelectorAll('.dynamic-item').forEach(item => {
-            const degree = item.querySelector('.edu-degree').value;
-            const school = item.querySelector('.edu-school').value;
-            // Field of study removed
-            const grade = item.querySelector('.edu-grade').value;
-            const gradeType = item.querySelector('.edu-grade-type').value;
-            const start = item.querySelector('.edu-start').value;
-            const end = item.querySelector('.edu-end').value;
-            const loc = item.querySelector('.edu-loc').value;
-
-            if (degree || school) {
-                // Grade formatting
-                let gradeText = '';
-                if (grade) {
-                    if (gradeType === 'percent') {
-                        gradeText = `Grade: ${grade}%`;
-                    } else if (gradeType === 'grade') {
-                        gradeText = `Grade: ${grade}`;
-                    } else {
-                        gradeText = `CGPA: ${grade}`;
-                    }
-                }
-
-                const div = document.createElement('div');
-                div.className = 'r-item-block';
-                div.innerHTML = `
-                    <div class="r-row-split">
-                        <span class="r-bold">${degree}</span>
-                        <span class="r-date">${start} - ${end}</span>
+                <!-- 3. Profile Meta -->
+                <section class="form-section">
+                    <h2>Profile Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Industry / Domain</label>
+                            <input type="text" id="industry" placeholder="Fintech / Healthcare">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Experience</label>
+                            <input type="text" id="totalExp" placeholder="5 Years 2 Months">
+                        </div>
+                        <div class="form-group">
+                            <label>Current / Last Role</label>
+                            <input type="text" id="currentRole" placeholder="Lead Developer">
+                        </div>
+                        <div class="form-group">
+                            <label>Location Preference</label>
+                            <select id="geoPref">
+                                <option value="">Select...</option>
+                                <option value="Remote">Remote</option>
+                                <option value="Hybrid">Hybrid</option>
+                                <option value="Onsite">Onsite</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="r-row-split r-sub">
-                        <span>${school}${loc ? `, ${loc}` : ''}</span>
-                        ${gradeText ? `<span style="font-weight:500;">${gradeText}</span>` : '<span></span>'}
+                </section>
+
+                <!-- 2. Summary / Objective (Mandatory) -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2 id="summaryHeaderLabel">2. Career Summary <span class="req">*</span></h2>
+                        <button type="button" class="btn-ai" id="aiEnhanceSummary" style="display:none;">✨ AI
+                            Enhance</button>
                     </div>
-                `;
-                output.appendChild(div);
-            }
-        });
-        checkVisibility();
-    };
-
-    // Projects
-    const renderProjects = () => {
-        const container = document.getElementById('projectsContainer');
-        const output = document.getElementById('r-projects-list');
-        output.innerHTML = '';
-
-        container.querySelectorAll('.dynamic-item').forEach(item => {
-            const title = item.querySelector('.proj-name').value;
-            const role = item.querySelector('.proj-role').value;
-            const link = item.querySelector('.proj-link').value;
-            const tech = item.querySelector('.proj-tech').value;
-            const desc = item.querySelector('.proj-desc').value;
-
-            if (title || desc) {
-                const div = document.createElement('div');
-                div.className = 'r-item-block';
-                div.innerHTML = `
-                    <div class="r-row-split">
-                        <span class="r-bold">${title} ${role ? `| ${role}` : ''}</span>
-                        ${link ? `<a href="${link}" target="_blank" class="r-link">${link}</a>` : ''}
+                    <!-- Hidden helpers removed to simplify as per strict request, or kept? Request says "Summary or Objective Text, 2 to 3 lines". I will simplify. -->
+                    <div class="form-group">
+                        <label>Summary text (2-3 lines) *</label>
+                        <textarea id="summary" rows="5" placeholder="Detailed summary..." required></textarea>
                     </div>
-                    ${desc ? `<div class="r-desc whitespace-pre">${desc}</div>` : ''}
-                    ${tech ? `<div class="r-tech"><strong>Tech:</strong> ${tech}</div>` : ''}
-                 `;
-                output.appendChild(div);
-            }
-        });
-        checkVisibility();
-    };
-
-    // Achievements
-    const renderAchievements = () => {
-        const container = document.getElementById('achievementsContainer');
-        const output = document.getElementById('r-achievements-list');
-        output.innerHTML = '';
-
-        container.querySelectorAll('.dynamic-item').forEach(item => {
-            const title = item.querySelector('.ach-title').value;
-            const year = item.querySelector('.ach-year').value;
-
-            if (title) {
-                const li = document.createElement('li');
-                li.innerHTML = `${title} ${year ? `(${year})` : ''}`;
-                output.appendChild(li);
-            }
-        });
-        checkVisibility();
-    };
-
-    // Languages
-    const renderLanguages = () => {
-        const container = document.getElementById('languagesContainer');
-        const output = document.getElementById('r-languages-list');
-        const items = [];
-
-        container.querySelectorAll('.dynamic-item').forEach(item => {
-            const name = item.querySelector('.lang-name').value;
-            const level = item.querySelector('.lang-level').value;
-            if (name) {
-                items.push(level ? `${name} (${level})` : name);
-            }
-        });
-        output.textContent = items.join(', ');
-        checkVisibility();
-    };
-
-    // References
-    const renderReferences = () => {
-        const displayMode = document.getElementById('refDisplay').value;
-        const output = document.getElementById('r-ref-content');
-        output.innerHTML = '';
-
-        if (displayMode === 'request') {
-            output.innerHTML = '<em>References available upon request.</em>';
-        } else {
-            const container = document.getElementById('referencesContainer');
-
-            // Use 2-col grid
-            const grid = document.createElement('div');
-            grid.className = 'r-ref-grid';
-
-            container.querySelectorAll('.dynamic-item').forEach(item => {
-                const name = item.querySelector('.ref-name').value;
-                const role = item.querySelector('.ref-role').value;
-                const org = item.querySelector('.ref-org').value;
-                const contact = item.querySelector('.ref-contact').value;
-
-                if (name) {
-                    const cell = document.createElement('div');
-                    cell.innerHTML = `
-                        <div class="r-bold">${name}</div>
-                        <div>${role}${org ? `, ${org}` : ''}</div>
-                        <div class="r-sm">${contact}</div>
-                     `;
-                    grid.appendChild(cell);
-                }
-            });
-            output.appendChild(grid);
-        }
-        checkVisibility();
-    };
-
-    /* --- 4. CONFIG & TOGGLES --- */
-
-    // Check Visibility of Sections
-    const checkVisibility = () => {
-        // Map IDs to their Data Source (logic)
-
-        // Simple Text Sections
-        ['secCerts', 'secHobbies', 'secDeclaration'].forEach(id => {
-            const sec = document.getElementById(id);
-            // find content: p tag inside or similar
-            const text = sec.querySelector('p')?.textContent.trim();
-            if (sec) sec.style.display = text ? 'block' : 'none';
-        });
-
-        // Dynamic List Sections
-        const listMap = {
-            'secSkills': 'r-skills-list',
-            'secExperience': 'r-experience-list',
-            'secEducation': 'r-education-list',
-            'secProjects': 'r-projects-list',
-            'secAchievements': 'r-achievements-list',
-            'secLanguages': 'r-languages-list', // content is text but logic same
-            'secReferences': 'r-references-list'
-        };
-
-        Object.keys(listMap).forEach(secId => {
-            const sec = document.getElementById(secId);
-            const content = document.getElementById(listMap[secId]);
-            if (sec && content) {
-                const hasContent = content.children.length > 0 || content.textContent.trim().length > 0;
-                sec.style.display = hasContent ? 'block' : 'none';
-            }
-        });
-
-        // Summary vs Objective
-        const summaryType = document.getElementById('summaryType').value;
-        const sumSec = document.getElementById('secSummary');
-        const sumText = document.querySelector('.r-summary-text').textContent;
-        document.getElementById('rSummaryTitle').textContent = summaryType === 'objective' ? 'Career Objective' : 'Professional Summary';
-        sumSec.style.display = sumText ? 'block' : 'none';
-
-        // Profile Meta
-        const meta = document.getElementById('rProfileMeta');
-        const hasMeta = ['industry', 'totalExp', 'currentRole', 'geoPref'].some(id => getValue('#' + id));
-        meta.style.display = hasMeta ? 'block' : 'none';
-
-        // Declaration Signature Block
-        // Only show if declaration text exists
-        // (already handled by simple text section logic above mostly, but signature block needs care?)
-        // The helper logic covers p text content.
-    };
-
-    // Event Listeners for Configs
-    document.getElementById('summaryType').addEventListener('change', checkVisibility);
-    document.getElementById('refDisplay').addEventListener('change', renderReferences);
-
-    // CV Type (Ordering)
-    document.getElementById('cvType').addEventListener('change', () => {
-        const type = document.getElementById('cvType').value;
-        const body = document.getElementById('resumeBody');
-        const exc = document.getElementById('secExperience');
-        const edu = document.getElementById('secEducation');
-
-        if (type === 'fresher' || type === 'academic') {
-            body.insertBefore(edu, exc);
-        } else {
-            body.insertBefore(exc, edu);
-        }
-    });
-
-    /* --- 6. MOBILE TABS --- */
-    const tabEdit = document.getElementById('tabEdit');
-    const tabPreview = document.getElementById('tabPreview');
-    const appContainer = document.querySelector('.app-container');
-
-    if (tabEdit && tabPreview) {
-        tabEdit.addEventListener('click', () => {
-            tabEdit.classList.add('active');
-            tabPreview.classList.remove('active');
-            appContainer.classList.remove('show-preview');
-        });
-
-        tabPreview.addEventListener('click', () => {
-            tabEdit.classList.remove('active');
-            tabPreview.classList.add('active');
-            appContainer.classList.add('show-preview');
-        });
-    }
-
-    /* --- 7. VALIDATION --- */
-    const validateResume = () => {
-        const errors = [];
-
-        // 1. Personal Info
-        if (!getValue('#fullName')) errors.push("Full Name is missing.");
-        if (!getValue('#jobTitle')) errors.push("Target Job Title is missing.");
-        if (!getValue('#email')) errors.push("Email is missing.");
-        if (!getValue('#phone')) errors.push("Phone is missing.");
-        if (!getValue('#location')) errors.push("Location is missing.");
-
-        // 2. Summary
-        if (!getValue('#summary')) errors.push("Summary is missing.");
-
-        // 3. Skills (At least one)
-        const skillItems = document.querySelectorAll('#skillsContainer .dynamic-item');
-        let hasSkill = false;
-        skillItems.forEach(i => {
-            if (i.querySelector('.skill-name').value.trim()) hasSkill = true;
-        });
-        if (!hasSkill) errors.push("At least one Skill is required.");
-
-        // 4. Experience OR Project (Optional - Check removed)
-        const expItems = document.querySelectorAll('#experienceContainer .dynamic-item');
-        const projItems = document.querySelectorAll('#projectsContainer .dynamic-item');
-
-        // if (!hasExp && !hasProj) errors.push("At least one Experience OR Project is required.");
-
-        // 5. Education (At least one)
-        const eduItems = document.querySelectorAll('#educationContainer .dynamic-item');
-        let hasEdu = false;
-        eduItems.forEach(i => {
-            if (i.querySelector('.edu-degree').value.trim()) hasEdu = true;
-        });
-        if (!hasEdu) errors.push("Education is required.");
-
-        // Display Status
-        const statusDiv = document.getElementById('validationStatus');
-        if (statusDiv) {
-            if (errors.length > 0) {
-                statusDiv.textContent = `⚠️ Missing: ${errors.length} fields`;
-                statusDiv.title = errors.join('\n');
-                statusDiv.style.color = '#e74c3c';
-            } else {
-                statusDiv.textContent = "✅ Ready";
-                statusDiv.style.color = '#27ae60';
-            }
-        }
-
-        return errors.length === 0;
-    };
-
-    // Attach validation to inputs
-    document.getElementById('resumeForm').addEventListener('input', validateResume);
-    // Initial check
-    setTimeout(validateResume, 1000);
-
-    /* --- 5. INIT --- */
-    attachStaticListeners();
-    setupDynamicSection('skillsContainer', 'addSkill', 'skillTemplate', () => { renderSkills(); validateResume(); });
-    setupDynamicSection('experienceContainer', 'addExperience', 'experienceTemplate', () => { renderExperience(); validateResume(); });
-    setupDynamicSection('educationContainer', 'addEducation', 'educationTemplate', () => { renderEducation(); validateResume(); });
-    setupDynamicSection('projectsContainer', 'addProject', 'projectTemplate', () => { renderProjects(); validateResume(); });
-    setupDynamicSection('achievementsContainer', 'addAchievement', 'achievementTemplate', renderAchievements);
-    setupDynamicSection('languagesContainer', 'addLanguage', 'languageTemplate', renderLanguages);
-    setupDynamicSection('referencesContainer', 'addReference', 'referenceTemplate', renderReferences);
-
-    // Ref Toggle trigger initially
-    renderReferences();
-
-    // AI Stub
-    document.getElementById('aiEnhanceSummary').addEventListener('click', (e) => {
-        e.target.innerText = 'Analyzing...';
-        setTimeout(() => {
-            alert('AI Suggestion: Keywords optimized based on job description.');
-            e.target.innerText = '✨ AI Enhance';
-        }, 800);
-    });
-
-    /* --- 8. GOOGLE SHEETS INTEGRATION --- */
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1YjSVMjZYuouVG62jeCqaIUzyvXa_YNPYQQ2f_WegU0hVqzRWMDrnDICfjev-i69Ksw/exec';
-
-    // Helper to get all dynamic values
-    const getDynamicValues = (containerId, fieldMap) => {
-        const container = document.getElementById(containerId);
-        if (!container) return [];
-        const items = [];
-        container.querySelectorAll('.dynamic-item').forEach(item => {
-            const obj = {};
-            Object.keys(fieldMap).forEach(key => {
-                const el = item.querySelector(fieldMap[key]);
-                obj[key] = el ? el.value : '';
-            });
-            items.push(obj);
-        });
-        return items;
-    };
-
-    const collectData = () => {
-        // Collect skills
-        const skillNodes = document.querySelectorAll('#skillsContainer .skill-name');
-        const skillsList = Array.from(skillNodes).map(input => input.value).filter(val => val.trim() !== '').join(', ');
-
-        return {
-            type: 'builder',
-            // Personal & Profile
-            fullName: getValue('#fullName'),
-            jobTitle: getValue('#jobTitle'),
-            // Identity Email (Login User)
-            loginEmail: (sessionStorage.getItem('gridify_admin_session') ? JSON.parse(sessionStorage.getItem('gridify_admin_session')).username : ''),
-            // Resume Contact Email (Form Input)
-            contactEmail: getValue('#email'),
-            photo: getValue('#photo'), // Photo URL
-            phone: getValue('#phone'),
-            location: getValue('#location'),
-            linkedin: getValue('#linkedin'),
-            website: getValue('#website'),
-            nationality: getValue('#nationality'),
-            // Meta
-            industry: getValue('#industry'),
-            totalExp: getValue('#totalExp'), // ID check: logic used .r-total-exp but input id?
-            // Checking input IDs from staticFields map: 
-            // 'totalExp': '.r-total-exp' is target. Input ID is same usually? 
-            // Wait, previous code used `getValue('#totalExp')`? No, staticFields keys are IDs.
-            // Let's use the known IDs from staticFields keys.
-            currentRole: getValue('#r-role'), // wait, key in staticFields is 'currentRole', selector is '.r-role'. ID is likely 'currentRole' or similar?
-            geoPref: getValue('#geoPref'), // Assuming IDs match keys if not standard
-
-            // Text Areas
-            summary: getValue('#summary'),
-
-            // Dynamic Lists (Full Objects)
-            skills: skillsList,
-            experience: getDynamicValues('experienceContainer', {
-                title: '.exp-title', company: '.exp-company', dept: '.exp-dept',
-                start: '.exp-start', end: '.exp-end', loc: '.exp-loc',
-                type: '.exp-type', desc: '.exp-desc', tech: '.exp-tech'
-            }),
-            education: getDynamicValues('educationContainer', {
-                degree: '.edu-degree', school: '.edu-school',
-                grade: '.edu-grade', gradeType: '.edu-grade-type',
-                start: '.edu-start', end: '.edu-end', loc: '.edu-loc'
-            }),
-            projects: getDynamicValues('projectsContainer', {
-                title: '.proj-name', role: '.proj-role', link: '.proj-link',
-                tech: '.proj-tech', desc: '.proj-desc'
-            }),
-            achievements: getDynamicValues('achievementsContainer', {
-                title: '.ach-title', year: '.ach-year'
-            }),
-            certifications: getValue('#certifications'), // Text area
-            languages: getDynamicValues('languagesContainer', {
-                name: '.lang-name', level: '.lang-level'
-            }),
-            hobbies: getValue('#hobbies'), // Text area
-            references: getDynamicValues('referencesContainer', {
-                name: '.ref-name', role: '.ref-role', org: '.ref-org', contact: '.ref-contact'
-            }),
-            declaration: {
-                text: getValue('#declaration'),
-                date: getValue('#declDate'),
-                place: getValue('#declPlace')
-            }
-        };
-    };
-
-    const sendToSheet = (data) => {
-        // Silent save, mostly
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            keepalive: true,
-            headers: {
-                'Content-Type': 'text/plain;charset=utf-8'
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(result => {
-                if (result.result !== 'success') {
-                    console.error('Sheet Error:', result);
-                } else {
-                    console.log('Auto-saved to Sheets');
-                }
-            })
-            .catch(error => {
-                console.error('Network Error during auto-save:', error);
-            });
-    };
-
-    const downloadBtn = document.getElementById('downloadPdfBtn');
-    if (downloadBtn) {
-        downloadBtn.addEventListener('click', (e) => {
-            let isValid = validateResume();
-
-            if (isValid) {
-                const data = collectData();
-                sendToSheet(data);
-
-                // Small delay to ensure network request starts before print dialog freezes context
-                setTimeout(() => {
-                    window.print();
-                }, 500);
-            } else {
-                // If invalid, just print? Or alert?
-                // Logic says just print, but maybe show alert?
-                alert('Resume has missing fields. Saving skipped, but you can still print.');
-                window.print();
-            }
-        });
-    }
-
-
-    /* --- 9. DATA LOADING --- */
-    const loadUserData = () => {
-        const sessionData = sessionStorage.getItem('gridify_admin_session');
-        if (!sessionData) return;
-
-        let session;
-        try { session = JSON.parse(sessionData); } catch (e) { return; }
-
-        const email = session.username; // For users, username is email
-        if (!email) return;
-
-        // PRE-FILL EMAIL IMMEDIATELY to ensure saving consistency
-        const emailInput = document.querySelector('#email');
-        if (emailInput) {
-            emailInput.value = email;
-            // dispatch input event?
-            emailInput.dispatchEvent(new Event('input'));
-            // Optional: Make it read-only to prevent user changing it and losing data link?
-            // emailInput.readOnly = true; 
-        }
-
-        console.log("Fetching data for:", email);
-
-        // Loader
-        const loadingDiv = document.createElement('div');
-        loadingDiv.id = 'data-loader-overlay';
-        loadingDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;';
-        loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div><div class="mt-2 fw-bold">Loading your data...</div>';
-        document.body.appendChild(loadingDiv);
-
-        fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            redirect: "follow",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8",
-            },
-            body: JSON.stringify({ action: 'fetch_data', email: email, sheetName: 'builder' })
-        })
-            .then(res => res.json())
-            .then(resp => {
-                if (resp.result === 'success' && resp.data) {
-                    populateBuilder(resp.data);
-                    // Optional: remove this alert later
-                    // alert("Data loaded successfully!");
-                } else {
-                    console.log("No existing data found or error:", resp);
-                    // alert("No saved data found for this email.");
-                }
-            })
-            .catch(err => {
-                console.error("Load Error:", err);
-                alert("Failed to load data. Please check connection.");
-            })
-            .finally(() => {
-                if (document.body.contains(loadingDiv)) document.body.removeChild(loadingDiv);
-            });
-    };
-
-    const populateBuilder = (data) => {
-        const setVal = (sel, val) => {
-            const el = document.querySelector(sel);
-            if (el) { el.value = val !== undefined ? val : ''; el.dispatchEvent(new Event('input')); }
-        };
-
-        setVal('#fullName', data.fullName);
-        setVal('#jobTitle', data.jobTitle);
-        setVal('#email', data.email);
-        setVal('#photo', data.photo);
-        setVal('#phone', data.phone);
-        setVal('#location', data.location);
-        setVal('#linkedin', data.linkedin);
-        setVal('#website', data.website);
-        setVal('#nationality', data.nationality);
-        setVal('#industry', data.industry);
-        setVal('#totalExp', data.totalExp);
-        setVal('#currentRole', data.currentRole);
-        setVal('#geoPref', data.geoPref);
-        setVal('#summary', data.summary);
-        setVal('#certifications', data.certifications);
-        setVal('#hobbies', data.hobbies);
-        if (data.declaration) {
-            setVal('#declaration', data.declaration.text);
-            setVal('#declDate', data.declaration.date);
-            setVal('#declPlace', data.declaration.place);
-        }
-
-        const populateList = (btnId, containerId, items, mapper) => {
-            const btn = document.getElementById(btnId);
-            const container = document.getElementById(containerId);
-            if (!btn || !container) return;
-            container.innerHTML = '';
-            if (!items || !Array.isArray(items)) return;
-            items.forEach(item => {
-                btn.click();
-                const newItem = container.lastElementChild;
-                if (newItem) mapper(newItem, item);
-            });
-        };
-
-        if (data.skills) {
-            const skillArr = data.skills.split(',').map(s => {
-                s = s.trim();
-                let name = s, level = '';
-                if (s.includes('(') && s.endsWith(')')) {
-                    const idx = s.lastIndexOf('(');
-                    name = s.substring(0, idx).trim();
-                    level = s.substring(idx + 1, s.length - 1).trim();
-                }
-                return { name, level };
-            });
-            populateList('addSkill', 'skillsContainer', skillArr, (el, item) => {
-                el.querySelector('.skill-name').value = item.name;
-                if (item.level) el.querySelector('.skill-level').value = item.level;
-                el.querySelector('.skill-name').dispatchEvent(new Event('input'));
-            });
-        }
-
-        populateList('addExperience', 'experienceContainer', data.experience, (el, item) => {
-            el.querySelector('.exp-title').value = item.title || '';
-            el.querySelector('.exp-company').value = item.company || '';
-            el.querySelector('.exp-dept').value = item.dept || '';
-            el.querySelector('.exp-start').value = item.start || '';
-            el.querySelector('.exp-end').value = item.end || '';
-            el.querySelector('.exp-loc').value = item.loc || '';
-            el.querySelector('.exp-type').value = item.type || '';
-            el.querySelector('.exp-desc').value = item.desc || '';
-            el.querySelector('.exp-tech').value = item.tech || '';
-            el.querySelector('.exp-title').dispatchEvent(new Event('input'));
-        });
-
-        populateList('addEducation', 'educationContainer', data.education, (el, item) => {
-            el.querySelector('.edu-degree').value = item.degree || '';
-            el.querySelector('.edu-school').value = item.school || '';
-            el.querySelector('.edu-grade').value = item.grade || '';
-            el.querySelector('.edu-grade-type').value = item.gradeType || '';
-            el.querySelector('.edu-start').value = item.start || '';
-            el.querySelector('.edu-end').value = item.end || '';
-            el.querySelector('.edu-loc').value = item.loc || '';
-            el.querySelector('.edu-degree').dispatchEvent(new Event('input'));
-        });
-
-        populateList('addProject', 'projectsContainer', data.projects, (el, item) => {
-            el.querySelector('.proj-name').value = item.title || '';
-            el.querySelector('.proj-role').value = item.role || '';
-            el.querySelector('.proj-link').value = item.link || '';
-            el.querySelector('.proj-tech').value = item.tech || '';
-            el.querySelector('.proj-desc').value = item.desc || '';
-            el.querySelector('.proj-name').dispatchEvent(new Event('input'));
-        });
-
-        populateList('addAchievement', 'achievementsContainer', data.achievements, (el, item) => {
-            el.querySelector('.ach-title').value = item.title || '';
-            el.querySelector('.ach-year').value = item.year || '';
-            el.querySelector('.ach-title').dispatchEvent(new Event('input'));
-        });
-
-        populateList('addLanguage', 'languagesContainer', data.languages, (el, item) => {
-            el.querySelector('.lang-name').value = item.name || '';
-            el.querySelector('.lang-level').value = item.level || '';
-            el.querySelector('.lang-name').dispatchEvent(new Event('input'));
-        });
-
-        populateList('addReference', 'referencesContainer', data.references, (el, item) => {
-            el.querySelector('.ref-name').value = item.name || '';
-            el.querySelector('.ref-role').value = item.role || '';
-            el.querySelector('.ref-org').value = item.org || '';
-            el.querySelector('.ref-contact').value = item.contact || '';
-            el.querySelector('.ref-name').dispatchEvent(new Event('input'));
-        });
-    };
-
-    /* --- 10. IMAGE UPLOAD TOOL --- */
-    const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyTfcGr8fa2c7kwwSzuDwMRPUMnzRhepBQCnetFLHNqjkuaUaaXAIuhACJsS3lk_lBq/exec';
-
-    const tabTools = document.getElementById('tabTools');
-    const showToolsBtn = document.getElementById('showToolsBtn');
-    const backToEditorBtn = document.getElementById('backToEditorBtn');
-    const uploadShortcutBtn = document.getElementById('uploadShortcutBtn');
-
-    // Elements
-    const resumeForm = document.getElementById('resumeForm');
-    const uploadSection = document.getElementById('uploadSection');
-    const editorPanel = document.getElementById('editorPanel');
-
-    // Toggle Functions
-    const showUploadInterface = () => {
-        resumeForm.style.display = 'none';
-        uploadSection.style.display = 'block';
-
-        // Mobile Tab State
-        if (tabTools) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            tabTools.classList.add('active');
-        }
-    };
-
-    const showEditorInterface = () => {
-        resumeForm.style.display = 'block';
-        uploadSection.style.display = 'none';
-
-        // Mobile Tab State
-        if (tabTools && tabEdit) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            tabEdit.classList.add('active');
-        }
-    };
-
-    // Listeners
-    let isShortcutUpload = false;
-
-    if (showToolsBtn) {
-        showToolsBtn.addEventListener('click', () => {
-            isShortcutUpload = false;
-            showUploadInterface();
-        });
-    }
-
-    if (uploadShortcutBtn) {
-        uploadShortcutBtn.addEventListener('click', () => {
-            isShortcutUpload = true;
-            showUploadInterface();
-        });
-    }
-
-    if (backToEditorBtn) backToEditorBtn.addEventListener('click', showEditorInterface);
-
-    // Mobile Tab Logic Update
-    if (tabTools) {
-        tabTools.addEventListener('click', () => {
-            isShortcutUpload = false; // Tab always acts like Tools button
-            // Switch to Editor Panel view first (if in Preview)
-            appContainer.classList.remove('show-preview');
-            if (tabPreview) tabPreview.classList.remove('active');
-
-            showUploadInterface();
-        });
-    }
-
-    // Also update existing tabs to switch back to form
-    if (tabEdit) {
-        // Intercept existing click to ensure form is shown
-        const originalClick = tabEdit.onclick; // not using onclick property, using addEventListener.
-        // We add a new listener. Events fire in order.
-        tabEdit.addEventListener('click', () => {
-            showEditorInterface();
-        });
-    }
-
-
-    /* --- Upload Logic --- */
-    const dropZone = document.getElementById('dropZone');
-    const imageInput = document.getElementById('imageInput');
-    const uploadPreview = document.getElementById('uploadPreview');
-    const previewImg = document.getElementById('previewImg');
-    const confirmUploadBtn = document.getElementById('confirmUploadBtn');
-    const cancelUploadBtn = document.getElementById('cancelUploadBtn');
-    const uploadLoader = document.getElementById('uploadLoader');
-    const uploadResult = document.getElementById('uploadResult');
-    const resultUrl = document.getElementById('resultUrl');
-    const copyUrlBtn = document.getElementById('copyUrlBtn');
-
-    let currentFile = null;
-
-    // Drag & Drop
-    if (dropZone) {
-        dropZone.addEventListener('click', () => imageInput.click());
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--accent-color)';
-        });
-
-        dropZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--border-dark)';
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = 'var(--border-dark)';
-            const files = e.dataTransfer.files;
-            if (files.length) handleFileSelect(files[0]);
-        });
-    }
-
-    if (imageInput) {
-        imageInput.addEventListener('change', (e) => {
-            if (e.target.files.length) handleFileSelect(e.target.files[0]);
-        });
-    }
-
-    const handleFileSelect = (file) => {
-        if (!file.type.startsWith('image/')) {
-            alert('Please select an image file.');
-            return;
-        }
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            alert('File is too large. Max 5MB.');
-            return;
-        }
-
-        currentFile = file;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            previewImg.src = e.target.result;
-            dropZone.style.display = 'none';
-            uploadPreview.style.display = 'block';
-            uploadResult.style.display = 'none';
-        };
-        reader.readAsDataURL(file);
-    };
-
-    if (cancelUploadBtn) {
-        cancelUploadBtn.addEventListener('click', () => {
-            currentFile = null;
-            previewImg.src = '';
-            dropZone.style.display = 'block';
-            uploadPreview.style.display = 'none';
-            imageInput.value = ''; // Reset input
-        });
-    }
-
-    if (confirmUploadBtn) {
-        confirmUploadBtn.addEventListener('click', () => {
-            if (!currentFile) return;
-
-            uploadPreview.style.display = 'none';
-            uploadLoader.style.display = 'block';
-
-            const reader = new FileReader();
-            reader.readAsDataURL(currentFile);
-            reader.onload = function () {
-                const base64Data = reader.result.split(',')[1]; // Remove header
-                const payload = {
-                    image: base64Data,
-                    mimeType: currentFile.type
-                };
-
-                fetch(UPLOAD_SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        uploadLoader.style.display = 'none';
-                        if (data.result === 'success') {
-                            uploadResult.style.display = 'block';
-                            resultUrl.value = data.url;
-
-                            // AUTO-FILL LOGIC
-                            const photoInput = document.getElementById('photo');
-                            if (photoInput) {
-                                photoInput.value = data.url;
-                                photoInput.dispatchEvent(new Event('input'));
-                                // Optional: Alert user visually
-                                const resultLabel = uploadResult.querySelector('label');
-                                if (resultLabel) resultLabel.textContent = "Image URL (Auto-applied to Resume):";
-                            }
-
-                            // Conditional Redirect
-                            if (isShortcutUpload) {
-                                setTimeout(() => {
-                                    showEditorInterface();
-                                }, 1000); // 1s delay to show success state
-                            }
-
-                        } else {
-                            alert('Upload Failed: ' + data.message);
-                            // Show retry
-                            uploadPreview.style.display = 'block';
-                        }
-                    })
-                    .catch(err => {
-                        uploadLoader.style.display = 'none';
-                        alert('Network Error: ' + err.message);
-                        uploadPreview.style.display = 'block';
-                    });
-            };
-        });
-    }
-
-    if (copyUrlBtn) {
-        copyUrlBtn.addEventListener('click', () => {
-            resultUrl.select();
-            document.execCommand('copy'); // Fallback or use navigator.clipboard
-            // navigator.clipboard.writeText(resultUrl.value);
-            const originalText = copyUrlBtn.textContent;
-            copyUrlBtn.textContent = 'Copied!';
-            setTimeout(() => copyUrlBtn.textContent = originalText, 2000);
-        });
-    }
-
-    loadUserData();
-});
+                </section>
+
+                <!-- 3. Skills (Mandatory) -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2>3. Skills <span class="req">*</span></h2>
+                        <button type="button" class="btn-secondary" id="addSkill">+ Add Skill</button>
+                    </div>
+                    <div id="skillsContainer">
+                        <!-- Dynamic Skills -->
+                    </div>
+                    <small style="color: #666; display: block; margin-top: 5px;">At least one skill is required.</small>
+                </section>
+
+                <!-- 4. Experience OR Projects (At Least One Required) -->
+                <section class="form-section" id="secWorkExpConfig">
+                    <div class="section-header">
+                        <h2>4. Experience / Projects <span class="req">*</span></h2>
+                    </div>
+                    <p style="font-size: 0.85rem; color: #555; margin-bottom: 1rem;">At least one Experience OR one
+                        Project is required.</p>
+
+                    <!-- Option A -->
+                    <div class="sub-section" style="margin-bottom: 1.5rem;">
+                        <div class="section-header">
+                            <h3 style="font-size: 1rem; color: #444; margin:0;">Option A: Experience</h3>
+                            <button type="button" class="btn-secondary" id="addExperience">+ Add Experience</button>
+                        </div>
+                        <div id="experienceContainer"></div>
+                    </div>
+
+                    <!-- Option B -->
+                    <div class="sub-section">
+                        <div class="section-header">
+                            <h3 style="font-size: 1rem; color: #444; margin:0;">Option B: Projects (Freshers)</h3>
+                            <button type="button" class="btn-secondary" id="addProject">+ Add Project</button>
+                        </div>
+                        <div id="projectsContainer"></div>
+                    </div>
+                </section>
+
+                <!-- 6. Education -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2>Education</h2>
+                        <button type="button" class="btn-secondary" id="addEducation">+ Add More Education</button>
+                    </div>
+                    <div id="educationContainer">
+                        <!-- Dynamic Education -->
+                    </div>
+                </section>
+
+                <!-- Projects moved to Section 4 -->
+
+                <!-- 9. Achievements -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2>Achievements / Awards</h2>
+                        <button type="button" class="btn-secondary" id="addAchievement">+ Add More Achievement</button>
+                    </div>
+                    <div id="achievementsContainer">
+                        <!-- Dynamic Achievements -->
+                    </div>
+                </section>
+
+                <!-- 8. Certifications -->
+                <section class="form-section">
+                    <h2>Certifications</h2>
+                    <div class="form-group">
+                        <label>List Certifications (One per line: Name - Org - Year)</label>
+                        <textarea id="certifications" rows="3"></textarea>
+                    </div>
+                </section>
+
+                <!-- 11. Languages -->
+                <section class="form-section">
+                    <div class="section-header">
+                        <h2>Languages</h2>
+                        <button type="button" class="btn-secondary" id="addLanguage">+ Add More Language</button>
+                    </div>
+                    <div id="languagesContainer">
+                        <!-- Dynamic Languages -->
+                    </div>
+                </section>
+
+                <!-- 10. Hobbies -->
+                <section class="form-section">
+                    <h2>Hobbies</h2>
+                    <div class="form-group">
+                        <label>List Hobbies (One per line, plain text)</label>
+                        <textarea id="hobbies" rows="2"></textarea>
+                    </div>
+                </section>
+
+                <!-- 12. References -->
+                <section class="form-section" id="refInputSection">
+                    <div class="section-header">
+                        <h2>References</h2>
+                        <button type="button" class="btn-secondary" id="addReference">+ Add More Reference</button>
+                    </div>
+                    <div id="referencesContainer">
+                        <!-- Dynamic References -->
+                    </div>
+                </section>
+
+                <!-- 13. Declaration -->
+                <section class="form-section">
+                    <h2>Declaration</h2>
+                    <div class="form-group">
+                        <label>Text</label>
+                        <textarea id="declaration"
+                            rows="2">I **YOUR NAME** hereby declare that the details furnished above are true to the best of my knowledge.</textarea>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="text" id="declDate" placeholder="DD/MM/YYYY">
+                        </div>
+                        <div class="form-group">
+                            <label>Place</label>
+                            <input type="text" id="declPlace" placeholder="City">
+                        </div>
+                    </div>
+                </section>
+
+            </form>
+
+            <!-- UPLOAD SECTION (Hidden by default) -->
+            <div id="uploadSection" class="form-section" style="display:none; text-align:center; padding: 2rem 0;">
+                <div class="upload-container">
+                    <h2>Image Hosting Tool</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 2rem;">Upload an image to get a public URL
+                        for your resume.</p>
+
+                    <div class="drop-zone" id="dropZone">
+                        <input type="file" id="imageInput" accept="image/*" class="file-input" hidden>
+                        <div class="drop-content">
+                            <span style="font-size: 3rem; display:block; margin-bottom:1rem;">📂</span>
+                            <p>Drag & Drop your image here or <span class="browser-btn">Browse</span></p>
+                            <p style="font-size: 0.8rem; color: var(--text-muted);">Supports JPG, PNG (Max 5MB)</p>
+                        </div>
+                    </div>
+
+                    <div id="uploadPreview" style="display:none; margin-top: 1.5rem;">
+                        <img id="previewImg" src="" alt="Preview"
+                            style="max-width: 200px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+                        <div style="margin-top: 1rem;">
+                            <button id="confirmUploadBtn" class="btn-primary">Upload Image</button>
+                            <button id="cancelUploadBtn" class="btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div id="uploadLoader" style="display:none; margin-top: 1.5rem;">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p>Uploading to Server...</p>
+                    </div>
+
+                    <div id="uploadResult"
+                        style="display:none; margin-top: 2rem; text-align: left; background: var(--input-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-dark);">
+                        <label
+                            style="font-weight: bold; display: block; margin-bottom: 0.5rem; color: var(--text-primary);">Image
+                            URL (Copy this):</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="resultUrl" readonly
+                                style="flex:1; background: #1e293b; border: 1px solid var(--border-dark); padding: 0.5rem; color: #4ade80; border-radius: 4px;">
+                            <button id="copyUrlBtn" class="btn-secondary">Copy</button>
+                        </div>
+                        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">This URL has
+                            been saved to your records.</p>
+                    </div>
+
+                    <button id="backToEditorBtn" class="btn-secondary" style="margin-top: 3rem;">&larr; Back to
+                        Editor</button>
+                </div>
+            </div>
+
+            <div class="app-footer">
+                <p>Designed and Developed by <a href="https://www.gridify.in" target="_blank">GRIDIFY</a></p>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE: PREVIEW (A4) -->
+        <div class="preview-panel" id="previewPanel">
+            <div class="resume-paper" id="resumePreview">
+
+                <!-- Header -->
+                <div class="resume-header" id="resumeHeader">
+                    <!-- Photo Container -->
+                    <div class="r-photo-container" id="rPhotoContainer" style="display:none;">
+                        <img id="rPhoto" src="" alt="Profile Photo">
+                    </div>
+                    <div class="r-header-content">
+                        <h1 class="r-name">NO NAME</h1>
+                        <p class="r-title">Target Role</p>
+
+                        <div class="r-contact-info">
+                            <!-- Separator logic will be styled in CSS or JS text -->
+                            <span class="r-phone"></span>
+                            <span class="r-email"></span>
+                            <span class="r-location"></span>
+                            <span class="r-linkedin"></span>
+                            <span class="r-website"></span>
+                            <span class="r-nationality"></span>
+                        </div>
+
+                    </div>
+                    <!-- Profile Meta Structured -->
+                    <div class="r-profile-meta hidden-if-empty" id="rProfileMeta">
+                        <div class="r-meta-row">
+                            <span class="r-meta-item r-industry"></span>
+                            <span class="r-meta-item r-exp"></span>
+                            <span class="r-meta-item r-role"></span>
+                            <span class="r-meta-item r-geo"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resume-body" id="resumeBody">
+
+                    <!-- Summary/Objective -->
+                    <div class="r-section" id="secSummary">
+                        <h2 class="r-section-title" id="rSummaryTitle">Professional Summary</h2>
+                        <p class="r-summary-text"></p>
+                    </div>
+
+                    <!-- Skills (Structured List) -->
+                    <div class="r-section" id="secSkills">
+                        <h2 class="r-section-title">Skills</h2>
+                        <div id="r-skills-list" class="r-skills-container">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Experience -->
+                    <div class="r-section" id="secExperience">
+                        <h2 class="r-section-title">Work Experience</h2>
+                        <div id="r-experience-list">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="r-section" id="secEducation">
+                        <h2 class="r-section-title">Education</h2>
+                        <div id="r-education-list">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Projects -->
+                    <div class="r-section" id="secProjects">
+                        <h2 class="r-section-title">Projects</h2>
+                        <div id="r-projects-list">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Achievements -->
+                    <div class="r-section" id="secAchievements">
+                        <h2 class="r-section-title">Achievements</h2>
+                        <ul id="r-achievements-list" class="r-bullet-list">
+                            <!-- Dynamic Content -->
+                        </ul>
+                    </div>
+
+                    <!-- Certifications -->
+                    <div class="r-section" id="secCerts">
+                        <h2 class="r-section-title">Certifications</h2>
+                        <p class="r-certs-text whitespace-pre"></p>
+                    </div>
+
+                    <!-- Languages -->
+                    <div class="r-section" id="secLanguages">
+                        <h2 class="r-section-title">Languages</h2>
+                        <p id="r-languages-list" class="r-comma-list"></p>
+                    </div>
+
+                    <!-- Hobbies -->
+                    <div class="r-section" id="secHobbies">
+                        <h2 class="r-section-title">Hobbies</h2>
+                        <p class="r-hobbies-text whitespace-pre"></p>
+                    </div>
+
+                    <!-- References -->
+                    <div class="r-section" id="secReferences">
+                        <h2 class="r-section-title">References</h2>
+                        <div id="r-ref-content">
+                            <!-- List or "Available directly" -->
+                        </div>
+                    </div>
+
+                    <!-- Declaration -->
+                    <div class="r-section" id="secDeclaration">
+                        <h2 class="r-section-title">Declaration</h2>
+                        <p class="r-declaration-text"></p>
+                        <div class="r-declaration-sign">
+                            <div class="r-date-place">
+                                <p><strong>Date:</strong> <span class="r-decl-date"></span></p>
+                                <p><strong>Place:</strong> <span class="r-decl-place"></span></p>
+                            </div>
+                            <div class="r-signature-block">
+                                <p style="margin-bottom:20pt;">(Signature)</p>
+                                <p class="r-name-sign"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATES -->
+
+    <!-- Skill Template -->
+    <template id="skillTemplate">
+        <div class="dynamic-item">
+            <button type="button" class="btn-remove remove-btn">&times;</button>
+            <div class="form-grid">
+                <!-- Category removed as per flat list requirement -->
+                <div class="form-group">
+                    <label>Skill Name</label>
+                    <input type="text" class="skill-name" placeholder="Java / Communication">
+                </div>
+                <div class="form-group full">
+                    <label>Proficiency (Optional)</label>
+                    <select class="skill-level">
+                        <option value="">None</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Expert">Expert</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Experience Template -->
+    <template id="experienceTemplate">
+        <div class="dynamic-item">
+            <button type="button" class="btn-remove remove-btn">&times;</button>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" class="exp-title" placeholder="Senior Developer">
+                </div>
+                <div class="form-group">
+                    <label>Company</label>
+                    <input type="text" class="exp-company" placeholder="Acme Corp">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <input type="text" class="exp-dept" placeholder="Engineering">
+                </div>
+                <div class="form-group">
+                    <label>Start</label>
+                    <input type="text" class="exp-start" placeholder="MM/YYYY">
+                </div>
+                <div class="form-group">
+                    <label>End</label>
+                    <input type="text" class="exp-end" placeholder="Present">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" class="exp-loc" placeholder="City, State">
+                </div>
+                <div class="form-group">
+                    <label>Emp Type</label>
+                    <input type="text" class="exp-type" placeholder="Full-time">
+                </div>
+                <div class="form-group full">
+                    <label>Responsibilities (Bullets recommended)</label>
+                    <textarea class="exp-desc" rows="3" placeholder="- Led team of 5..."></textarea>
+                </div>
+                <div class="form-group full">
+                    <label>Tech Stack / Tools</label>
+                    <input type="text" class="exp-tech" placeholder="React, Node.js">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Education Template -->
+    <template id="educationTemplate">
+        <div class="dynamic-item">
+            <button type="button" class="btn-remove remove-btn">&times;</button>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Degree</label>
+                    <input type="text" class="edu-degree" placeholder="BS Computer Science">
+                </div>
+                <!-- Institution -> University -->
+                <div class="form-group">
+                    <label>University / Institute</label>
+                    <input type="text" class="edu-school" placeholder="University of Tech">
+                </div>
+                <!-- Field of Study Removed -->
+
+                <div class="form-group">
+                    <label>Grade / CGPA</label>
+                    <div style="display:flex; gap:5px;">
+                        <input type="text" class="edu-grade" placeholder="3.8 or 85">
+                        <select class="edu-grade-type" style="width: 80px;">
+                            <option value="cgpa">CGPA</option>
+                            <option value="percent">%</option>
+                            <option value="grade">Grade</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Start Year</label>
+                    <input type="text" class="edu-start" placeholder="2018">
+                </div>
+                <div class="form-group">
+                    <label>End Year</label>
+                    <input type="text" class="edu-end" placeholder="2022">
+                </div>
+                <div class="form-group full">
+                    <label>Location</label>
+                    <input type="text" class="edu-loc" placeholder="City, State">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Project Template -->
+    <template id="projectTemplate">
+        <div class="dynamic-item">
+            <button type="button" class="btn-remove remove-btn">&times;</button>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Project Title</label>
+                    <input type="text" class="proj-name" placeholder="E-commerce App">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <input type="text" class="proj-role" placeholder="Frontend Dev">
+                </div>
+                <div class="form-group">
+                    <label>Link</label>
+                    <input type="text" class="proj-link" placeholder="github.com/...">
+                </div>
+                <div class="form-group">
+                    <label>Tech Used</label>
+                    <input type="text" class="proj-tech" placeholder="Python, Django">
+                </div>
+                <div class="form-group full">
+                    <label>Description (Bullets)</label>
+                    <textarea class="proj-desc" rows="2" placeholder="- Built cart feature..."></textarea>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Achievement Template -->
+    <template id="achievementTemplate">
+        <div class="dynamic-item">
+            <button type="button" class="btn-remove remove-btn">&times;</button>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Title / Description</label>
+                    <input type="text" class="ach-title" placeholder="Employee of the Month">
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input type="text" class="ach-year" placeholder="2023">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Language Template -->
+    <template id="languageTemplate">
+        <div class="dynamic-item">
+            <button type="button" class="btn-remove remove-btn">&times;</button>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Language</label>
+                    <input type="text" class="lang-name" placeholder="English">
+                </div>
+                <div class="form-group">
+                    <label>Proficiency</label>
+                    <input type="text" class="lang-level" placeholder="Native / Fluent">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Reference Template -->
+    <template id="referenceTemplate">
+        <div class="dynamic-item">
+            <button type="button" class="btn-remove remove-btn">&times;</button>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="ref-name" placeholder="Jane Doe">
+                </div>
+                <div class="form-group">
+                    <label>Designation</label>
+                    <input type="text" class="ref-role" placeholder="Manager">
+                </div>
+                <div class="form-group">
+                    <label>Organization</label>
+                    <input type="text" class="ref-org" placeholder="Acme Inc">
+                </div>
+                <div class="form-group">
+                    <label>Contact Info</label>
+                    <input type="text" class="ref-contact" placeholder="email@example.com">
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
