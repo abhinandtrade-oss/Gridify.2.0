@@ -228,8 +228,10 @@ body {
     background-color: #0f172a;
     /* Slate 900 for high contrast with paper */
     padding: 1rem;
-    overflow-y: auto; /* Ensure vertical scroll works reliably */
-    display: block;   /* Changed from flex to block to allow natural document flow */
+    overflow-y: auto;
+    /* Ensure vertical scroll works reliably */
+    display: block;
+    /* Changed from flex to block to allow natural document flow */
     position: relative;
 }
 
@@ -274,8 +276,10 @@ body {
     background: white;
     width: 210mm;
     min-height: 297mm;
-    height: auto; /* Allow growth */
-    margin: 0 auto; /* Center horizontally */
+    height: auto;
+    /* Allow growth */
+    margin: 0 auto;
+    /* Center horizontally */
     padding: 15mm 20mm;
     /* Standard margins */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -285,7 +289,8 @@ body {
     line-height: 1.5;
     font-size: 11pt;
     /* Standard ATS size */
-    overflow: hidden; /* Contain floats if any, though flex is used inside */
+    overflow: hidden;
+    /* Contain floats if any, though flex is used inside */
 }
 
 /* Resume Core Styles */
@@ -527,7 +532,8 @@ body {
         background: white;
         transform: none !important;
         /* Remove any scale */
-        color: #000; /* Ensure text is black */
+        color: #000;
+        /* Ensure text is black */
     }
 
     /* Pagination / Breaks */
@@ -545,7 +551,8 @@ body {
     a {
         text-decoration: none;
         color: #000;
-        pointer-events: none; /* Prevent clickable links if preferred, but text remains selectable */
+        pointer-events: none;
+        /* Prevent clickable links if preferred, but text remains selectable */
     }
 }
 
@@ -690,4 +697,36 @@ body {
     .app-footer {
         display: none;
     }
+}
+
+/* --- UPLOAD SECTION STYLES --- */
+.upload-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.drop-zone {
+    border: 2px dashed var(--border-dark);
+    border-radius: 12px;
+    padding: 2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(30, 41, 59, 0.5);
+}
+
+.drop-zone:hover {
+    border-color: var(--accent-color);
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.browser-btn {
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+#previewImg {
+    border: 2px solid var(--border-dark);
+    background: white;
+    /* to see transparent images clearly */
 }
