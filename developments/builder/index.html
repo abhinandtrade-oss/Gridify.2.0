@@ -78,10 +78,13 @@
                         </div>
                         <div class="form-group">
                             <label>Photo URL (Optional)</label>
-                            <div style="display: flex; gap: 5px;">
-                                <input type="url" id="photo" placeholder="https://example.com/photo.jpg" style="flex:1">
-                                <button type="button" id="uploadShortcutBtn" class="btn-secondary" title="Upload Image"
-                                    style="padding: 0 25px;">☁️Upload Image</button>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <input type="url" id="photo" placeholder="https://example.com/photo.jpg"
+                                    style="flex:1; min-width: 0;">
+                                <button type="button" id="uploadShortcutBtn" class="btn-secondary shortcut-btn"
+                                    title="Upload Image">
+                                    <span class="btn-icon">☁️</span> <span class="btn-text">Upload</span>
+                                </button>
                             </div>
                             <small style="font-size: 0.75rem; color: #e74c3c;">Skipping the photo keeps your resume more
                                 ATS friendly.</small>
@@ -96,11 +99,11 @@
                         </div>
                         <div class="form-group">
                             <label>Phone Number *</label>
-                            <input type="tel" id="phone" placeholder="+1 234 567 890" required>
+                            <input type="tel" id="phone" placeholder="+91 934 567 890" required>
                         </div>
                         <div class="form-group full">
-                            <label>Location (City, Country) *</label>
-                            <input type="text" id="location" placeholder="New York, USA" required>
+                            <label>Address *</label>
+                            <input type="text" id="location" placeholder="Kerala, India" required>
                         </div>
                         <div class="form-group">
                             <label>LinkedIn URL</label>
@@ -514,7 +517,7 @@
                 </div>
                 <div class="form-group">
                     <label>Start</label>
-                    <input type="text" class="exp-start" placeholder="MM/YYYY">
+                    <input type="text" class="exp-start" placeholder="DD/MM/YYYY">
                 </div>
                 <div class="form-group">
                     <label>End</label>
@@ -546,7 +549,7 @@
             <button type="button" class="btn-remove remove-btn">&times;</button>
             <div class="form-grid">
                 <div class="form-group">
-                    <label>Degree</label>
+                    <label>Cource</label>
                     <input type="text" class="edu-degree" placeholder="BS Computer Science">
                 </div>
                 <!-- Institution -> University -->
@@ -665,7 +668,7 @@
                 </div>
                 <div class="form-group">
                     <label>Contact Info</label>
-                    <input type="text" class="ref-contact" placeholder="email@example.com">
+                    <input type="text" class="ref-contact" placeholder="Mob / Email">
                 </div>
             </div>
         </div>
