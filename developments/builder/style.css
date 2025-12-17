@@ -222,6 +222,20 @@ body {
     transform: scale(1.1);
 }
 
+
+/* key changes in style.css */
+.preview-panel {
+    display: block; /* Robust vertical scrolling */
+    overflow-y: auto;
+    /* ... */
+}
+.resume-paper {
+    height: auto; /* Grows with content */
+    margin: 0 auto; /* Centers horizontally in the block parent */
+    /* ... */
+}
+
+
 /* RIGHT PANEL: PREVIEW */
 .preview-panel {
     flex: 1;
@@ -689,3 +703,4 @@ body {
         display: none;
     }
 }
+
