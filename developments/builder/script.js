@@ -433,20 +433,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         if (!hasSkill) errors.push("At least one Skill is required.");
 
-        // 4. Experience OR Project (At least one total)
+        // 4. Experience OR Project (Optional - Check removed)
         const expItems = document.querySelectorAll('#experienceContainer .dynamic-item');
         const projItems = document.querySelectorAll('#projectsContainer .dynamic-item');
-        let hasExp = false;
-        let hasProj = false;
 
-        expItems.forEach(i => {
-            if (i.querySelector('.exp-title').value.trim()) hasExp = true;
-        });
-        projItems.forEach(i => {
-            if (i.querySelector('.proj-name').value.trim()) hasProj = true;
-        });
-
-        if (!hasExp && !hasProj) errors.push("At least one Experience OR Project is required.");
+        // if (!hasExp && !hasProj) errors.push("At least one Experience OR Project is required.");
 
         // 5. Education (At least one)
         const eduItems = document.querySelectorAll('#educationContainer .dynamic-item');
@@ -500,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* --- 8. GOOGLE SHEETS INTEGRATION --- */
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwa-o23BceevxUgQHY686Y0weLKUQeVm0QHafp5gY8wqYYtfEttiEWX4c6KPsohBFoxkA/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1YjSVMjZYuouVG62jeCqaIUzyvXa_YNPYQQ2f_WegU0hVqzRWMDrnDICfjev-i69Ksw/exec';
 
     // Helper to get all dynamic values
     const getDynamicValues = (containerId, fieldMap) => {
@@ -528,7 +519,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Personal & Profile
             fullName: getValue('#fullName'),
             jobTitle: getValue('#jobTitle'),
-            email: getValue('#email'),
+            // Identity Email (Login User)
+            loginEmail: (sessionStorage.getItem('gridify_admin_session') ? JSON.parse(sessionStorage.getItem('gridify_admin_session')).username : ''),
+            // Resume Contact Email (Form Input)
+            contactEmail: getValue('#email'),
+            photo: getValue('#photo'), // Photo URL
             phone: getValue('#phone'),
             location: getValue('#location'),
             linkedin: getValue('#linkedin'),
@@ -628,4 +623,176 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    /* --- 9. DATA LOADING --- */
+    const loadUserData = () => {
+        const sessionData = sessionStorage.getItem('gridify_admin_session');
+        if (!sessionData) return;
+
+        let session;
+        try { session = JSON.parse(sessionData); } catch (e) { return; }
+
+        const email = session.username; // For users, username is email
+        if (!email) return;
+
+        // PRE-FILL EMAIL IMMEDIATELY to ensure saving consistency
+        const emailInput = document.querySelector('#email');
+        if (emailInput) {
+            emailInput.value = email;
+            // dispatch input event?
+            emailInput.dispatchEvent(new Event('input'));
+            // Optional: Make it read-only to prevent user changing it and losing data link?
+            // emailInput.readOnly = true; 
+        }
+
+        console.log("Fetching data for:", email);
+
+        // Loader
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'data-loader-overlay';
+        loadingDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;';
+        loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div><div class="mt-2 fw-bold">Loading your data...</div>';
+        document.body.appendChild(loadingDiv);
+
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            redirect: "follow",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8",
+            },
+            body: JSON.stringify({ action: 'fetch_data', email: email, sheetName: 'builder' })
+        })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.result === 'success' && resp.data) {
+                    populateBuilder(resp.data);
+                    // Optional: remove this alert later
+                    // alert("Data loaded successfully!");
+                } else {
+                    console.log("No existing data found or error:", resp);
+                    // alert("No saved data found for this email.");
+                }
+            })
+            .catch(err => {
+                console.error("Load Error:", err);
+                alert("Failed to load data. Please check connection.");
+            })
+            .finally(() => {
+                if (document.body.contains(loadingDiv)) document.body.removeChild(loadingDiv);
+            });
+    };
+
+    const populateBuilder = (data) => {
+        const setVal = (sel, val) => {
+            const el = document.querySelector(sel);
+            if (el) { el.value = val !== undefined ? val : ''; el.dispatchEvent(new Event('input')); }
+        };
+
+        setVal('#fullName', data.fullName);
+        setVal('#jobTitle', data.jobTitle);
+        setVal('#email', data.email);
+        setVal('#photo', data.photo);
+        setVal('#phone', data.phone);
+        setVal('#location', data.location);
+        setVal('#linkedin', data.linkedin);
+        setVal('#website', data.website);
+        setVal('#nationality', data.nationality);
+        setVal('#industry', data.industry);
+        setVal('#totalExp', data.totalExp);
+        setVal('#currentRole', data.currentRole);
+        setVal('#geoPref', data.geoPref);
+        setVal('#summary', data.summary);
+        setVal('#certifications', data.certifications);
+        setVal('#hobbies', data.hobbies);
+        if (data.declaration) {
+            setVal('#declaration', data.declaration.text);
+            setVal('#declDate', data.declaration.date);
+            setVal('#declPlace', data.declaration.place);
+        }
+
+        const populateList = (btnId, containerId, items, mapper) => {
+            const btn = document.getElementById(btnId);
+            const container = document.getElementById(containerId);
+            if (!btn || !container) return;
+            container.innerHTML = '';
+            if (!items || !Array.isArray(items)) return;
+            items.forEach(item => {
+                btn.click();
+                const newItem = container.lastElementChild;
+                if (newItem) mapper(newItem, item);
+            });
+        };
+
+        if (data.skills) {
+            const skillArr = data.skills.split(',').map(s => {
+                s = s.trim();
+                let name = s, level = '';
+                if (s.includes('(') && s.endsWith(')')) {
+                    const idx = s.lastIndexOf('(');
+                    name = s.substring(0, idx).trim();
+                    level = s.substring(idx + 1, s.length - 1).trim();
+                }
+                return { name, level };
+            });
+            populateList('addSkill', 'skillsContainer', skillArr, (el, item) => {
+                el.querySelector('.skill-name').value = item.name;
+                if (item.level) el.querySelector('.skill-level').value = item.level;
+                el.querySelector('.skill-name').dispatchEvent(new Event('input'));
+            });
+        }
+
+        populateList('addExperience', 'experienceContainer', data.experience, (el, item) => {
+            el.querySelector('.exp-title').value = item.title || '';
+            el.querySelector('.exp-company').value = item.company || '';
+            el.querySelector('.exp-dept').value = item.dept || '';
+            el.querySelector('.exp-start').value = item.start || '';
+            el.querySelector('.exp-end').value = item.end || '';
+            el.querySelector('.exp-loc').value = item.loc || '';
+            el.querySelector('.exp-type').value = item.type || '';
+            el.querySelector('.exp-desc').value = item.desc || '';
+            el.querySelector('.exp-tech').value = item.tech || '';
+            el.querySelector('.exp-title').dispatchEvent(new Event('input'));
+        });
+
+        populateList('addEducation', 'educationContainer', data.education, (el, item) => {
+            el.querySelector('.edu-degree').value = item.degree || '';
+            el.querySelector('.edu-school').value = item.school || '';
+            el.querySelector('.edu-grade').value = item.grade || '';
+            el.querySelector('.edu-grade-type').value = item.gradeType || '';
+            el.querySelector('.edu-start').value = item.start || '';
+            el.querySelector('.edu-end').value = item.end || '';
+            el.querySelector('.edu-loc').value = item.loc || '';
+            el.querySelector('.edu-degree').dispatchEvent(new Event('input'));
+        });
+
+        populateList('addProject', 'projectsContainer', data.projects, (el, item) => {
+            el.querySelector('.proj-name').value = item.title || '';
+            el.querySelector('.proj-role').value = item.role || '';
+            el.querySelector('.proj-link').value = item.link || '';
+            el.querySelector('.proj-tech').value = item.tech || '';
+            el.querySelector('.proj-desc').value = item.desc || '';
+            el.querySelector('.proj-name').dispatchEvent(new Event('input'));
+        });
+
+        populateList('addAchievement', 'achievementsContainer', data.achievements, (el, item) => {
+            el.querySelector('.ach-title').value = item.title || '';
+            el.querySelector('.ach-year').value = item.year || '';
+            el.querySelector('.ach-title').dispatchEvent(new Event('input'));
+        });
+
+        populateList('addLanguage', 'languagesContainer', data.languages, (el, item) => {
+            el.querySelector('.lang-name').value = item.name || '';
+            el.querySelector('.lang-level').value = item.level || '';
+            el.querySelector('.lang-name').dispatchEvent(new Event('input'));
+        });
+
+        populateList('addReference', 'referencesContainer', data.references, (el, item) => {
+            el.querySelector('.ref-name').value = item.name || '';
+            el.querySelector('.ref-role').value = item.role || '';
+            el.querySelector('.ref-org').value = item.org || '';
+            el.querySelector('.ref-contact').value = item.contact || '';
+            el.querySelector('.ref-name').dispatchEvent(new Event('input'));
+        });
+    };
+
+    loadUserData();
 });
