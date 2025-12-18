@@ -180,7 +180,39 @@ class AdminManager {
         }
     }
 
-    // --- DEFAULTS MANAGEMENT ---
+    // --- DEFAULTS & PROGRAM MANAGEMENT ---
+    static async getAvailablePrograms() {
+        try {
+            const docRef = doc(db, 'settings', 'global');
+            const d = await getDoc(docRef);
+            if (d.exists()) {
+                return d.data().availablePrograms || [
+                    { id: 'builder', name: 'Resume Builder', path: 'builder', icon: 'fa-pencil-ruler', color: 'success' },
+                    { id: 'scanner', name: 'Resume Scanner', path: 'scanner', icon: 'fa-file-invoice', color: 'info' }
+                ];
+            }
+            return [
+                { id: 'builder', name: 'Resume Builder', path: 'builder', icon: 'fa-pencil-ruler', color: 'success' },
+                { id: 'scanner', name: 'Resume Scanner', path: 'scanner', icon: 'fa-file-invoice', color: 'info' }
+            ];
+        } catch (e) {
+            console.error("Get Available Programs Error:", e);
+            return [];
+        }
+    }
+
+    static async updateAvailablePrograms(programs) {
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
+        try {
+            const docRef = doc(db, 'settings', 'global');
+            await setDoc(docRef, { availablePrograms: programs }, { merge: true });
+        } catch (e) {
+            console.error("Update Available Programs Error:", e);
+            throw e;
+        }
+    }
+
     static async saveDefaultPrograms(programs) {
         const session = this.getSession();
         if (!session || session.role !== 'admin') throw new Error("Unauthorized");
@@ -189,6 +221,7 @@ class AdminManager {
             // 1. Save Global Defaults
             const docRef = doc(db, 'settings', 'global');
             await setDoc(docRef, { defaultPrograms: programs }, { merge: true });
+
 
             // 2. Retroactively Update ALL Existing 'user' role accounts
             const q = query(collection(db, USERS_COLLECTION), where("role", "==", "user"));
