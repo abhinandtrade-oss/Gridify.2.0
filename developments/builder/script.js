@@ -452,11 +452,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         if (!hasSkill) errors.push("At least one Skill is required.");
 
-        // 4. Experience OR Project (Optional - Check removed)
-        const expItems = document.querySelectorAll('#experienceContainer .dynamic-item');
-        const projItems = document.querySelectorAll('#projectsContainer .dynamic-item');
-
-        // if (!hasExp && !hasProj) errors.push("At least one Experience OR Project is required.");
+        // 4. Experience OR Project (Optional)
+        // No validation check needed as these are now optional.
 
         // 5. Education (At least one)
         const eduItems = document.querySelectorAll('#educationContainer .dynamic-item');
