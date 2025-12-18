@@ -378,6 +378,25 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('summaryType').addEventListener('change', checkVisibility);
     document.getElementById('refDisplay').addEventListener('change', renderReferences);
 
+    // Template Selector
+    document.getElementById('resumeTemplate').addEventListener('change', () => {
+        const template = document.getElementById('resumeTemplate').value;
+        const preview = document.getElementById('resumePreview');
+
+        // Remove all theme classes first
+        const themes = [
+            'theme-default', 'theme-modern-blue', 'theme-minimalist',
+            'theme-elegant-purple', 'theme-professional-green', 'theme-classic-purple'
+        ];
+        themes.forEach(t => preview.classList.remove(t));
+
+        // Add selected theme
+        preview.classList.add(template);
+
+        // Re-trigger layout-specific logic if needed
+        checkVisibility();
+    });
+
     // CV Type (Ordering)
     document.getElementById('cvType').addEventListener('change', () => {
         const type = document.getElementById('cvType').value;
