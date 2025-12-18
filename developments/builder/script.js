@@ -491,7 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     /* --- 8. GOOGLE SHEETS INTEGRATION --- */
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyR_D2lb3Wj1goWGXbTdpNgyoafwgF603fjdbJYd44-eyyek96SFZUC1WhwgMUr7Gaq/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1YjSVMjZYuouVG62jeCqaIUzyvXa_YNPYQQ2f_WegU0hVqzRWMDrnDICfjev-i69Ksw/exec';
 
     // Helper to get all dynamic values
     const getDynamicValues = (containerId, fieldMap) => {
@@ -795,7 +795,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /* --- 10. IMAGE UPLOAD TOOL --- */
-    const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyR_D2lb3Wj1goWGXbTdpNgyoafwgF603fjdbJYd44-eyyek96SFZUC1WhwgMUr7Gaq/exec';
+    const UPLOAD_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1CRFm9T8TIpnLuv_Wihw3gfVhV53fp1KIL7WtOlcd4U5tVTBwFQwmynH-zqI2_rax/exec';
 
     const tabTools = document.getElementById('tabTools');
     const showToolsBtn = document.getElementById('showToolsBtn');
@@ -1039,4 +1039,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadUserData();
 });
-
