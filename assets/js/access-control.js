@@ -24,30 +24,35 @@
     } else if (session.role === 'user') {
         // 3. User Role -> Check Allowed Programs based on Path
         const path = window.location.pathname.toLowerCase();
-        const allowed = session.allowedPrograms || []; // e.g. ['builder', 'scanner']
+        const allowed = session.allowedPrograms || [];
 
         let isAuthorized = false;
 
-        // Check path against allowed keywords
-        if (path.includes('builder')) {
-            if (allowed.includes('builder')) isAuthorized = true;
-        } else if (path.includes('scanner')) {
-            if (allowed.includes('scanner')) isAuthorized = true;
-        } else {
-            // Dashboard or other pages? 
-            // If they are in /developments/ but not builder/scanner?
-            // Assume strict check for the known apps.
-            if (path.includes('developments')) {
-                // strict
+        // Check if we are inside a development program folder
+        const devMatch = path.match(/\/developments\/([^\/]+)/i);
+
+        if (devMatch) {
+            const currentProgFolder = devMatch[1].toLowerCase();
+            // Check if user has access to this program
+            // We assume the program folder name matches an entry in allowedPrograms
+            if (allowed.includes(currentProgFolder)) {
+                isAuthorized = true;
             } else {
-                isAuthorized = true; // access to shared assets/pages?
+                // Special case for sub-paths or legacy naming if any
+                if (currentProgFolder === 'scanner' && allowed.includes('scanner')) isAuthorized = true;
+                if (currentProgFolder === 'builder' && allowed.includes('builder')) isAuthorized = true;
             }
+        } else {
+            // Dashboard, login, or other shared pages are authorized
+            isAuthorized = true;
         }
 
         if (!isAuthorized) {
+            console.warn(`Access Denied to ${path}. Allowed:`, allowed);
             alert("You do not have access to this feature.");
             window.location.href = '../../login/';
         }
+
 
     } else {
         // Unknown role or 'early-access' legacy?
