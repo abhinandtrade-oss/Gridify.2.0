@@ -379,45 +379,11 @@
                     Password</button>
             </div>
 
-            <div class="row justify-content-center g-4">
-                <!-- Admin Panel Card -->
-                <div class="col-md-4 col-lg-3 d-none" id="cardAdminPanel">
-                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
-                        <div class="mb-3">
-                            <i class="fas fa-user-cog fa-3x text-primary"></i>
-                        </div>
-                        <h4 class="mb-3">Admin Panel</h4>
-                        <p class="text-muted small mb-4">Manage products, orders, coupons, and system users.</p>
-                        <button class="btn btn-primary w-100" id="btnGoAdmin">Access Panel</button>
-                    </div>
-                </div>
-
-                <!-- Scanner Card -->
-                <div class="col-md-4 col-lg-3" id="cardScanner">
-                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
-                        <div class="mb-3">
-                            <i class="fas fa-file-invoice fa-3x text-info"></i>
-                        </div>
-                        <h4 class="mb-3">Resume Scanner</h4>
-                        <p class="text-muted small mb-4">Beta Feature: AI-powered resume scanning and scoring.</p>
-                        <a href="../developments/Scanner/index.html" class="btn btn-outline-info w-100"
-                            target="_self">Launch Beta</a>
-                    </div>
-                </div>
-
-                <!-- Builder Card -->
-                <div class="col-md-4 col-lg-3" id="cardBuilder">
-                    <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
-                        <div class="mb-3">
-                            <i class="fas fa-pencil-ruler fa-3x text-success"></i>
-                        </div>
-                        <h4 class="mb-3">Resume Builder</h4>
-                        <p class="text-muted small mb-4">Beta Feature: Create ATS-friendly resumes easily.</p>
-                        <a href="../developments/builder/index.html" class="btn btn-outline-success w-100"
-                            target="_self">Launch Beta</a>
-                    </div>
-                </div>
+            <!-- Dynamic Program Cards -->
+            <div id="dynamicProgramCards" class="row justify-content-center g-4">
+                <!-- Rendered by JS -->
             </div>
+
         </div>
     </div>
 
@@ -678,6 +644,11 @@
                                     <button class="nav-link" data-bs-toggle="tab"
                                         data-bs-target="#userSettingsSubTab">Settings & Defaults</button>
                                 </li>
+                                <li class="nav-item">
+                                    <button class="nav-link" id="programs-tab" data-bs-toggle="tab"
+                                        data-bs-target="#programsListSubTab">Manage Programs</button>
+                                </li>
+
                             </ul>
 
                             <div class="tab-content">
@@ -725,13 +696,8 @@
                                         <p class="small text-muted">When external users sign up properly via the login
                                             page, they will automatically get access to the selected programs.</p>
 
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="def-builder">
-                                            <label class="form-check-label" for="def-builder">Resume Builder</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="def-scanner">
-                                            <label class="form-check-label" for="def-scanner">Resume Scanner</label>
+                                        <div id="defaultAccessContainer">
+                                            <!-- Dynamic Checkboxes -->
                                         </div>
 
                                         <div class="mt-3">
@@ -740,6 +706,36 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Manage Programs Registry -->
+                                <div class="tab-pane fade" id="programsListSubTab">
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <h5>Program Registry</h5>
+                                        <button class="btn btn-success btn-sm" id="btn-add-program-row">
+                                            <i class="fas fa-plus"></i> Add Program
+                                        </button>
+                                    </div>
+
+                                    <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+                                        <table class="table table-sm table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Name</th>
+                                                    <th>Path</th>
+                                                    <th>Icon</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="program-registry-body"></tbody>
+                                        </table>
+                                    </div>
+                                    <div class="mt-3 text-end">
+                                        <button class="btn btn-primary btn-sm" id="btn-save-programs">Save Program
+                                            Registry</button>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -967,49 +963,61 @@
                 }
             });
 
-            function showDashboard(session) {
+            async function showDashboard(session) {
                 $('#loginSection').addClass('d-none');
                 $('#adminSection').addClass('d-none');
                 $('#dashboardSelection').removeClass('d-none').addClass('d-flex');
                 $('#dashUsername').text(session.username);
 
-                // Role Check & Program Access
+                const container = $('#dynamicProgramCards');
+                container.empty();
+
+                // 1. Admin Card (Always first for admins)
                 if (session.role === 'admin') {
-                    $('#cardAdminPanel').removeClass('d-none');
-                    // Admins see everything
-                    $('#cardScanner').removeClass('d-none');
-                    $('#cardBuilder').removeClass('d-none');
-                } else {
-                    $('#cardAdminPanel').addClass('d-none');
+                    const adminCard = `
+                        <div class="col-md-4 col-lg-3" id="cardAdminPanel">
+                            <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                                <div class="mb-3">
+                                    <i class="fas fa-user-cog fa-3x text-primary"></i>
+                                </div>
+                                <h4 class="mb-3">Admin Panel</h4>
+                                <p class="text-muted small mb-4">Manage products, orders, coupons, and system users.</p>
+                                <button class="btn btn-primary w-100" id="btnGoAdmin">Access Panel</button>
+                            </div>
+                        </div>`;
+                    container.append(adminCard);
+                }
 
-                    const allowed = session.allowedPrograms || [];
-                    let hasAccess = false;
+                // 2. Fetch Available Programs
+                const allPrograms = await AdminManager.getAvailablePrograms();
+                const allowed = session.allowedPrograms || [];
+                let visibleCount = 0;
 
-                    if (allowed.includes('scanner')) {
-                        $('#cardScanner').removeClass('d-none');
-                        hasAccess = true;
-                    } else {
-                        $('#cardScanner').addClass('d-none');
+                allPrograms.forEach(p => {
+                    const hasAccess = session.role === 'admin' || allowed.includes(p.id);
+                    if (hasAccess) {
+                        visibleCount++;
+                        const card = `
+                            <div class="col-md-4 col-lg-3">
+                                <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
+                                    <div class="mb-3">
+                                        <i class="fas ${p.icon || 'fa-rocket'} fa-3x text-${p.color || 'primary'}"></i>
+                                    </div>
+                                    <h4 class="mb-3">${p.name}</h4>
+                                    <p class="text-muted small mb-4">Launch the ${p.name} beta feature.</p>
+                                    <a href="../developments/${p.path}/index.html" class="btn btn-outline-${p.color || 'primary'} w-100">Launch Beta</a>
+                                </div>
+                            </div>`;
+                        container.append(card);
                     }
+                });
 
-                    if (allowed.includes('builder')) {
-                        $('#cardBuilder').removeClass('d-none');
-                        hasAccess = true;
-                    } else {
-                        $('#cardBuilder').addClass('d-none');
-                    }
-
-                    if (!hasAccess) {
-                        if ($('#noAccessMsg').length === 0) {
-                            $('#dashboardSelection .row').append('<div id="noAccessMsg" class="col-12 text-center text-muted mt-5"><i class="fas fa-lock fa-3x mb-3 text-secondary"></i><h4>No Access Granted</h4><p>You do not have access to any beta programs yet.<br>Please contact an administrator.</p></div>');
-                        } else {
-                            $('#noAccessMsg').removeClass('d-none');
-                        }
-                    } else {
-                        $('#noAccessMsg').addClass('d-none');
-                    }
+                // 3. No Access Message
+                if (visibleCount === 0 && session.role !== 'admin') {
+                    container.append('<div id="noAccessMsg" class="col-12 text-center text-muted mt-5"><i class="fas fa-lock fa-3x mb-3 text-secondary"></i><h4>No Access Granted</h4><p>You do not have access to any beta programs yet.<br>Please contact an administrator.</p></div>');
                 }
             }
+
 
             $('#btnGoAdmin').click(function () {
                 const session = AdminManager.getSession();
@@ -1031,7 +1039,95 @@
 
                 if (session.role === 'admin') {
                     $('#users-tab-li').show();
+                    $('#programs-tab').parent().show();
+                } else {
+                    $('#programs-tab').parent().hide();
                 }
+            }
+
+            // --- Program Registry Logic ---
+            let programRegistryCache = [];
+
+            async function loadProgramRegistry() {
+                programRegistryCache = await AdminManager.getAvailablePrograms();
+                const tbody = $('#program-registry-body');
+                tbody.empty();
+
+                programRegistryCache.forEach((p, idx) => {
+                    const row = `<tr>
+                        <td><input type="text" class="form-control form-control-sm prog-id" value="${p.id}" data-idx="${idx}"></td>
+                        <td><input type="text" class="form-control form-control-sm prog-name" value="${p.name}" data-idx="${idx}"></td>
+                        <td><input type="text" class="form-control form-control-sm prog-path" value="${p.path}" data-idx="${idx}"></td>
+                        <td><input type="text" class="form-control form-control-sm prog-icon" value="${p.icon}" data-idx="${idx}"></td>
+                        <td><button class="btn btn-sm btn-danger btn-remove-prog" data-idx="${idx}"><i class="fas fa-trash"></i></button></td>
+                    </tr>`;
+                    tbody.append(row);
+                });
+            }
+
+            $('#btn-add-program-row').click(function () {
+                const tbody = $('#program-registry-body');
+                const idx = tbody.children().length;
+                const row = `<tr>
+                    <td><input type="text" class="form-control form-control-sm prog-id" placeholder="e.g. builder" data-idx="${idx}"></td>
+                    <td><input type="text" class="form-control form-control-sm prog-name" placeholder="Name" data-idx="${idx}"></td>
+                    <td><input type="text" class="form-control form-control-sm prog-path" placeholder="Folder Name" data-idx="${idx}"></td>
+                    <td><input type="text" class="form-control form-control-sm prog-icon" placeholder="fa-icon" data-idx="${idx}"></td>
+                    <td><button class="btn btn-sm btn-danger btn-remove-prog" data-idx="${idx}"><i class="fas fa-trash"></i></button></td>
+                </tr>`;
+                tbody.append(row);
+            });
+
+            $(document).on('click', '.btn-remove-prog', function () {
+                $(this).closest('tr').remove();
+            });
+
+            $('#btn-save-programs').click(async function () {
+                const programs = [];
+                $('#program-registry-body tr').each(function () {
+                    const id = $(this).find('.prog-id').val();
+                    const name = $(this).find('.prog-name').val();
+                    const path = $(this).find('.prog-path').val();
+                    const icon = $(this).find('.prog-icon').val();
+                    if (id && name && path) {
+                        programs.push({ id, name, path, icon: icon || 'fa-external-link-alt', color: 'primary' });
+                    }
+                });
+
+                const btn = $(this);
+                btn.prop('disabled', true).text('Saving...');
+                try {
+                    await AdminManager.updateAvailablePrograms(programs);
+                    alert("Program Registry Updated!");
+                    await loadProgramRegistry();
+                    await renderProgramCheckboxes(); // Refresh other UI parts
+                } catch (e) { alert("Error: " + e.message); }
+                btn.prop('disabled', false).text('Save Program Registry');
+            });
+
+            $('#programs-tab').on('click', loadProgramRegistry);
+
+            async function renderProgramCheckboxes() {
+                const programs = await AdminManager.getAvailablePrograms();
+                const defaultContainer = $('#defaultAccessContainer');
+                const manageContainer = $('#manageUserProgramsContainer');
+
+                defaultContainer.empty();
+                manageContainer.empty();
+
+                programs.forEach(p => {
+                    const defHtml = `<div class="form-check">
+                        <input class="form-check-input def-prog-check" type="checkbox" id="def-${p.id}" data-id="${p.id}">
+                        <label class="form-check-label" for="def-${p.id}">${p.name}</label>
+                    </div>`;
+                    defaultContainer.append(defHtml);
+
+                    const manageHtml = `<div class="form-check">
+                        <input class="form-check-input manage-user-prog-check" type="checkbox" id="check-${p.id}" data-id="${p.id}">
+                        <label class="form-check-label" for="check-${p.id}">${p.name}</label>
+                    </div>`;
+                    manageContainer.append(manageHtml);
+                });
             }
 
             // --- Management Modal Logic ---
@@ -1134,15 +1230,19 @@
 
             // Defaults Logic
             async function loadDefaults() {
+                await renderProgramCheckboxes(); // Ensure checkboxes are there
                 const defs = await AdminManager.getDefaultPrograms();
-                $('#def-builder').prop('checked', defs.includes('builder'));
-                $('#def-scanner').prop('checked', defs.includes('scanner'));
+                $('.def-prog-check').each(function () {
+                    const id = $(this).data('id');
+                    $(this).prop('checked', defs.includes(id));
+                });
             }
 
             $('#btn-save-defaults').click(async function () {
                 const defaults = [];
-                if ($('#def-builder').is(':checked')) defaults.push('builder');
-                if ($('#def-scanner').is(':checked')) defaults.push('scanner');
+                $('.def-prog-check:checked').each(function () {
+                    defaults.push($(this).data('id'));
+                });
 
                 const btn = $(this);
                 btn.prop('disabled', true).text('Saving...');
@@ -1154,7 +1254,7 @@
             });
 
             // Manage User Modal Logic
-            $(document).on('click', '.btn-manage-user', function () {
+            $(document).on('click', '.btn-manage-user', async function () {
                 const username = $(this).data('user');
                 const user = usersCache.find(u => u.username === username);
                 if (!user) return;
@@ -1163,10 +1263,15 @@
                 $('#manageUserUsername').val(username);
                 $('#manageUserRole').val(user.role);
 
+                // Ensure checkboxes are rendered first
+                await renderProgramCheckboxes();
+
                 // Programs
                 const progs = user.allowedPrograms || [];
-                $('#checkBuilder').prop('checked', progs.includes('builder'));
-                $('#checkScanner').prop('checked', progs.includes('scanner'));
+                $('.manage-user-prog-check').each(function () {
+                    const id = $(this).data('id');
+                    $(this).prop('checked', progs.includes(id));
+                });
 
                 // Status Button
                 const statusBtnText = user.status === 'active' ? 'Suspend Account' : 'Activate Account';
@@ -1182,8 +1287,10 @@
                 const newRole = $('#manageUserRole').val();
                 const updatedPrograms = [];
 
-                if ($('#checkBuilder').is(':checked')) updatedPrograms.push('builder');
-                if ($('#checkScanner').is(':checked')) updatedPrograms.push('scanner');
+                $('.manage-user-prog-check:checked').each(function () {
+                    updatedPrograms.push($(this).data('id'));
+                });
+
 
                 const btn = $(this);
                 btn.prop('disabled', true).text('Saving...');
@@ -1600,17 +1707,11 @@
 
                     <div class="mb-3">
                         <label class="form-label">Program Access</label>
-                        <div class="card p-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="checkBuilder">
-                                <label class="form-check-label" for="checkBuilder">Resume Builder</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="checkScanner">
-                                <label class="form-check-label" for="checkScanner">Resume Scanner</label>
-                            </div>
+                        <div class="card p-3" id="manageUserProgramsContainer">
+                            <!-- Dynamic Checkboxes -->
                         </div>
                     </div>
+
 
                     <div class="mb-3 border-top pt-3">
                         <label class="form-label">User Status</label>
