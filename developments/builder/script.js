@@ -649,8 +649,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Loader
         const loadingDiv = document.createElement('div');
         loadingDiv.id = 'data-loader-overlay';
-        loadingDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;';
-        loadingDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div><div class="mt-2 fw-bold">Loading your data...</div>';
+        loadingDiv.innerHTML = `
+            <div class="lux-spinner"></div>
+            <div class="loader-text">Syncing with Cloud...</div>
+        `;
         document.body.appendChild(loadingDiv);
 
         fetch(GOOGLE_SCRIPT_URL, {
