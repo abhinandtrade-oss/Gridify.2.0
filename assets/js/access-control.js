@@ -34,13 +34,16 @@
         if (devMatch) {
             const currentProgFolder = devMatch[1].toLowerCase();
             // Check if user has access to this program
-            // We assume the program folder name matches an entry in allowedPrograms
-            if (allowed.includes(currentProgFolder)) {
+            // Normalize allowed to lowercase for robust matching
+            const lowerAllowed = allowed.map(p => p.toLowerCase());
+
+            if (lowerAllowed.includes(currentProgFolder)) {
                 isAuthorized = true;
             } else {
                 // Special case for sub-paths or legacy naming if any
-                if (currentProgFolder === 'scanner' && allowed.includes('scanner')) isAuthorized = true;
-                if (currentProgFolder === 'builder' && allowed.includes('builder')) isAuthorized = true;
+                if (currentProgFolder === 'scanner' && lowerAllowed.includes('scanner')) isAuthorized = true;
+                if (currentProgFolder === 'builder' && lowerAllowed.includes('builder')) isAuthorized = true;
+                if (currentProgFolder === 'imageurl' && lowerAllowed.includes('imageurl')) isAuthorized = true;
             }
         } else {
             // Dashboard, login, or other shared pages are authorized
