@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started | Dream HR</title>
+    <meta name="description" content="Collect your data and verify your email to get started.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <main class="container">
+        <div class="card">
+            <header>
+                <h1>Join the Waitlist</h1>
+                <p>We're launching soon! Enter your details to get early access.</p>
+            </header>
+
+            <form id="verificationForm">
+                <div id="step-1" class="form-step">
+                    <div class="input-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="john@example.com" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="mobile">Mobile Number</label>
+                        <input type="tel" id="mobile" name="mobile" placeholder="+1 (555) 000-0000" required>
+                    </div>
+
+                    <button type="submit" id="sendOtpBtn">Get Started</button>
+                </div>
+
+                <div id="step-2" class="form-step hidden">
+                    <div class="otp-header">
+                        <h2>Verify Email</h2>
+                        <p>We've sent a 6-digit code to <span id="display-email"></span></p>
+                    </div>
+
+                    <div class="input-group otp-group">
+                        <input type="text" id="otp" name="otp" placeholder="000000" maxlength="6" pattern="\d{6}">
+                    </div>
+
+                    <button type="button" id="verifyOtpBtn">Verify & Proceed</button>
+                    <button type="button" id="resendBtn" class="secondary">Resend OTP</button>
+                </div>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
