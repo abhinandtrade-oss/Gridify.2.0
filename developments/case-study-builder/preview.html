@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview | UX Case Study Builder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .export-panel {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 0;
+            z-index: 1000;
+        }
+
+        .case-study-paper {
+            background: white;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 80px 100px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            min-height: 1000px;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+            padding-bottom: 4px;
+        }
+
+        .content-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            margin-bottom: 24px;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .image-gallery img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .export-panel,
+            footer {
+                display: none !important;
+            }
+
+            .case-study-paper {
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .case-study-paper {
+                padding: 40px 20px;
+                margin: 20px;
+            }
+
+            .export-panel .container {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="export-panel no-print">
+        <div class="container flex justify-between items-center">
+            <div class="flex items-center gap-16">
+                <a href="builder.html" class="btn btn-outline">Back to Editor</a>
+                <span class="heading" style="font-size: 1.1rem;">Previewing Your Work</span>
+            </div>
+            <div class="flex items-center gap-12">
+                <button id="btnPDF" class="btn btn-primary" onclick="exportPDF()">Download PDF</button>
+                <button id="btnDOCX" class="btn btn-outline" onclick="exportDOCX()">Download DOCX</button>
+                <button id="btnFigma" class="btn btn-outline" onclick="exportFigma()">Export for Figma</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <article class="case-study-paper" id="caseStudyContent">
+            <!-- Content rendered by JS -->
+        </article>
+    </main>
+
+    <footer class="container no-print">
+        <p>Powered by <a href="https://gridify.in" target="_blank">GRIDIFY</a></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/docx@8.1.0/build/index.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/preview.js"></script>
+    <script src="js/export-pdf.js"></script>
+    <script src="js/export-docx.js"></script>
+    <script src="js/export-figma.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builder | UX Case Study Builder</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .builder-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 1fr;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: white;
+            border-right: 1px solid var(--border-color);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-item.active {
+            background: var(--accent-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        /* Form Editor */
+        .editor-container {
+            padding: 40px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        .editor-header {
+            margin-bottom: 32px;
+        }
+
+        .section-editor {
+            display: none;
+        }
+
+        .section-editor.active {
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 24px;
+        }
+
+        /* Preview Frame */
+        .preview-pane {
+            border-left: 1px solid var(--border-color);
+            background: var(--bg-color);
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .live-preview {
+            background: white;
+            padding: 60px;
+            min-height: 100%;
+            box-shadow: var(--shadow-soft);
+        }
+
+        /* Progress Header */
+        .top-bar {
+            height: 60px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #eee;
+            width: 200px;
+            margin: 0 20px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .builder-layout {
+                grid-template-columns: 240px 1fr;
+            }
+
+            .preview-pane {
+                display: none;
+            }
+
+            /* Hide live preview on smaller desktop */
+        }
+
+        @media (max-width: 768px) {
+            .builder-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 60px;
+                display: flex;
+                overflow-x: auto;
+                z-index: 100;
+                padding: 10px;
+                border-top: 1px solid var(--border-color);
+                border-right: none;
+            }
+
+            .nav-item {
+                white-space: nowrap;
+                margin: 0 5px;
+            }
+
+            .editor-container {
+                padding: 20px 20px 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-bar justify-between">
+        <div class="flex items-center">
+            <a href="index.html" class="heading" style="margin-right: 32px; font-size: 1.2rem;">CaseStudy.</a>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <span id="progressText" style="font-size: 0.85rem; color: var(--text-secondary);">0% complete</span>
+        </div>
+        <div class="flex items-center gap-16">
+            <span id="saveStatus" style="font-size: 0.8rem; color: #888;">All changes saved</span>
+            <button onclick="window.UXData.resetData()" class="btn btn-outline"
+                style="padding: 8px 16px; font-size: 0.85rem;">Reset</button>
+            <a href="preview.html" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.85rem;">Preview &
+                Export</a>
+        </div>
+    </div>
+
+    <div class="builder-layout">
+        <aside class="sidebar" id="sectionNav">
+            <!-- Nav items injected by JS -->
+        </aside>
+
+        <main class="editor-container">
+            <div class="editor-header">
+                <input type="text" id="caseStudyTitle" class="heading"
+                    style="width: 100%; border: none; background: transparent; font-size: 2rem; outline: none;"
+                    placeholder="Enter Case Study Title">
+            </div>
+
+            <div id="sectionEditors">
+                <!-- Editors injected by JS -->
+            </div>
+
+            <div class="flex justify-between" style="margin-top: 40px;">
+                <button id="prevBtn" class="btn btn-outline">Previous Section</button>
+                <button id="nextBtn" class="btn btn-primary">Next Section</button>
+            </div>
+        </main>
+
+        <section class="preview-pane">
+            <div class="live-preview" id="livePreview">
+                <!-- Real-time preview content -->
+            </div>
+        </section>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/builder.js"></script>
+</body>
+
+</html>
