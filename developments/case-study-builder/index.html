@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UX Case Study Builder | Professional Portfolios</title>
+    <link rel="icon" type="image/png" href="assets/images/logos/favicon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero {
+            padding: 100px 0 60px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 24px;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .hero h1 span {
+            color: var(--accent-color);
+            text-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .workflow {
+            padding: 80px 0;
+            background: var(--section-bg);
+        }
+
+        .workflow-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            margin-top: 48px;
+        }
+
+        .step {
+            text-align: center;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-weight: 700;
+        }
+
+        .step h3 {
+            margin-bottom: 12px;
+        }
+
+        .step p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .workflow-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="container flex justify-between items-center" style="height: 100px;">
+        <div class="logo flex items-center">
+            <img src="assets/images/logos/logo.png" alt="Logo"
+                style="height: 40px; margin-right: 12px; filter: drop-shadow(0 0 10px var(--accent-glow));">
+            <span class="heading" style="font-size: 1.6rem; color: #fff;">Gridify <span
+                    style="color: var(--accent-color)">Builder</span></span>
+        </div>
+        <a href="builder.html" class="btn btn-primary hide-mobile">Get Started</a>
+    </header>
+
+    <main>
+        <section class="hero container">
+            <h1>Create UX Case Studies.<br><span>Structured. Professional.</span></h1>
+            <p>The easiest way for UX students to structure, preview, and export high-quality case studies for their
+                portfolios.</p>
+            <div class="cta-group">
+                <a href="builder.html" class="btn btn-primary">Create New Case Study</a>
+                <a href="#" class="btn btn-outline" onclick="alert('Sample coming soon!')">View Sample</a>
+            </div>
+        </section>
+
+        <section class="workflow">
+            <div class="container">
+                <h2 style="text-align: center;">How It Works</h2>
+                <div class="workflow-grid">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Structure</h3>
+                        <p>Fill out our guided sections designed by UX professionals to follow industry standards.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Preview</h3>
+                        <p>See your case study come to life in real-time with professional typography and layout.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Export</h3>
+                        <p>Download as PDF, DOCX, or get it Figma-ready for your portfolio or interview.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="container">
+        <p>&copy; 2025 UX Case Study Builder. All rights reserved.</p>
+        <p style="margin-top: 8px;">Powered by <a href="https://gridify.in" target="_blank">GRIDIFY</a></p>
+    </footer>
+</body>
+
+</html>

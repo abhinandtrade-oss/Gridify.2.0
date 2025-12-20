@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Premium Night Theme Palette */
+    --bg-color: #0d121d;
+    --card-bg: #161b26;
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --accent-color: #38bdf8;
+    /* Vibrant Cyan */
+    --accent-glow: rgba(56, 189, 248, 0.3);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --panel-bg: #0f172a;
+    --editor-bg: #0d121d;
+    --section-bg: rgba(255, 255, 255, 0.03);
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-hover: 0 8px 24px rgba(56, 189, 248, 0.2);
+    --radius: 12px;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* A4 Dimensions */
+    --a4-width: 210mm;
+    --a4-height: 297mm;
+}
+
+/* Base Night Mode Overrides (removing [data-theme]) */
+body {
+    background-color: var(--bg-color);
+    background-image:
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+}
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* A4 Page Container */
+.a4-container {
+    width: var(--a4-width);
+    min-height: var(--a4-height);
+    background: white;
+    margin: 20px auto;
+    padding: 2em;
+    /* Flexible padding */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    color: #1a1a1a;
+    font-size: 16px;
+    /* Absolute base, overridden by builder for scaling */
+}
+
+
+h1,
+h2,
+h3,
+h4,
+.heading {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+button {
+    cursor: pointer;
+    font-family: var(--font-body);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+/* Base Layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* UI Elements */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 1rem;
+    gap: 8px;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: #000;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px var(--accent-glow);
+    filter: brightness(1.2);
+}
+
+.btn-outline {
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-soft);
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-hover);
+}
+
+/* Footer */
+footer {
+    padding: 60px 0 30px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+footer a {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Responsive Grid/Flex Utilities */
+.flex {
+    display: flex;
+}
+
+.flex-col {
+    flex-direction: column;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.justify-between {
+    justify-content: space-between;
+}
+
+.grid {
+    display: grid;
+}
+
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none;
+    }
+}
+
+@media print {
+
+    .no-print,
+    .export-panel,
+    footer {
+        display: none !important;
+    }
+
+    body {
+        background: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .case-study-paper {
+        margin: 0 !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        padding: 15mm !important;
+    }
+
+    .section {
+        page-break-inside: avoid;
+    }
+}
+
+/* Custom Page Sizes (Default A4) */
+@page {
+    size: A4;
+    margin: 0;
+}
