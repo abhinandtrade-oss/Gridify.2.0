@@ -53,7 +53,7 @@ generateBtn.addEventListener('click', () => {
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzuSLq1eUZyp1k5B7NpPxzBmHgtMvL5hp4GOTYqIFgQ0GfRgGPlOQ1LBpcFKtCjnhy9/exec";
     // ---------------------
 
-    const baseUrl = window.location.href.replace('create.html', 'view.html');
+    const baseUrl = "https://www.gridify.in/developments/love-letter/view";
 
     // Option A: If Script URL is present, save to Sheet (Excel)
     if (GOOGLE_SCRIPT_URL) {
