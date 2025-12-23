@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const greeting = document.getElementById('greeting');
     const createBtnContainer = document.getElementById('createBtnContainer');
     const musicControl = document.getElementById('musicControl');
+    const loadingScreen = document.getElementById('loadingScreen');
 
     // --- Data Parsing (URL Params) ---
     const urlParams = new URLSearchParams(window.location.search);
@@ -37,12 +38,10 @@ No matter where life takes us, know that my heart beats for you.`;
     // ---------------------
 
     // 1. Check for Database ID first
+    // 1. Check for Database ID first
     if (msgId && GOOGLE_SCRIPT_URL) {
-        // Show loading state on envelope
-        const envelopeText = document.querySelector('.envelope .text-hint');
-        const originalText = envelopeText.textContent;
-        envelopeText.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching letter...';
-        envelopeContainer.style.pointerEvents = 'none'; // Disable click while loading
+        // Show Loading Screen
+        if (loadingScreen) loadingScreen.classList.remove('hidden');
 
         fetch(`${GOOGLE_SCRIPT_URL}?id=${msgId}`)
             .then(res => res.json())
@@ -62,9 +61,14 @@ No matter where life takes us, know that my heart beats for you.`;
                 letterText = "Error loading letter. Please check your internet connection.";
             })
             .finally(() => {
-                // Restore envelope state
-                envelopeText.textContent = originalText;
-                envelopeContainer.style.pointerEvents = 'auto';
+                // Hide Loading Screen with fade
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingScreen.classList.add('hidden');
+                        loadingScreen.style.opacity = ''; // Reset for reuse if needed
+                    }, 500);
+                }
             });
     }
     // 2. Fallback to URL Params
@@ -78,6 +82,11 @@ No matter where life takes us, know that my heart beats for you.`;
             try {
                 senderName = decodeURIComponent(encodedSender);
             } catch (e) { console.error("Error decoding sender", e); }
+        }
+
+        // Hide Loading Screen immediately if not fetching
+        if (loadingScreen) {
+            loadingScreen.classList.add('hidden');
         }
     }
 
