@@ -137,6 +137,13 @@ No matter where life takes us, know that my heart beats for you.`;
         // 2. Animate Envelope
         envelope.classList.add('open');
 
+        // 3. Play Music after pops are done (Moved here to ensure flow)
+        // Note: The burstInterval actually handles the audio play, but we can show the button here anyway
+
+        // Show Mute Control immediately when interaction starts
+        musicControl.classList.remove('hidden-fade');
+        musicControl.classList.add('visible-fade');
+
         // 4. Transition to Letter
         setTimeout(() => {
             startScreen.style.opacity = '0';
@@ -150,9 +157,7 @@ No matter where life takes us, know that my heart beats for you.`;
                     signature.classList.remove('hidden-fade');
                     signature.classList.add('visible-fade');
 
-                    // Show Mute Control
-                    musicControl.classList.remove('hidden-fade');
-                    musicControl.classList.add('visible-fade');
+
 
                     // Show "Create Your Own" button after a delay
                     setTimeout(() => {
