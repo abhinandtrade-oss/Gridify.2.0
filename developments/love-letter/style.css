@@ -234,7 +234,6 @@ main {
     margin-bottom: 20px;
     /* Removed rotation to simple center for better readibility on long text */
     background-image:
-        linear-gradient(90deg, transparent 39px, #abced4 39px, #abced4 41px, transparent 41px),
         linear-gradient(#eee 1px, transparent 1px);
     background-size: 100% 40px;
 }
