@@ -1,1 +1,100 @@
-0
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your Love Letter</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Parisienne&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Falling Background -->
+    <div class="falling-container" id="fallingContainer"></div>
+
+    <main class="main-container" style="display:flex; justify-content:center; align-items:center; min-height:100vh;">
+        <div class="creator-container">
+            <div class="creator-header">
+                <h1>Create a Love Letter</h1>
+                <p>Compose a heartfelt message and send it to your special someone.</p>
+            </div>
+
+            <!-- Input Form -->
+            <div id="formSection">
+                <div class="form-group">
+                    <label for="senderName">Your Name (or Nickname)</label>
+                    <input type="text" id="senderName" class="form-control" placeholder="e.g., Your Secret Admirer">
+                </div>
+
+                <div class="form-group">
+                    <label for="messageBody">Your Message</label>
+                    <textarea id="messageBody" class="form-control" placeholder="Write your heart out..."></textarea>
+
+                    <!-- Presets -->
+                    <div class="presets">
+                        <span style="width:100%; font-size:0.8rem; color:#888; margin-top:5px;">Or choose a
+                            preset:</span>
+                        <div class="preset-chip" onclick="applyPreset(0)">Short & Sweet</div>
+                        <div class="preset-chip" onclick="applyPreset(1)">Deeply Romantic</div>
+                        <div class="preset-chip" onclick="applyPreset(2)">Long Distance</div>
+                        <div class="preset-chip" onclick="applyPreset(3)">Poetic</div>
+                    </div>
+                </div>
+
+                <button id="generateBtn" class="generate-btn">
+                    <i class="fas fa-magic"></i> Create Magic Link
+                </button>
+            </div>
+
+            <!-- Result Section (Hidden Initially) -->
+            <div id="resultSection" class="result-section hidden">
+                <h3><i class="fas fa-link"></i> Your Unique Link is Ready!</h3>
+                <p style="margin:10px 0; color:#666;">Send this link to your person:</p>
+
+                <div class="link-box" id="linkBox">https://...</div>
+
+                <div style="display:flex; gap:10px; justify-content:center;">
+                    <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Copy Link</button>
+                    <a href="#" target="_blank" id="previewBtn" class="create-btn"
+                        style="padding:10px 20px; font-size:0.9rem;">
+                        <i class="fas fa-eye"></i> Preview
+                    </a>
+                </div>
+
+                <button onclick="location.reload()"
+                    style="margin-top:20px; background:none; border:none; text-decoration:underline; cursor:pointer; color:#777;">Create
+                    Another</button>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="footer">
+        Powered by <a href="https://Gridify.in" target="_blank">Gridify.in</a>
+    </footer>
+
+    <script src="create.js"></script>
+    <script>
+        // Inline simple falling logic to reuse visual
+        const fallingContainer = document.getElementById('fallingContainer');
+        const symbols = ['❤', '🌸', '🌹', '💕'];
+        setInterval(() => {
+            const el = document.createElement('div');
+            el.classList.add('falling-item');
+            el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            el.style.left = Math.random() * 100 + '%';
+            el.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            el.style.fontSize = (Math.random() * 1.5 + 1) + 'rem';
+            el.style.color = Math.random() > 0.5 ? '#ff4757' : '#ff7b93';
+            fallingContainer.appendChild(el);
+            setTimeout(() => el.remove(), 10000);
+        }, 500);
+    </script>
+</body>
+
+</html>
