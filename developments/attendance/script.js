@@ -329,12 +329,11 @@ const AttendanceApp = {
     bindEvents() {
         document.getElementById('btnPunchIn').addEventListener('click', () => this.handlePunch('IN'));
         document.getElementById('btnPunchOut').addEventListener('click', () => this.handlePunch('OUT'));
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            if (typeof AdminManager !== 'undefined') AdminManager.logout();
-            else window.location.href = '../../login/';
-        });
+        document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
         document.getElementById('btnRefreshAdmin').addEventListener('click', () => this.loadAdminDashboard());
         document.getElementById('editAttendanceForm').addEventListener('submit', (e) => this.handleEditSubmit(e));
+
+        this.initInactivityMonitoring();
     },
 
     showLoading(show) {
@@ -346,6 +345,34 @@ const AttendanceApp = {
             overlay.style.opacity = '0';
             setTimeout(() => overlay.style.display = 'none', 300);
         }
+    },
+
+    // Inactivity / Auto-Logout Logic
+    inactivityTimer: null,
+    INACTIVITY_LIMIT: 2 * 60 * 1000, // 2 minutes
+
+    initInactivityMonitoring() {
+        const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+        events.forEach(event => {
+            document.addEventListener(event, () => this.resetInactivityTimer());
+        });
+
+        // Start the initial timer
+        this.resetInactivityTimer();
+    },
+
+    resetInactivityTimer() {
+        if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
+
+        this.inactivityTimer = setTimeout(() => {
+            console.log("User inactive for 2 minutes. Auto-logging out...");
+            this.handleLogout();
+        }, this.INACTIVITY_LIMIT);
+    },
+
+    handleLogout() {
+        if (typeof AdminManager !== 'undefined') AdminManager.logout();
+        else window.location.href = '../../login/';
     }
 };
 
