@@ -14,7 +14,7 @@
     <link rel="shortcut icon" href="../assets/images/logos/favicon.png" type="image/x-icon">
     <!-- Google Fonts -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -359,6 +359,144 @@
         .d-none {
             display: none !important;
         }
+
+        /* Modern Dashboard Selection Styles */
+        #dashboardSelection {
+            background: #f8fafc;
+            background-image: radial-gradient(at 0% 0%, rgba(67, 97, 238, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .welcome-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: -0.03em;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-name {
+            background: linear-gradient(135deg, #4361ee 0%, #3a7bd5 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .workspace-card {
+            background: white;
+            border-radius: 28px;
+            padding: 2.5rem;
+            height: 100%;
+            border: 1px solid #f1f5f9;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workspace-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #4361ee;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .workspace-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border-color: #4361ee;
+        }
+
+        .workspace-card:hover::before {
+            opacity: 1;
+        }
+
+        .icon-box {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            font-size: 28px;
+            transition: transform 0.3s ease;
+        }
+
+        .workspace-card:hover .icon-box {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .ws-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .ws-card-desc {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .ws-action-btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            text-decoration: none !important;
+            width: 100%;
+            border: none;
+        }
+
+        .ws-btn-primary {
+            background: #4361ee;
+            color: white;
+        }
+
+        .ws-btn-primary:hover {
+            background: #3046bc;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
+        }
+
+        .ws-btn-outline {
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .ws-btn-outline:hover {
+            border-color: #4361ee;
+            color: #4361ee;
+            background: rgba(67, 97, 238, 0.04);
+        }
     </style>
 </head>
 
@@ -523,8 +661,8 @@
 
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="rememberMe">
-                                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                                    <!--input class="form-check-input" type="checkbox" id="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Remember me</label-->
                                 </div>
                                 <a href="#" id="forgotPassLink" class="small">Forgot Password?</a>
                             </div>
@@ -608,23 +746,37 @@
         </div>
     </div>
 
-    <!-- Dashboard Selection (Hidden by default) -->
-    <div id="dashboardSelection" class="d-none"
-        style="min-height: 100vh; background: #f4f7fa; display: flex; align-items: center; justify-content: center;">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h1 class="fw-bold">Welcome, <span id="dashUsername" class="text-primary">User</span>!</h1>
-                <p class="text-muted">Select a workspace to continue.</p>
-                <button id="dashLogoutBtn" class="btn btn-outline-danger btn-sm mt-2">Logout</button>
-                <button id="dashChangePassBtn" class="btn btn-outline-secondary btn-sm mt-2 ms-2">Change
-                    Password</button>
+    <!-- Dashboard Selection (New Modern UI) -->
+    <div id="dashboardSelection" class="d-none flex-column" style="min-height: 100vh;">
+        <nav class="dashboard-header w-100">
+            <div class="container d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <img src="../assets/images/logos/logo.png" alt="Gridify" style="height: 35px;">
+                    <span class="fw-bold fs-4" style="color: #1e293b; letter-spacing: -0.5px;">Gridify</span>
+                </div>
+                <div class="d-flex gap-3">
+                    <button id="dashChangePassBtn" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">
+                        <i class="fas fa-shield-alt me-2"></i>Security
+                    </button>
+                    <button id="dashLogoutBtn" class="btn btn-danger rounded-pill px-4 btn-sm">
+                        <i class="fas fa-power-off me-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container py-5">
+            <div class="text-center mb-5 mt-4">
+                <h1 class="welcome-title">Welcome back, <span id="dashUsername" class="welcome-name">User</span>!</h1>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 600px;">Explore your digital workspace. Select a
+                    tool
+                    below to pick up where you left off.</p>
             </div>
 
             <!-- Dynamic Program Cards -->
-            <div id="dynamicProgramCards" class="row justify-content-center g-4">
+            <div id="dynamicProgramCards" class="row g-4 justify-content-center">
                 <!-- Rendered by JS -->
             </div>
-
         </div>
     </div>
 
@@ -1236,23 +1388,38 @@
                 const container = $('#dynamicProgramCards');
                 container.empty();
 
-                // 1. Admin Card (Always first for admins)
+                // Brand Color Helper
+                const getBrandColors = (color) => {
+                    const palette = {
+                        'primary': { bg: 'rgba(67, 97, 238, 0.1)', text: '#4361ee' },
+                        'success': { bg: 'rgba(16, 185, 129, 0.1)', text: '#10b981' },
+                        'warning': { bg: 'rgba(245, 158, 11, 0.1)', text: '#f59e0b' },
+                        'danger': { bg: 'rgba(239, 68, 68, 0.1)', text: '#ef4444' },
+                        'info': { bg: 'rgba(6, 182, 212, 0.1)', text: '#06b6d4' },
+                        'secondary': { bg: 'rgba(100, 116, 139, 0.1)', text: '#64748b' }
+                    };
+                    return palette[color] || palette['primary'];
+                };
+
+                // 1. Admin Card
                 if (session.role === 'admin') {
                     const adminCard = `
-                        <div class="col-md-4 col-lg-3" id="cardAdminPanel">
-                            <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
-                                <div class="mb-3">
-                                    <i class="fas fa-user-cog fa-3x text-primary"></i>
+                        <div class="col-md-6 col-lg-4 col-xl-3" id="cardAdminPanel">
+                            <article class="workspace-card">
+                                <div class="icon-box" style="background: rgba(67, 97, 238, 0.1); color: #4361ee;">
+                                    <i class="fas fa-user-shield"></i>
                                 </div>
-                                <h4 class="mb-3">Admin Panel</h4>
-                                <p class="text-muted small mb-4">Manage products, orders, coupons, and system users.</p>
-                                <button class="btn btn-primary w-100" id="btnGoAdmin">Access Panel</button>
-                            </div>
+                                <h3 class="ws-card-title">Admin Control</h3>
+                                <p class="ws-card-desc">Comprehensive oversight of products, orders, users, and system analytics.</p>
+                                <button class="ws-action-btn ws-btn-primary" id="btnGoAdmin">
+                                    Access Panel <i class="fas fa-chevron-right ms-1" style="font-size: 0.8em;"></i>
+                                </button>
+                            </article>
                         </div>`;
                     container.append(adminCard);
                 }
 
-                // 2. Fetch Available Programs
+                // 2. Beta Programs
                 const allPrograms = await AdminManager.getAvailablePrograms();
                 const allowed = session.allowedPrograms || [];
                 let visibleCount = 0;
@@ -1261,24 +1428,33 @@
                     const hasAccess = session.role === 'admin' || allowed.includes(p.id);
                     if (hasAccess) {
                         visibleCount++;
+                        const colors = getBrandColors(p.color || 'primary');
                         const card = `
-                            <div class="col-md-4 col-lg-3">
-                                <div class="card h-100 border-0 shadow-sm text-center p-4 hover-lift">
-                                    <div class="mb-3">
-                                        <i class="fas ${p.icon || 'fa-rocket'} fa-3x text-${p.color || 'primary'}"></i>
+                            <div class="col-md-6 col-lg-4 col-xl-3">
+                                <article class="workspace-card">
+                                    <div class="icon-box" style="background: ${colors.bg}; color: ${colors.text};">
+                                        <i class="fas ${p.icon || 'fa-rocket'}"></i>
                                     </div>
-                                    <h4 class="mb-3">${p.name}</h4>
-                                    <p class="text-muted small mb-4">Launch the ${p.name} beta feature.</p>
-                                    <a href="../developments/${p.path}/index.html" class="btn btn-outline-${p.color || 'primary'} w-100">Launch</a>
-                                </div>
+                                    <h3 class="ws-card-title">${p.name}</h3>
+                                    <p class="ws-card-desc">Professional tools for ${p.name.toLowerCase()}. Securely managed beta environment.</p>
+                                    <a href="../developments/${p.path}/index.html" class="ws-action-btn ws-btn-outline">
+                                        Launch Tool <i class="fas fa-external-link-alt ms-1" style="font-size: 0.8em;"></i>
+                                    </a>
+                                </article>
                             </div>`;
                         container.append(card);
                     }
                 });
 
-                // 3. No Access Message
                 if (visibleCount === 0 && session.role !== 'admin') {
-                    container.append('<div id="noAccessMsg" class="col-12 text-center text-muted mt-5"><i class="fas fa-lock fa-3x mb-3 text-secondary"></i><h4>No Access Granted</h4><p>You do not have access to any beta programs yet.<br>Please contact an administrator.</p></div>');
+                    container.append(`
+                        <div class="col-12 text-center py-5">
+                            <div class="mb-4 opacity-25">
+                                <i class="fas fa-lock fa-5x"></i>
+                            </div>
+                            <h3 class="fw-bold">No Active Workspaces</h3>
+                            <p class="text-muted">Your account hasn't been assigned any workspaces yet.<br>Please contact system administration for access.</p>
+                        </div>`);
                 }
             }
 
