@@ -1486,6 +1486,27 @@
                                         </div>
                                     </div>
 
+                                    <!-- Search and Sort Controls -->
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-md-8">
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-white border-end-0"><i
+                                                        class="fas fa-search text-muted"></i></span>
+                                                <input type="text" id="userSearchInput"
+                                                    class="form-control border-start-0"
+                                                    placeholder="Search by username or email...">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <select id="userSortSelect" class="form-select form-select-sm">
+                                                <option value="none">Sort by: Default</option>
+                                                <option value="role-asc">Role (Admin First)</option>
+                                                <option value="role-desc">Role (User First)</option>
+                                                <option value="name-asc">Username (A-Z)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
                                     <div class="admin-table-wrapper"
                                         style="max-height:300px; overflow-y:auto; background: white;">
                                         <table class="table admin-table m-0">
@@ -2126,10 +2147,32 @@
 
             async function loadUsers() {
                 usersCache = await AdminManager.getUsers();
+                renderUserList();
+                // Load Defaults for Settings Tab
+                loadDefaults();
+            }
+
+            function renderUserList() {
                 const tbody = $('#user-list-body');
+                const search = $('#userSearchInput').val()?.toLowerCase() || '';
+                const sort = $('#userSortSelect').val() || 'none';
+
                 tbody.empty();
 
-                usersCache.forEach(u => {
+                let filtered = usersCache.filter(u => {
+                    return (u.username?.toLowerCase() || '').includes(search) ||
+                        (u.fullName?.toLowerCase() || '').includes(search);
+                });
+
+                if (sort === 'role-asc') {
+                    filtered.sort((a, b) => a.role.localeCompare(b.role));
+                } else if (sort === 'role-desc') {
+                    filtered.sort((a, b) => b.role.localeCompare(a.role));
+                } else if (sort === 'name-asc') {
+                    filtered.sort((a, b) => a.username.localeCompare(b.username));
+                }
+
+                filtered.forEach(u => {
                     const roleClass = u.role === 'admin' ? 'role-admin' : 'role-user';
                     const roleBadge = `<span class="role-badge ${roleClass}">${u.role}</span>`;
                     const statusClass = u.status === 'active' ? 'text-success' : 'text-danger';
@@ -2147,10 +2190,11 @@
                     </tr>`;
                     tbody.append(row);
                 });
-
-                // Load Defaults for Settings Tab
-                loadDefaults();
             }
+
+            // Listeners for User Search & Sort
+            $(document).on('keyup', '#userSearchInput', renderUserList);
+            $(document).on('change', '#userSortSelect', renderUserList);
 
             // Defaults Logic
             async function loadDefaults() {
