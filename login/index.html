@@ -34,74 +34,299 @@
 
     <style>
         body {
-            background-color: #f4f7fa;
-            color: #333;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
         }
 
-        /* Login Styles */
-        .login-wrapper {
+        /* Redesigned Login/Signup Layout */
+        .auth-page {
             height: 100vh;
+            width: 100vw;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .auth-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sidebar Stylings */
+        .auth-sidebar {
+            flex: 1;
+            background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
+            background-size: cover;
+            position: relative;
+            display: none;
+            /* Hidden on mobile */
+            color: white;
+            padding: 60px;
+        }
+
+        @media (min-width: 992px) {
+            .auth-sidebar {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                max-width: 45%;
+            }
+        }
+
+        .sidebar-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
+            z-index: 1;
+        }
+
+        .sidebar-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-name {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-text h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .social-proof {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 100px;
+            width: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .avatars {
+            display: flex;
+            margin-right: 5px;
+        }
+
+        .avatars img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            margin-left: -10px;
+        }
+
+        .avatars img:first-child {
+            margin-left: 0;
+        }
+
+        .proof-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .stars {
+            color: #ffcc00;
+            margin-right: 5px;
+        }
+
+        /* Form Area Stylings */
+        .auth-form-wrapper {
+            flex: 1;
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
-        }
-
-        .login-card {
-            background: white;
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+        }
+
+        .auth-form-container {
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
         }
 
-        .login-header h3 {
-            margin-bottom: 20px;
-            text-align: center;
+        .form-header {
+            margin-bottom: 35px;
+        }
+
+        .form-header h2 {
+            font-size: 32px;
             font-weight: 700;
+            margin-bottom: 10px;
+            color: #111;
         }
 
-        .auth-tabs {
-            border-bottom: 2px solid #f0f0f0;
-            margin-bottom: 20px;
-        }
-
-        .auth-tabs .nav-link {
+        .form-header p {
             color: #666;
-            border: none;
-            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        /* Social Buttons */
+        .social-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            background: #f9f9f9;
             font-weight: 600;
+            color: #333;
+            transition: all 0.2s;
+            cursor: pointer;
         }
 
-        .auth-tabs .nav-link.active {
-            color: #3d72fc;
-            border-bottom: 2px solid #3d72fc;
-            background: none;
+        .social-btn:hover {
+            background: #f0f0f0;
+            border-color: #ccc;
         }
 
-        /* Custom Tabs for Management Modal to match Auth Tabs */
-        .custom-tabs {
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 1rem;
+        .social-btn img {
+            width: 20px;
+            height: 20px;
         }
 
-        .custom-tabs .nav-link {
-            border: none;
+        .social-btn i {
+            font-size: 20px;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 30px 0;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .separator span {
+            margin: 0 15px;
+        }
+
+        /* Form Controls */
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .input-with-icon i.toggle-password {
+            left: auto;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .input-with-icon .form-control {
+            padding: 14px 15px 14px 45px;
+            border-radius: 12px;
+            border: 1.5px solid #eee;
+            background: #fafafa;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .input-with-icon .form-control:focus {
+            border-color: var(--ridda-primary-color);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(255, 208, 67, 0.1);
+        }
+
+        .input-with-icon .form-control:focus+i {
+            color: var(--ridda-primary-color);
+        }
+
+
+        .form-check-input:checked {
+            background-color: var(--ridda-primary-color);
+            border-color: var(--ridda-primary-color);
+        }
+
+        .form-footer {
+            text-align: center;
+            font-size: 15px;
             color: #666;
-            font-weight: 600;
-            padding: 10px 15px;
-            margin-bottom: -1px;
-            /* Align with border */
         }
 
-        .custom-tabs .nav-link.active {
-            color: #3d72fc;
-            background: none;
-            border-bottom: 2px solid #3d72fc;
+        .form-footer a {
+            color: var(--ridda-primary-color);
+            font-weight: 700;
+            text-decoration: none;
         }
 
-        /* Admin Styles */
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Management Styles */
+        #adminSection {
+            background: #f4f7fa;
+            min-height: 100vh;
+        }
+
         .admin-header {
             background: white;
             padding: 20px 0;
@@ -115,31 +340,6 @@
             font-weight: 700;
         }
 
-        .product-img-preview {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-active {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-        }
-
-        .status-inactive {
-            background-color: #ffebee;
-            color: #c62828;
-        }
-
         .table-card {
             background: white;
             border-radius: 15px;
@@ -147,71 +347,7 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         }
 
-        .action-btn {
-            width: 35px;
-            height: 35px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin: 0 3px;
-            transition: all 0.3s;
-            border: none;
-            color: white;
-        }
-
-        .btn-edit {
-            background-color: #3d72fc;
-        }
-
-        .btn-edit:hover {
-            background-color: #2a5bdc;
-        }
-
-        .btn-delete {
-            background-color: #ff4757;
-        }
-
-        .btn-delete:hover {
-            background-color: #e0404e;
-        }
-
-        .form-switch .form-check-input {
-            width: 3em;
-            height: 1.5em;
-            cursor: pointer;
-        }
-
-        .modal-content {
-            border-radius: 15px;
-            border: none;
-        }
-
-        .modal-header {
-            border-bottom: 1px solid #f0f0f0;
-            padding: 20px 30px;
-        }
-
-        .modal-body {
-            padding: 30px;
-        }
-
-        .form-label {
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .form-control {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .form-control:focus {
-            box-shadow: 0 0 0 3px rgba(61, 114, 252, 0.1);
-            border-color: #3d72fc;
-        }
-
+        /* Generic Utilities */
         .hover-lift {
             transition: transform 0.2s;
         }
@@ -220,13 +356,8 @@
             transform: translateY(-5px);
         }
 
-        .role-badge {
-            font-size: 11px;
-            padding: 3px 8px;
-            border-radius: 12px;
-            background: #f0f0f0;
-            color: #666;
-            margin-left: 5px;
+        .d-none {
+            display: none !important;
         }
     </style>
 </head>
@@ -238,73 +369,181 @@
         saved locally and sync when online.
     </div>
 
-    <!-- Auth Dialog (Visible by default) -->
-    <div id="loginSection" class="login-wrapper">
-        <div class="login-card">
-            <div class="login-header">
-                <h3>Welcome</h3>
+    <!-- Auth Dialog (Redesigned Split Layout) -->
+    <div id="loginSection" class="auth-page">
+        <div class="auth-container">
+            <!-- Sidebar (Left side) -->
+            <div class="auth-sidebar">
+                <div class="sidebar-overlay"></div>
+                <div class="sidebar-content">
+                    <div class="brand">
+                        <img src="../assets/images/logos/logo.png" alt="Gridify" class="brand-logo"
+                            style="width:150px; height:auto;">
+                        <span class="brand-name">Gridify.in</span>
+                    </div>
+
+                    <div class="hero-text">
+                        <h1 style="color: #d0b426;">Transforming Ideas into Reality with Gridify .in</h1>
+                        <p>
+                            Join the Gridify.in early access program to be one of the first to experience our innovative
+                            platform.
+                        </p>
+                    </div>
+
+                    <div class="social-proof">
+                        <!--div class="avatars">
+                            <img src="https://i.pravatar.cc/100?u=1" alt="Student">
+                            <img src="https://i.pravatar.cc/100?u=2" alt="Student">
+                            <img src="https://i.pravatar.cc/100?u=3" alt="Student">
+                        </div-->
+                        <div class="proof-text">
+                            <span class="stars">★</span> dessigned and developed by Gridify.in <span
+                                class="stars">★</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <ul class="nav nav-tabs auth-tabs justify-content-center" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#loginTab">Login</button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#signupTab">Sign Up</button>
-                </li>
-            </ul>
+            <!-- Form Content (Right side) -->
+            <div class="auth-form-wrapper">
+                <div class="auth-form-container">
+                    <!-- Signup Section -->
+                    <div id="signupSectionContent" class="auth-section d-none">
+                        <div class="form-header">
+                            <h2>Create your account</h2>
+                            <p>Start your journey towards a better career. No fees required.</p>
+                        </div>
 
-            <div class="tab-content">
-                <!-- Login Tab -->
-                <div class="tab-pane fade show active" id="loginTab">
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <label class="form-label">Email / Username</label>
-                            <input type="text" id="username" class="form-control" placeholder="Enter email" required>
+                        <!--div class="social-auth">
+                            <button class="social-btn google-btn">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                    alt="Google">
+                                Continue with Google
+                            </button>
+                            <button class="social-btn apple-btn">
+                                <i class="fab fa-apple"></i>
+                                Continue with Apple
+                            </button>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label">Password</label>
-                            <input type="password" id="password" class="form-control" placeholder="Enter password"
-                                required>
-                        </div>
-                        <div id="loginError" class="text-danger small mb-3 text-center d-none">Invalid credentials</div>
-                        <button type="submit" class="theme-btn w-100 justify-content-center">Login</button>
-                        <div class="text-center mt-3">
-                            <a href="#" id="forgotPassLink" class="small text-muted"
-                                style="text-decoration: none;">Forgot Password?</a>
-                        </div>
-                        <div class="text-center mt-2">
-                            <a href="#" id="setupAdminLink" class="small text-muted" style="text-decoration: none;"></a>
-                        </div>
-                    </form>
-                </div>
 
-                <!-- Sign Up Tab -->
-                <div class="tab-pane fade" id="signupTab">
-                    <form id="signupForm">
-                        <div class="mb-3">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" id="regEmail" class="form-control" placeholder="Enter your email"
-                                required>
+                        <div class="separator">
+                            <span>Or sign up with email</span>
+                        </div-->
+
+                        <form id="signupForm">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Full Name</label>
+                                <div class="input-with-icon">
+                                    <i class="far fa-user"></i>
+                                    <input type="text" id="regFullName" class="form-control"
+                                        placeholder="e.g. Alex Johnson" required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email Address</label>
+                                <div class="input-with-icon">
+                                    <i class="far fa-envelope"></i>
+                                    <input type="email" id="regEmail" class="form-control"
+                                        placeholder="name@example.com" required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Password</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="regPass" class="form-control"
+                                        placeholder="Create a password" required>
+                                    <i class="far fa-eye toggle-password"></i>
+                                </div>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Confirm Password</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-redo"></i>
+                                    <input type="password" id="regConfirmPass" class="form-control"
+                                        placeholder="Confirm your password" required>
+                                </div>
+                            </div>
+
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">
+                                    I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy
+                                        Policy</a>.
+                                </label>
+                            </div>
+
+                            <div id="signupError" class="text-danger small mb-3 text-center d-none">Error</div>
+                            <button type="submit" class="theme-btn w-100 justify-content-center py-3">Create
+                                Account</button>
+                        </form>
+
+                        <div class="form-footer mt-4">
+                            Already have an account? <a href="#" onclick="toggleAuth('login')">Log In</a>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" id="regPass" class="form-control" placeholder="Create password"
-                                required>
+                    </div>
+
+                    <!-- Login Section -->
+                    <div id="loginSectionContent" class="auth-section">
+                        <div class="form-header">
+                            <h2>Welcome back</h2>
+                            <p>Enter your credentials to access your account.</p>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label">Confirm Password</label>
-                            <input type="password" id="regConfirmPass" class="form-control"
-                                placeholder="Confirm password" required>
+
+                        <!--div class="social-auth">
+                            <button class="social-btn google-btn">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                    alt="Google">
+                                Continue with Google
+                            </button>
                         </div>
-                        <div id="signupError" class="text-danger small mb-3 text-center d-none">Error</div>
-                        <button type="submit" class="theme-btn w-100 justify-content-center">Sign Up (Early
-                            Access)</button>
-                    </form>
+
+                        <div class="separator">
+                            <span>Or log in with email</span>
+                        </div-->
+
+                        <form id="loginForm">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email Address / Username</label>
+                                <div class="input-with-icon">
+                                    <i class="far fa-envelope"></i>
+                                    <input type="text" id="username" class="form-control" placeholder="name@example.com"
+                                        required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Password</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="password" class="form-control"
+                                        placeholder="Enter your password" required>
+                                    <i class="far fa-eye toggle-password"></i>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                                </div>
+                                <a href="#" id="forgotPassLink" class="small">Forgot Password?</a>
+                            </div>
+
+                            <div id="loginError" class="text-danger small mb-3 text-center d-none">Invalid
+                                credentials
+                            </div>
+                            <button type="submit" class="theme-btn w-100 justify-content-center py-3">Log In</button>
+                        </form>
+
+                        <div class="form-footer mt-4">
+                            Don't have an account? <a href="#" onclick="toggleAuth('signup')">Sign Up</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- OTP Modal -->
     <div class="modal fade" id="otpModal" tabindex="-1" data-bs-backdrop="static">
@@ -351,7 +590,8 @@
 
                     <!-- Step 2: OTP & New Pass (Hidden initially) -->
                     <div id="fpStep2" class="d-none">
-                        <p class="text-muted small text-center">Enter OTP sent to your email and your new password.</p>
+                        <p class="text-muted small text-center">Enter OTP sent to your email and your new password.
+                        </p>
                         <div class="mb-3">
                             <label class="form-label">OTP</label>
                             <input type="text" id="fpOtp" class="form-control text-center" placeholder="000000">
@@ -360,7 +600,8 @@
                             <label class="form-label">New Password</label>
                             <input type="password" id="fpNewPass" class="form-control" placeholder="New password">
                         </div>
-                        <button id="btnFpReset" class="theme-btn w-100 justify-content-center">Reset Password</button>
+                        <button id="btnFpReset" class="theme-btn w-100 justify-content-center">Reset
+                            Password</button>
                     </div>
                 </div>
             </div>
@@ -693,7 +934,8 @@
                                 <div class="tab-pane fade" id="userSettingsSubTab">
                                     <div class="card p-3 border-0 bg-light">
                                         <h6>Default Access for New Signups</h6>
-                                        <p class="small text-muted">When external users sign up properly via the login
+                                        <p class="small text-muted">When external users sign up properly via the
+                                            login
                                             page, they will automatically get access to the selected programs.</p>
 
                                         <div id="defaultAccessContainer">
@@ -701,7 +943,8 @@
                                         </div>
 
                                         <div class="mt-3">
-                                            <button class="btn btn-primary btn-sm" id="btn-save-defaults">Save Default
+                                            <button class="btn btn-primary btn-sm" id="btn-save-defaults">Save
+                                                Default
                                                 Settings</button>
                                         </div>
                                     </div>
@@ -762,6 +1005,25 @@
             // User Manage Modal
             let manageUserModal = new bootstrap.Modal(document.getElementById('manageUserModal'));
 
+            // --- UI Transitions ---
+            window.toggleAuth = function (mode) {
+                if (mode === 'signup') {
+                    $('#loginSectionContent').addClass('d-none');
+                    $('#signupSectionContent').removeClass('d-none');
+                } else {
+                    $('#signupSectionContent').addClass('d-none');
+                    $('#loginSectionContent').removeClass('d-none');
+                }
+            };
+
+            // Password Visibility Toggle
+            $(document).on('click', '.toggle-password', function () {
+                const input = $(this).siblings('input');
+                const type = input.attr('type') === 'password' ? 'text' : 'password';
+                input.attr('type', type);
+                $(this).toggleClass('fa-eye fa-eye-slash');
+            });
+
             // --- Network Status Logic ---
             function updateOnlineStatus() {
                 if (navigator.onLine) {
@@ -807,6 +1069,7 @@
             // Signup Flow
             $('#signupForm').on('submit', async function (e) {
                 e.preventDefault();
+                const fullName = $('#regFullName').val();
                 const email = $('#regEmail').val();
                 const pass = $('#regPass').val();
                 const confirm = $('#regConfirmPass').val();
@@ -815,19 +1078,20 @@
                     return;
                 }
                 const btn = $(this).find('button');
+                const originalText = btn.text();
                 btn.prop('disabled', true).text('Sending OTP...');
 
                 const res = await AdminManager.sendOtp(email);
 
                 if (res.result === 'success') {
-                    registrationData = { email, pass, mode: 'signup' };
+                    registrationData = { email, pass, fullName, mode: 'signup' };
                     $('#otpEmailDisp').text(email);
                     otpModal.show();
                     $('#signupError').addClass('d-none');
                 } else {
                     $('#signupError').removeClass('d-none').text("Error sending OTP: " + (res.error || 'Unknown'));
                 }
-                btn.prop('disabled', false).text('Sign Up (Early Access)');
+                btn.prop('disabled', false).text(originalText);
             });
 
             // Forgot Password Flow
@@ -891,12 +1155,12 @@
 
                 const vRes = await AdminManager.verifyOtp(registrationData.email, otp);
                 if (vRes.result === 'success') {
-                    const cRes = await AdminManager.registerUser(registrationData.email, registrationData.pass);
+                    const cRes = await AdminManager.registerUser(registrationData.email, registrationData.pass, registrationData.fullName);
                     if (cRes.success) {
                         alert("Account created successfully! Please login.");
                         otpModal.hide();
-                        $('.nav-tabs button[data-bs-target="#loginTab"]').tab('show');
-                        $('#regEmail').val(''); $('#regPass').val(''); $('#regConfirmPass').val('');
+                        toggleAuth('login');
+                        $('#regEmail').val(''); $('#regPass').val(''); $('#regConfirmPass').val(''); $('#regFullName').val('');
                     } else {
                         alert("Registration failed: " + cRes.message);
                     }
