@@ -411,30 +411,41 @@ class AdminManager {
         });
     }
 
-    static async setupInitialAdmin() {
-        const username = "abhinand";
-        const password = "admin123";
-
+    // --- ORDER MANAGEMENT ---
+    static async getOrders() {
         try {
-            const q = query(collection(db, USERS_COLLECTION), where("username", "==", username));
-            const snap = await getDocs(q);
-
-            if (!snap.empty) {
-                return { success: false, message: "Admin user 'abhinand' already exists." };
-            }
-
-            await addDoc(collection(db, USERS_COLLECTION), {
-                username: username,
-                password: password,
-                role: 'admin',
-                allowedPrograms: ['builder', 'scanner', 'admin'],
-                status: 'active',
-                createdAt: new Date().toISOString()
+            const querySnapshot = await getDocs(collection(db, 'orders'));
+            let orders = [];
+            querySnapshot.forEach((doc) => {
+                orders.push({ id: doc.id, ...doc.data() });
             });
-
-            return { success: true, message: `Admin created!` };
+            // Sort by date descending
+            return orders.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
         } catch (e) {
-            return { success: false, message: "Error: " + e.message };
+            console.error("Error getting orders", e);
+            return [];
+        }
+    }
+
+    static async updateOrderStatus(orderId, status) {
+        try {
+            const docRef = doc(db, 'orders', orderId);
+            await updateDoc(docRef, { status: status });
+            return true;
+        } catch (e) {
+            console.error("Update Order Status Error", e);
+            throw e;
+        }
+    }
+
+    static async updatePaymentStatus(orderId, status) {
+        try {
+            const docRef = doc(db, 'orders', orderId);
+            await updateDoc(docRef, { paymentStatus: status });
+            return true;
+        } catch (e) {
+            console.error("Update Payment Status Error", e);
+            throw e;
         }
     }
 }
