@@ -323,7 +323,7 @@ class AdminManager {
         }
     }
 
-    static async registerUser(email, password) {
+    static async registerUser(email, password, fullName = '') {
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", email));
             const snap = await getDocs(q);
@@ -336,6 +336,7 @@ class AdminManager {
             await addDoc(collection(db, USERS_COLLECTION), {
                 username: email,
                 password: password,
+                fullName: fullName,
                 role: 'user',
                 allowedPrograms: defaults,
                 status: 'active',
