@@ -17,6 +17,17 @@ body {
     color: #5a3e36;
 }
 
+/* Global Heart Cursor */
+body,
+button,
+a,
+.envelope-container,
+.create-btn,
+.preset-chip,
+.music-control {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><text x='0' y='24' font-size='24'>❤️</text></svg>"), auto !important;
+}
+
 /* Utilities */
 .hidden {
     display: none !important;
@@ -370,6 +381,7 @@ textarea.form-control {
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 10px;
+    justify-content: center;
 }
 
 .preset-chip {
@@ -584,4 +596,92 @@ textarea.form-control {
 .music-control:hover {
     transform: scale(1.1);
     background: #fff;
+}
+
+/* --- Theme Support --- */
+
+/* Theme: Midnight */
+body.theme-midnight {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    color: #f0f0f0;
+}
+
+body.theme-midnight .paper {
+    background: #1e1e1e;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    background-image: linear-gradient(#333 1px, transparent 1px);
+}
+
+body.theme-midnight .paper:before {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #444;
+}
+
+body.theme-midnight .handwritten-text {
+    color: #e0e0e0;
+}
+
+body.theme-midnight .letter-body h1,
+body.theme-midnight .signature span,
+body.theme-midnight .signature {
+    color: #ff7b93;
+    /* Light pink to pop against dark */
+}
+
+body.theme-midnight .footer {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Theme: Sunset */
+body.theme-sunset {
+    background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
+    color: #5a2a2a;
+}
+
+body.theme-sunset .paper {
+    background: #fff5e6;
+}
+
+body.theme-sunset .letter-body h1 {
+    color: #c0392b;
+}
+
+/* Theme: Ocean */
+body.theme-ocean {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    color: #2c3e50;
+}
+
+body.theme-ocean .paper {
+    background: #f0f8ff;
+    background-image: linear-gradient(#dbeeff 1px, transparent 1px);
+}
+
+body.theme-ocean .letter-body h1 {
+    color: #0077b6;
+}
+
+body.theme-ocean .envelope {
+    background-color: #00b4d8;
+}
+
+body.theme-ocean .envelope:before {
+    border-left-color: #0077b6;
+}
+
+body.theme-ocean .envelope:after {
+    border-right-color: #0077b6;
+}
+
+body.theme-ocean .flap {
+    border-top-color: #48cae4;
+}
+
+body.theme-ocean .heart-seal {
+    color: #0077b6;
+}
+
+.theme-selector .theme-option.selected div {
+    border-color: #ff4757 !important;
+    transform: scale(1.1);
 }
