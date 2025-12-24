@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const encodedMessage = urlParams.get('m'); // 'm' for message
     const encodedSender = urlParams.get('s');  // 's' for sender
     const msgId = urlParams.get('id');         // 'id' for database entry
+    const themeParam = urlParams.get('theme') || urlParams.get('t') || 'classic';
+
+    // Apply Theme
+    if (themeParam && themeParam !== 'classic') {
+        document.body.classList.add(`theme-${themeParam}`);
+    }
 
     // Default Content
     let letterText = `My dearest,
