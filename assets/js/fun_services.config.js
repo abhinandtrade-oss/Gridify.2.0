@@ -1,6 +1,10 @@
+import { db } from './firebase-config.js';
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
 /**
  * Fun Zone Services Configuration
  * Supports dynamic sections and services.
+ * Backend: Firebase Firestore
  */
 
 const DEFAULT_SECTIONS = [
@@ -94,43 +98,74 @@ const DEFAULT_FUN_SERVICES = [
     }
 ];
 
-// Keys
-const FUN_SERVICES_KEY = 'gridify_fun_services_config';
-const FUN_SECTIONS_KEY = 'gridify_fun_sections_config';
+// Firestore Reference
+const CONFIG_DOC_REF = doc(db, "fun_zone_config", "main");
 
 // --- Services Config ---
-export function getFunServices() {
-    const stored = localStorage.getItem(FUN_SERVICES_KEY);
-    if (!stored) return DEFAULT_FUN_SERVICES;
-    return JSON.parse(stored);
+export async function getFunServices() {
+    console.log("[FunConfig] Fetching Services from Firestore...");
+    try {
+        const snapshot = await getDoc(CONFIG_DOC_REF);
+        if (snapshot.exists() && snapshot.data().services) {
+            console.log("[FunConfig] Services fetched:", snapshot.data().services.length);
+            return snapshot.data().services;
+        } else {
+            console.log("[FunConfig] No config found, using defaults.");
+        }
+    } catch (error) {
+        console.error("[FunConfig] Error getting services:", error);
+    }
+    return DEFAULT_FUN_SERVICES;
 }
 
-export function saveFunServices(services) {
-    localStorage.setItem(FUN_SERVICES_KEY, JSON.stringify(services));
+export async function saveFunServices(services) {
+    console.log("[FunConfig] Saving Services...", services.length);
+    try {
+        await setDoc(CONFIG_DOC_REF, { services: services }, { merge: true });
+        console.log("[FunConfig] Services saved successfully.");
+    } catch (error) {
+        console.error("[FunConfig] Error saving services:", error);
+        throw error;
+    }
 }
 
-export function addFunService(service) {
-    const services = getFunServices();
+export async function addFunService(service) {
+    const services = await getFunServices();
     if (!service.id) service.id = 'svc-' + Date.now();
     if (!service.wrapperClass) service.wrapperClass = 'icon-default';
     services.push(service);
-    saveFunServices(services);
+    await saveFunServices(services);
 }
 
 // --- Sections Config ---
-export function getFunSections() {
-    const stored = localStorage.getItem(FUN_SECTIONS_KEY);
-    if (!stored) return DEFAULT_SECTIONS;
-    return JSON.parse(stored);
+export async function getFunSections() {
+    console.log("[FunConfig] Fetching Sections...");
+    try {
+        const snapshot = await getDoc(CONFIG_DOC_REF);
+        if (snapshot.exists() && snapshot.data().sections) {
+            console.log("[FunConfig] Sections fetched:", snapshot.data().sections.length);
+            return snapshot.data().sections;
+        }
+    } catch (error) {
+        console.error("[FunConfig] Error getting sections:", error);
+    }
+    return DEFAULT_SECTIONS;
 }
 
-export function saveFunSections(sections) {
-    localStorage.setItem(FUN_SECTIONS_KEY, JSON.stringify(sections));
+export async function saveFunSections(sections) {
+    console.log("[FunConfig] Saving Sections...", sections.length);
+    try {
+        await setDoc(CONFIG_DOC_REF, { sections: sections }, { merge: true });
+        console.log("[FunConfig] Sections saved successfully.");
+    } catch (error) {
+        console.error("[FunConfig] Error saving sections:", error);
+        throw error;
+    }
 }
 
-export function addFunSection(section) {
-    const sections = getFunSections();
+export async function addFunSection(section) {
+    const sections = await getFunSections();
     if (!section.id) section.id = section.title.toLowerCase().replace(/\s+/g, '-');
     sections.push(section);
-    saveFunSections(sections);
+    await saveFunSections(sections);
 }
