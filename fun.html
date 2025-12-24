@@ -282,22 +282,39 @@
         <script type="module">
             import { getFunServices, getFunSections } from './assets/js/fun_services.config.js';
 
-            document.addEventListener('DOMContentLoaded', () => {
+            async function initFunZone() {
                 const root = document.getElementById('fun-page-root');
-                const services = getFunServices();
-                const sections = getFunSections();
+                if (!root) return;
 
-                if (!sections || sections.length === 0) return;
+                // Prevent double init
+                if (root.dataset.loaded) return;
+                root.dataset.loaded = "true";
 
-                sections.forEach((section, index) => {
-                    const sectionServices = services.filter(s => s.category === section.id && s.enabled !== false);
+                try {
+                    console.log("[FunPage] Loading...");
+                    const [services, sections] = await Promise.all([
+                        getFunServices(),
+                        getFunSections()
+                    ]);
 
-                    let pt = 'pt-50';
-                    let pb = 'pb-50';
-                    if (index === 0) pt = 'pt-100';
-                    if (index === sections.length - 1) pb = 'pb-100';
+                    console.log("[FunPage] Loaded:", { services, sections });
 
-                    const sectionHTML = `
+                    if (!sections || sections.length === 0) {
+                        root.innerHTML = '<div class="text-center py-5"><p>No sections configured.</p></div>';
+                        return;
+                    }
+
+                    root.innerHTML = ''; // Clear eventual loading state
+
+                    sections.forEach((section, index) => {
+                        const sectionServices = services.filter(s => s.category === section.id && s.enabled !== false);
+
+                        let pt = 'pt-50';
+                        let pb = 'pb-50';
+                        if (index === 0) pt = 'pt-100';
+                        if (index === sections.length - 1) pb = 'pb-100';
+
+                        const sectionHTML = `
                         <section class="fun-services-area rel z-1" id="section-wrapper-${section.id}">
                             <div class="container bordered-x ${pt} ${pb} rpy-80">
                                 <div class="row justify-content-center">
@@ -311,19 +328,19 @@
                             </div>
                         </section>
                     `;
-                    root.insertAdjacentHTML('beforeend', sectionHTML);
+                        root.insertAdjacentHTML('beforeend', sectionHTML);
 
-                    const container = document.getElementById(`section-container-${section.id}`);
-                    const wrapper = document.getElementById(`section-wrapper-${section.id}`);
+                        const container = document.getElementById(`section-container-${section.id}`);
+                        const wrapper = document.getElementById(`section-wrapper-${section.id}`);
 
-                    if (sectionServices.length === 0) {
-                        wrapper.style.display = 'none';
-                    } else {
-                        let delay = 50;
-                        sectionServices.forEach(service => {
-                            const serviceItem = document.createElement('div');
-                            serviceItem.className = 'col px-3';
-                            serviceItem.innerHTML = `
+                        if (sectionServices.length === 0) {
+                            wrapper.style.display = 'none';
+                        } else {
+                            let delay = 50;
+                            sectionServices.forEach(service => {
+                                const serviceItem = document.createElement('div');
+                                serviceItem.className = 'col px-3';
+                                serviceItem.innerHTML = `
                                  <div class="service-card" data-aos="fade-up" data-aos-delay="${delay}" data-aos-duration="1500" data-aos-offset="50">
                                     <a href="${service.path}" class="card-link"></a>
                                     <div class="icon-wrapper ${service.wrapperClass || 'icon-default'}">
@@ -333,14 +350,25 @@
                                     <p>${service.description}</p>
                                 </div>
                             `;
-                            container.appendChild(serviceItem);
-                            delay += 50;
-                        });
-                    }
-                });
+                                container.appendChild(serviceItem);
+                                delay += 50;
+                            });
+                        }
+                    });
 
-                if (window.AOS) setTimeout(() => AOS.refresh(), 500);
-            });
+                    if (window.AOS) setTimeout(() => AOS.refresh(), 500);
+
+                } catch (error) {
+                    console.error("[FunPage] Init Error:", error);
+                    root.innerHTML = `<div class="text-center py-5 text-danger"><p>Failed to load content.</p></div>`;
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initFunZone);
+            } else {
+                initFunZone();
+            }
         </script><!-- Services Grid Area end -->
 
 
