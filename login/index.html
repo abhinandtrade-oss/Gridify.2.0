@@ -1711,11 +1711,17 @@
         let funServicesCache = [];
         let funSectionsCache = [];
 
-        window.loadFunZoneManager = function () {
-            funServicesCache = getFunServices();
-            funSectionsCache = getFunSections();
-            renderFunZoneSections();
-            renderFunZoneTable();
+        window.loadFunZoneManager = async function () {
+            try {
+                // Show loading state if needed
+                funServicesCache = await getFunServices();
+                funSectionsCache = await getFunSections();
+                renderFunZoneSections();
+                renderFunZoneTable();
+            } catch (e) {
+                console.error("Error loading Fun Zone config:", e);
+                alert("Failed to load Fun Zone configuration.");
+            }
         };
 
         // --- Sections Logic ---
@@ -1835,12 +1841,26 @@
             }
         };
 
-        window.saveFunZoneConfig = function () {
-            saveFunServices(funServicesCache);
-            saveFunSections(funSectionsCache);
-            alert('Fun Zone configuration (Sections & Services) saved! Reload fun.html to see changes.');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('funZoneModal'));
-            if (modal) modal.hide();
+        window.saveFunZoneConfig = async function () {
+            const btn = document.querySelector('#funZoneModal .btn-success');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                await saveFunServices(funServicesCache);
+                await saveFunSections(funSectionsCache);
+                alert('Fun Zone configuration (Sections & Services) saved! Reload fun.html to see changes.');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('funZoneModal'));
+                if (modal) modal.hide();
+            } catch (e) {
+                console.error("Error saving Fun Zone config:", e);
+                alert("Failed to save changes: " + e.message);
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+            // Trigger refresh if needed or notify user
         };
 
         $(document).ready(function () {
