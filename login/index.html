@@ -1267,6 +1267,7 @@
                                             <th>Category / Section</th>
                                             <th>Description</th>
                                             <th>Icon</th>
+                                            <th>Permissions</th>
                                             <th style="width: 50px;"></th>
                                         </tr>
                                     </thead>
@@ -1671,6 +1672,7 @@
                                                     <th>Name</th>
                                                     <th>Path</th>
                                                     <th>Icon</th>
+                                                    <th>Permissions</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
@@ -1794,6 +1796,13 @@
                         <div class="text-center"><i class="${svc.iconClass}"></i></div>
                     </td>
                     <td>
+                         <select class="form-select form-select-sm" onchange="window.updateFunService(${index}, 'permissions', this.value)">
+                                <option value="anyone" ${(!svc.permissions || svc.permissions === 'anyone') ? 'selected' : ''}>Anyone</option>
+                                <option value="user" ${svc.permissions === 'user' ? 'selected' : ''}>User</option>
+                                <option value="admin" ${svc.permissions === 'admin' ? 'selected' : ''}>Admin</option>
+                        </select>
+                    </td>
+                    <td>
                          <button class="btn btn-sm btn-outline-danger border-0" onclick="window.removeFunService(${index})"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
@@ -1823,6 +1832,7 @@
                 category: firstSectionId,
                 iconClass: 'fas fa-star',
                 wrapperClass: 'icon-love',
+                permissions: 'anyone',
                 enabled: true
             });
             renderFunZoneTable();
@@ -2118,7 +2128,21 @@
                 let visibleCount = 0;
 
                 allPrograms.forEach(p => {
-                    const hasAccess = session.role === 'admin' || allowed.includes(p.id);
+                    // Permission Logic
+                    const perm = p.permissions;
+                    let hasAccess = false;
+
+                    if (session.role === 'admin') {
+                        hasAccess = true;
+                    } else if (perm === 'anyone') {
+                        hasAccess = true;
+                    } else if (perm === 'user') {
+                        hasAccess = true; // All logged in users
+                    } else {
+                        // Fallback to explicit assignment
+                        if (allowed.includes(p.id)) hasAccess = true;
+                    }
+
                     if (hasAccess) {
                         visibleCount++;
                         const colors = getBrandColors(p.color || 'primary');
@@ -2255,6 +2279,13 @@
                         <td><input type="text" class="form-control admin-input form-control-sm prog-name" value="${p.name}" data-idx="${idx}"></td>
                         <td><input type="text" class="form-control admin-input form-control-sm prog-path" value="${p.path}" data-idx="${idx}"></td>
                         <td><input type="text" class="form-control admin-input form-control-sm prog-icon" value="${p.icon}" data-idx="${idx}"></td>
+                        <td>
+                            <select class="form-select admin-input form-select-sm prog-perm" data-idx="${idx}">
+                                <option value="admin" ${p.permissions === 'admin' ? 'selected' : ''}>Admin Only</option>
+                                <option value="user" ${(p.permissions === 'user' || !p.permissions) ? 'selected' : ''}>User (Login)</option>
+                                <option value="anyone" ${p.permissions === 'anyone' ? 'selected' : ''}>Anyone (Public)</option>
+                            </select>
+                        </td>
                         <td class="text-end"><button class="action-btn btn-delete btn-remove-prog" data-idx="${idx}" title="Remove"><i class="fas fa-trash"></i></button></td>
                     </tr>`;
                     tbody.append(row);
@@ -2269,6 +2300,13 @@
                     <td><input type="text" class="form-control form-control-sm prog-name" placeholder="Name" data-idx="${idx}"></td>
                     <td><input type="text" class="form-control form-control-sm prog-path" placeholder="Folder Name" data-idx="${idx}"></td>
                     <td><input type="text" class="form-control form-control-sm prog-icon" placeholder="fa-icon" data-idx="${idx}"></td>
+                    <td>
+                         <select class="form-select form-select-sm prog-perm" data-idx="${idx}">
+                                <option value="admin">Admin Only</option>
+                                <option value="user" selected>User (Login)</option>
+                                <option value="anyone">Anyone (Public)</option>
+                        </select>
+                    </td>
                     <td><button class="btn btn-sm btn-danger btn-remove-prog" data-idx="${idx}"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
                 tbody.append(row);
@@ -2285,8 +2323,9 @@
                     const name = $(this).find('.prog-name').val();
                     const path = $(this).find('.prog-path').val();
                     const icon = $(this).find('.prog-icon').val();
+                    const permissions = $(this).find('.prog-perm').val();
                     if (id && name && path) {
-                        programs.push({ id, name, path, icon: icon || 'fa-external-link-alt', color: 'primary' });
+                        programs.push({ id, name, path, icon: icon || 'fa-external-link-alt', color: 'primary', permissions: permissions || 'user' });
                     }
                 });
 
