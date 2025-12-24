@@ -1,0 +1,464 @@
+﻿<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Gridify - Fun Zone</title>
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" href="assets/images/logos/favicon.png" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        rel="stylesheet">
+
+    <!-- Flaticon -->
+    <link rel="stylesheet" href="assets/css/flaticon.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="assets/css/fontawesome-5.14.0.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <!-- Magnific Popup -->
+    <link rel="stylesheet" href="assets/css/magnific-popup.min.css">
+    <!-- Nice Select -->
+    <link rel="stylesheet" href="assets/css/nice-select.min.css">
+    <!-- Animate -->
+    <link rel="stylesheet" href="assets/css/aos.css">
+    <!-- Slick -->
+    <link rel="stylesheet" href="assets/css/slick.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <style>
+        /* Allow clicks to pass through the header background */
+        .main-header {
+            pointer-events: none;
+        }
+
+        /* Re-enable clicks on interactive elements */
+        .main-header .logo-outer,
+        .main-header .nav-outer,
+        .main-header .menu-btns,
+        .main-header .navbar-toggle {
+            pointer-events: auto;
+        }
+
+        /* Fun Zone Grid Styles */
+        .fun-services-area {
+            background-color: #f8f9fa;
+        }
+
+        .service-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            border: 1px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .service-card .icon-wrapper {
+            margin-bottom: 20px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 28px;
+            color: #fff;
+            /* Default gradient, overridden by specific classes */
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+        }
+
+        .service-card h4 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .service-card p {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 0;
+            flex-grow: 1;
+        }
+
+        .card-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+        }
+
+        /* Icon Colors */
+        .icon-love {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: #d63384;
+        }
+
+        .icon-pdf {
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            color: #fff;
+        }
+
+        .icon-scan {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #fff;
+        }
+
+        .icon-msg {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #fff;
+        }
+
+        .icon-qr {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: #fff;
+        }
+
+        .icon-tool {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .icon-link {
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            color: #fff;
+        }
+
+        .icon-case {
+            background: linear-gradient(135deg, #c471f5 0%, #fa71cd 100%);
+            color: #fff;
+        }
+
+        .icon-attend {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .service-card {
+                padding: 20px;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="page-wrapper">
+
+        <!-- Preloader -->
+        <div class="preloader">
+            <div class="custom-loader"></div>
+        </div>
+
+        <!-- main header -->
+        <header class="main-header header-one white-menu menu-absolute">
+            <!--Header-Upper-->
+            <div class="header-upper">
+                <div class="container px-xxl-0 bordered-x clearfix">
+
+                    <div class="header-inner rel d-flex align-items-center">
+                        <div class="logo-outer">
+                            <div class="logo"><a href="index.html"><img src="assets/images/logos/logo.png" alt="Logo"
+                                        title="Logo" style="width: 100px; height: 100px; object-fit: contain;"></a>
+                            </div>
+                        </div>
+
+                        <div class="nav-outer mx-lg-auto ps-xxl-5 clearfix">
+                            <!-- Main Menu -->
+                            <nav class="main-menu navbar-expand-lg">
+                                <div class="navbar-header rpy-10">
+                                    <div class="mobile-logo">
+                                        <a href="index.html">
+                                            <img src="assets/images/logos/logo.png" alt="Logo" title="Logo"
+                                                style="width: 100px; height: 100px; object-fit: contain;">
+                                        </a>
+                                    </div>
+
+                                    <!-- Toggle Button -->
+                                    <button type="button" class="navbar-toggle" data-bs-toggle="collapse"
+                                        data-bs-target=".navbar-collapse">
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+
+                                <div class="navbar-collapse collapse clearfix">
+                                    <ul class="navigation clearfix">
+                                        <li class=""><a href="index.html">Home</a>
+                                            <ul>
+                                            </ul>
+                                        </li>
+                                        <li><a href="about.html">About</a></li>
+                                        <li><a href="services.html">Services</a></li>
+                                        <li><a href="shop.html">Shop</a></li>
+                                        <li><a href="contact.html">Contact</a></li>
+                                    </ul>
+                                </div>
+
+                            </nav>
+                            <!-- Main Menu End-->
+                        </div>
+
+                        <!-- Menu Button -->
+                        <div class="menu-btns">
+                            <a href="shop.html" class="theme-btn btn-small" data-hover="Shop Now">
+                                <span>Shop Now</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End Header Upper-->
+        </header>
+
+
+        <!-- Page Banner Start -->
+        <!-- Page Banner Start -->
+        <section class="page-banner-area text-white rel z-1 overflow-hidden"
+            style="position: relative; overflow: hidden; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 40vh;">
+            <div class="container bordered-x py-100 rpt-80 rpb-80" style="position: relative; z-index: 2;">
+                <div class="banner-inner px-xl-4 pt-90 text-center">
+                    <h1 class="page-title mb-20" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50"
+                        style="font-size: 4rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">Fun
+                        Zone
+                    </h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb justify-content-center" data-aos="fade-up" data-aos-delay="200"
+                            data-aos-duration="1500" data-aos-offset="50">
+                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item active">Fun Zone</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Decorative Circles -->
+            <div class="circle-shape"
+                style="position: absolute; top: -50px; left: -50px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,0.1);">
+            </div>
+            <div class="circle-shape"
+                style="position: absolute; bottom: -30px; right: -30px; width: 150px; height: 150px; border-radius: 50%; background: rgba(255,255,255,0.1);">
+            </div>
+            <div class="circle-shape"
+                style="position: absolute; top: 20%; right: 10%; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.05);">
+            </div>
+
+        </section>
+        <!-- Page Banner End -->
+
+
+        <!-- Services Grid Area start -->
+        <div id="fun-page-root"></div>
+
+        <!-- Dynamic Loading Script -->
+        <script type="module">
+            import { getFunServices, getFunSections } from './assets/js/fun_services.config.js';
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const root = document.getElementById('fun-page-root');
+                const services = getFunServices();
+                const sections = getFunSections();
+
+                if (!sections || sections.length === 0) return;
+
+                sections.forEach((section, index) => {
+                    const sectionServices = services.filter(s => s.category === section.id && s.enabled !== false);
+
+                    let pt = 'pt-50';
+                    let pb = 'pb-50';
+                    if (index === 0) pt = 'pt-100';
+                    if (index === sections.length - 1) pb = 'pb-100';
+
+                    const sectionHTML = `
+                        <section class="fun-services-area rel z-1" id="section-wrapper-${section.id}">
+                            <div class="container bordered-x ${pt} ${pb} rpy-80">
+                                <div class="row justify-content-center">
+                                    <div class="col-lg-12">
+                                        <div class="section-title text-center mb-50" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
+                                            <span class="subtitle" style="padding: 15px 40px; display: inline-block;">${section.title}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 justify-content-center" id="section-container-${section.id}"></div>
+                            </div>
+                        </section>
+                    `;
+                    root.insertAdjacentHTML('beforeend', sectionHTML);
+
+                    const container = document.getElementById(`section-container-${section.id}`);
+                    const wrapper = document.getElementById(`section-wrapper-${section.id}`);
+
+                    if (sectionServices.length === 0) {
+                        wrapper.style.display = 'none';
+                    } else {
+                        let delay = 50;
+                        sectionServices.forEach(service => {
+                            const serviceItem = document.createElement('div');
+                            serviceItem.className = 'col px-3';
+                            serviceItem.innerHTML = `
+                                 <div class="service-card" data-aos="fade-up" data-aos-delay="${delay}" data-aos-duration="1500" data-aos-offset="50">
+                                    <a href="${service.path}" class="card-link"></a>
+                                    <div class="icon-wrapper ${service.wrapperClass || 'icon-default'}">
+                                        <i class="${service.iconClass}"></i>
+                                    </div>
+                                    <h4>${service.title}</h4>
+                                    <p>${service.description}</p>
+                                </div>
+                            `;
+                            container.appendChild(serviceItem);
+                            delay += 50;
+                        });
+                    }
+                });
+
+                if (window.AOS) setTimeout(() => AOS.refresh(), 500);
+            });
+        </script><!-- Services Grid Area end -->
+
+
+        <!-- footer area start -->
+        <!-- footer area start -->
+        <footer class="main-footer bgc-black text-white rel z-1" style="padding-top: 50px;">
+            <!--div class="container bordered-x pb-30">
+                <div class="row align-items-center justify-content-between">
+                    <div class="col-lg-5 col-sm-12" data-aos="fade-right" data-aos-duration="1500" data-aos-offset="50">
+                        <div class="footer-widget footer-newsletter">
+                            <div class="footer-logo mb-20">
+                                <h2
+                                    style="color: #FFC107; font-family: 'Manrope', sans-serif; font-weight: 800; letter-spacing: -1px; font-size: 40px; margin: 0;">
+                                    Gridify</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6" data-aos="fade-up" data-aos-delay="50"
+                                data-aos-duration="1500" data-aos-offset="50">
+                                <div class="footer-widget footer-text">
+                                    <div class="footer-title">
+                                        <h6
+                                            style="color: #aaa; font-size: 14px; text-transform: uppercase; margin-bottom: 15px;">
+                                            Contact Us</h6>
+                                    </div>
+                                    <div class="text">
+                                        <a href="mailto:info@gridify.com"
+                                            style="display: block; color: white; margin-bottom: 5px; font-size: 16px;">info@gridify.com</a>
+                                        <a href="callto:+918129566053"
+                                            style="display: block; color: white; font-size: 16px;">+91 81295 66053</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6" data-aos="fade-up" data-aos-delay="100"
+                                data-aos-duration="1500" data-aos-offset="50">
+                                <div class="footer-widget footer-contact">
+                                    <div class="footer-title">
+                                        <h6
+                                            style="color: #aaa; font-size: 14px; text-transform: uppercase; margin-bottom: 15px;">
+                                            Follow Us On</h6>
+                                    </div>
+                                    <div class="social-style-two">
+                                        <a href="www.facebook.com"
+                                            style="margin-right: 15px; color: white; font-size: 18px;"><i
+                                                class="fab fa-facebook-f"></i></a>
+                                        <a href="www.instagram.com"
+                                            style="margin-right: 15px; color: white; font-size: 18px;"><i
+                                                class="fab fa-instagram"></i></a>
+                                        <a href="https://wa.me/918129566053" style="color: white; font-size: 18px;"><i
+                                                class="fab fa-whatsapp"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div-->
+
+            <div class="footer-bottom" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                <div class="container bordered-x pt-20 pb-20">
+                    <div class="row align-items-center">
+                        <div class="col-lg-5">
+                            <div class="copyright-text text-center text-lg-start">
+                                <p style="color: #777; margin: 0;">Copyright 2025 Â© <a href="index.html"
+                                        style="color: #FFC107;">Gridify</a>, all rights reserved.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 text-center text-lg-end">
+                            <ul class="footer-bottom-nav" style="margin: 0;">
+                                <li style="display: inline-block; margin-left: 20px;"><a href="faqs.html"
+                                        style="color: #777;">FAQ</a></li>
+                                <li style="display: inline-block; margin-left: 20px;"><a href="404.html"
+                                        style="color: #777;">Privacy Policy</a></li>
+                                <li style="display: inline-block; margin-left: 20px;"><a href="404.html"
+                                        style="color: #777;">Terms & Conditions</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Scroll Top Button -->
+                    <button class="scroll-top scroll-to-target" data-target="html"
+                        style="bottom: 20px; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;"><i
+                            class="far fa-arrow-up"></i></button>
+                </div>
+            </div>
+        </footer>
+        <!-- footer area end -->
+
+    </div>
+    <!--End pagewrapper-->
+
+
+    <!-- Jquery -->
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <!-- Appear Js -->
+    <script src="assets/js/appear.min.js"></script>
+    <!-- Slick -->
+    <script src="assets/js/slick.min.js"></script>
+    <!-- Magnific Popup -->
+    <script src="assets/js/jquery.magnific-popup.min.js"></script>
+    <!-- Nice Select -->
+    <script src="assets/js/jquery.nice-select.min.js"></script>
+    <!-- Image Loader -->
+    <script src="assets/js/imagesloaded.pkgd.min.js"></script>
+    <!-- Skillbar -->
+    <script src="assets/js/skill.bars.jquery.min.js"></script>
+    <!-- Isotope -->
+    <script src="assets/js/isotope.pkgd.min.js"></script>
+    <!--  AOS Animation -->
+    <script src="assets/js/aos.js"></script>
+    <!-- Custom script -->
+    <script src="assets/js/script.js"></script>
+
+</body>
+
+</html>
