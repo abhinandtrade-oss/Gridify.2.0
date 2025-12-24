@@ -1197,6 +1197,91 @@
                             <button class="btn btn-sm btn-dark rounded-pill w-100 mt-2">System Config</button>
                         </div>
                     </div>
+                    <!-- Fun Zone Card -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="admin-card feature-card animate-up"
+                            onclick="const fzModal = new bootstrap.Modal(document.getElementById('funZoneModal')); fzModal.show(); window.loadFunZoneManager();">
+                            <div class="icon-box-large bg-info-soft"
+                                style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                                <i class="fas fa-gamepad fa-2x"></i>
+                            </div>
+                            <h5 class="fw-700">Fun Zone</h5>
+                            <p class="text-muted small px-2">Manage content on Fun Zone page.</p>
+                            <button class="btn btn-sm btn-info text-white rounded-pill w-100 mt-2">Manage Page</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fun Zone Manager Modal -->
+            <div class="modal fade" id="funZoneModal" tabindex="-1">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
+                    <div class="modal-content border-0">
+                        <div class="modal-header custom-modal-header border-0 pb-0 shadow-sm mb-2">
+                            <div>
+                                <h5 class="modal-title fw-800">Fun Zone Manager</h5>
+                                <p class="text-muted small mb-0">Control services displayed on the Fun Zone page.</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body p-4">
+
+                            <!-- Section Management -->
+                            <div class="d-flex justify-content-between mb-3 align-items-center">
+                                <h6 class="fw-bold">Step 1: Manage Sections</h6>
+                                <button class="btn btn-primary btn-sm rounded-pill"
+                                    onclick="window.addNewFunSectionRow()">
+                                    <i class="fas fa-plus me-1"></i> Add Section
+                                </button>
+                            </div>
+                            <div class="table-responsive bg-white rounded-3 border mb-5"
+                                style="max-height: 200px; overflow-y: auto;">
+                                <table class="table align-middle mb-0">
+                                    <thead class="bg-light sticky-top">
+                                        <tr>
+                                            <th>ID (System)</th>
+                                            <th>Display Title</th>
+                                            <th style="width: 50px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fun-zone-sections-body"></tbody>
+                                </table>
+                            </div>
+
+                            <!-- Service Management -->
+                            <div class="d-flex justify-content-between mb-3 align-items-center">
+                                <h6 class="fw-bold">Step 2: Manage Services</h6>
+                                <button class="btn btn-primary btn-sm rounded-pill"
+                                    onclick="window.addNewFunServiceRow()">
+                                    <i class="fas fa-plus me-1"></i> Add Service
+                                </button>
+                            </div>
+
+                            <div class="table-responsive bg-white rounded-3 border"
+                                style="max-height: 400px; overflow-y: auto;">
+                                <table class="table align-middle mb-0">
+                                    <thead class="bg-light sticky-top">
+                                        <tr>
+                                            <th style="width: 50px;">Show</th>
+                                            <th>Title & Path</th>
+                                            <th>Category / Section</th>
+                                            <th>Description</th>
+                                            <th>Icon</th>
+                                            <th style="width: 50px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fun-zone-table-body">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-end">
+                                <button class="btn btn-success rounded-pill px-4" onclick="window.saveFunZoneConfig()">
+                                    <i class="fas fa-save me-2"></i> Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1617,6 +1702,146 @@
     <script type="module">
         import { AdminManager } from '../assets/js/admin-manager.js';
         import ProductManager from '../assets/js/product-manager.js';
+        import {
+            getFunServices, saveFunServices,
+            getFunSections, saveFunSections
+        } from '../assets/js/fun_services.config.js';
+
+        // --- Fun Zone Manager Logic ---
+        let funServicesCache = [];
+        let funSectionsCache = [];
+
+        window.loadFunZoneManager = function () {
+            funServicesCache = getFunServices();
+            funSectionsCache = getFunSections();
+            renderFunZoneSections();
+            renderFunZoneTable();
+        };
+
+        // --- Sections Logic ---
+        window.renderFunZoneSections = function () {
+            const tbody = document.getElementById('fun-zone-sections-body');
+            tbody.innerHTML = '';
+            funSectionsCache.forEach((sec, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <input type="text" class="form-control form-control-sm" value="${sec.id}" placeholder="unique-id" onchange="window.updateFunSection(${index}, 'id', this.value)">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm fw-bold" value="${sec.title}" placeholder="Section Title" onchange="window.updateFunSection(${index}, 'title', this.value)">
+                    </td>
+                    <td>
+                         <button class="btn btn-sm btn-outline-danger border-0" onclick="window.removeFunSection(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                 `;
+                tbody.appendChild(tr);
+            });
+        };
+
+        window.updateFunSection = function (index, field, value) {
+            funSectionsCache[index][field] = value;
+            if (field === 'id') renderFunZoneTable();
+        };
+
+        window.addNewFunSectionRow = function () {
+            funSectionsCache.push({ id: 'new-section-' + Date.now(), title: 'New Section' });
+            renderFunZoneSections();
+        };
+
+        window.removeFunSection = function (index) {
+            if (confirm('Remove this section? Services in this section will disappear until reassigned.')) {
+                funSectionsCache.splice(index, 1);
+                renderFunZoneSections();
+                renderFunZoneTable();
+            }
+        };
+
+        // --- Services Logic ---
+        window.renderFunZoneTable = function () {
+            const tbody = document.getElementById('fun-zone-table-body');
+            tbody.innerHTML = '';
+
+            // Build options for sections
+            const sectionOptions = funSectionsCache.map(sec =>
+                `<option value="${sec.id}">${sec.title}</option>`
+            ).join('');
+
+            funServicesCache.forEach((svc, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">
+                        <div class="form-check d-flex justify-content-center">
+                            <input class="form-check-input" type="checkbox" ${svc.enabled ? 'checked' : ''} onchange="window.updateFunService(${index}, 'enabled', this.checked)">
+                        </div>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm mb-1 fw-bold" value="${svc.title}" placeholder="Title" onchange="window.updateFunService(${index}, 'title', this.value)">
+                        <input type="text" class="form-control form-control-sm text-muted fst-italic" value="${svc.path}" placeholder="Path (e.g. developments/game/index.html)" onchange="window.updateFunService(${index}, 'path', this.value)">
+                    </td>
+                    <td>
+                        <select class="form-select form-select-sm" onchange="window.updateFunService(${index}, 'category', this.value)">
+                            ${sectionOptions}
+                            <option value="misc" disabled>---</option>
+                            <option value="${svc.category}" ${funSectionsCache.some(s => s.id === svc.category) ? '' : 'selected style="color:red;"'}>${svc.category} (Current)</option>
+                        </select>
+                    </td>
+                    <td>
+                        <textarea class="form-control form-control-sm" rows="2" onchange="window.updateFunService(${index}, 'description', this.value)">${svc.description}</textarea>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm mb-1" value="${svc.iconClass}" placeholder="Icon Class" onchange="window.updateFunService(${index}, 'iconClass', this.value)">
+                        <div class="text-center"><i class="${svc.iconClass}"></i></div>
+                    </td>
+                    <td>
+                         <button class="btn btn-sm btn-outline-danger border-0" onclick="window.removeFunService(${index})"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Fix selection state for dropdowns
+            Array.from(tbody.querySelectorAll('select')).forEach((select, idx) => {
+                const currentCat = funServicesCache[idx].category;
+                if (funSectionsCache.some(s => s.id === currentCat)) {
+                    select.value = currentCat;
+                }
+            });
+        };
+
+        window.updateFunService = function (index, field, value) {
+            funServicesCache[index][field] = value;
+        };
+
+        window.addNewFunServiceRow = function () {
+            const firstSectionId = funSectionsCache.length > 0 ? funSectionsCache[0].id : 'fun';
+            funServicesCache.push({
+                id: 'new-' + Date.now(),
+                title: 'New Service',
+                description: 'Description here...',
+                path: 'developments/',
+                category: firstSectionId,
+                iconClass: 'fas fa-star',
+                wrapperClass: 'icon-love',
+                enabled: true
+            });
+            renderFunZoneTable();
+        };
+
+        window.removeFunService = function (index) {
+            if (confirm('Remove this service?')) {
+                funServicesCache.splice(index, 1);
+                renderFunZoneTable();
+            }
+        };
+
+        window.saveFunZoneConfig = function () {
+            saveFunServices(funServicesCache);
+            saveFunSections(funSectionsCache);
+            alert('Fun Zone configuration (Sections & Services) saved! Reload fun.html to see changes.');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('funZoneModal'));
+            if (modal) modal.hide();
+        };
 
         $(document).ready(function () {
             let registrationData = {};
