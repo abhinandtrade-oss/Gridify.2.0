@@ -290,7 +290,7 @@
                 if (!sections || sections.length === 0) return;
 
                 sections.forEach((section, index) => {
-                    const sectionServices = services.filter(s => s.category === section.id && s.enabled !== false && (!s.permissions || s.permissions === 'anyone'));
+                    const sectionServices = services.filter(s => s.category === section.id && s.enabled !== false);
 
                     let pt = 'pt-50';
                     let pb = 'pb-50';
