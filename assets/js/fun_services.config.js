@@ -1,11 +1,27 @@
-import { db } from './firebase-config.js';
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 /**
  * Fun Zone Services Configuration
- * Supports dynamic sections and services.
  * Backend: Firebase Firestore
+ * 
+ * NOTE: Firebase Config is inlined here to avoid CORS issues with local file imports 
+ * when running directly via file:// protocol.
  */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyD9G64Wu-hOHadZUfk9EG8MaXfqL7T9-F0",
+    authDomain: "grfy-b1731.firebaseapp.com",
+    projectId: "grfy-b1731",
+    storageBucket: "grfy-b1731.firebasestorage.app",
+    messagingSenderId: "376190086826",
+    appId: "1:376190086826:web:71c268ada23c4163f02ad3",
+    measurementId: "G-M45BCQPTPV"
+};
+
+// Initialize Firebase internally
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const DEFAULT_SECTIONS = [
     { id: 'fun', title: 'Fun Zone' },
@@ -107,10 +123,13 @@ export async function getFunServices() {
     try {
         const snapshot = await getDoc(CONFIG_DOC_REF);
         if (snapshot.exists() && snapshot.data().services) {
-            console.log("[FunConfig] Services fetched:", snapshot.data().services.length);
-            return snapshot.data().services;
+            let services = snapshot.data().services;
+            console.log("[FunConfig] Services fetched:", services.length);
+            return services;
         } else {
-            console.log("[FunConfig] No config found, using defaults.");
+            console.log("[FunConfig] No config found, initializing defaults.");
+            await saveFunServices(DEFAULT_FUN_SERVICES);
+            return DEFAULT_FUN_SERVICES;
         }
     } catch (error) {
         console.error("[FunConfig] Error getting services:", error);
@@ -143,8 +162,13 @@ export async function getFunSections() {
     try {
         const snapshot = await getDoc(CONFIG_DOC_REF);
         if (snapshot.exists() && snapshot.data().sections) {
-            console.log("[FunConfig] Sections fetched:", snapshot.data().sections.length);
-            return snapshot.data().sections;
+            let sections = snapshot.data().sections;
+            console.log("[FunConfig] Sections fetched:", sections.length);
+            return sections;
+        } else {
+            // Init defaults
+            await saveFunSections(DEFAULT_SECTIONS);
+            return DEFAULT_SECTIONS;
         }
     } catch (error) {
         console.error("[FunConfig] Error getting sections:", error);
@@ -168,4 +192,24 @@ export async function addFunSection(section) {
     if (!section.id) section.id = section.title.toLowerCase().replace(/\s+/g, '-');
     sections.push(section);
     await saveFunSections(sections);
+}
+
+// --- Real-time Subscription ---
+export function subscribeToFunZone(callback) {
+    return onSnapshot(CONFIG_DOC_REF, (doc) => {
+        if (doc.exists()) {
+            const data = doc.data();
+            // Fallback to defaults if fields are explicitly undefined (missing)
+            // But allow empty arrays if they exist (user cleared them)
+            const services = data.services !== undefined ? data.services : DEFAULT_FUN_SERVICES;
+            const sections = data.sections !== undefined ? data.sections : DEFAULT_SECTIONS;
+
+            callback(services, sections);
+        } else {
+            // Document doesn't exist at all -> use defaults
+            callback(DEFAULT_FUN_SERVICES, DEFAULT_SECTIONS);
+        }
+    }, (error) => {
+        console.error("[FunConfig] Real-time Error:", error);
+    });
 }
