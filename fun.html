@@ -280,88 +280,76 @@
 
         <!-- Dynamic Loading Script -->
         <script type="module">
-            import { getFunServices, getFunSections } from './assets/js/fun_services.config.js';
+            import { getFunServices, getFunSections, subscribeToFunZone } from './assets/js/fun_services.config.js';
 
-            async function initFunZone() {
+            function renderFunPage(services, sections) {
                 const root = document.getElementById('fun-page-root');
                 if (!root) return;
 
-                // Prevent double init
+                console.log("[FunPage] Starting Simple Render...");
+
+                if (!sections || sections.length === 0) {
+                    root.innerHTML = '<div style="padding: 50px; text-align: center; color: black;">No sections found.</div>';
+                    return;
+                }
+
+                let html = '';
+                sections.forEach(section => {
+                    const sectionServices = services.filter(s => s.category === section.id && s.enabled !== false);
+
+                    html += `
+                        <div style="padding: 40px 20px; background: #f0f0f0; border-bottom: 2px solid #ccc; display: block; visibility: visible; opacity: 1;">
+                            <h2 style="text-align: center; color: #333; margin-bottom: 30px; display: block;">${section.title}</h2>
+                            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
+                    `;
+
+                    sectionServices.forEach(service => {
+                        html += `
+                            <div onclick="window.location.href='${service.path}'" 
+                                 style="background: white; padding: 20px; border-radius: 10px; width: 250px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; display: block; visibility: visible; opacity: 1; border: 1px solid #ddd;">
+                                <div style="font-size: 30px; margin-bottom: 10px; color: #667eea;">
+                                    <i class="${service.iconClass}"></i>
+                                </div>
+                                <h4 style="margin: 0 0 10px 0; color: #000;">${service.title}</h4>
+                                <p style="margin: 0; color: #444; font-size: 14px;">${service.description}</p>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+
+                root.innerHTML = html;
+
+                // Debugging
+                setTimeout(() => {
+                    console.log("[FunPage] Simple Render Complete.");
+                    console.log("[FunPage] Content height:", root.offsetHeight);
+                    console.log("[FunPage] Content display:", window.getComputedStyle(root).display);
+                    console.log("[FunPage] Content visibility:", window.getComputedStyle(root).visibility);
+                    if (root.offsetHeight === 0) {
+                        console.error("[FunPage] ERROR: Root height is still 0 after rendering!");
+                    }
+                }, 100);
+            }
+
+            function initFunZone() {
+                const root = document.getElementById('fun-page-root');
+                if (!root) return;
+
+                // Prevent double init listeners
                 if (root.dataset.loaded) return;
                 root.dataset.loaded = "true";
 
-                try {
-                    console.log("[FunPage] Loading...");
-                    const [services, sections] = await Promise.all([
-                        getFunServices(),
-                        getFunSections()
-                    ]);
+                console.log("[FunPage] initializing subscription...");
 
-                    console.log("[FunPage] Loaded:", { services, sections });
-
-                    if (!sections || sections.length === 0) {
-                        root.innerHTML = '<div class="text-center py-5"><p>No sections configured.</p></div>';
-                        return;
-                    }
-
-                    root.innerHTML = ''; // Clear eventual loading state
-
-                    sections.forEach((section, index) => {
-                        const sectionServices = services.filter(s => s.category === section.id && s.enabled !== false);
-
-                        let pt = 'pt-50';
-                        let pb = 'pb-50';
-                        if (index === 0) pt = 'pt-100';
-                        if (index === sections.length - 1) pb = 'pb-100';
-
-                        const sectionHTML = `
-                        <section class="fun-services-area rel z-1" id="section-wrapper-${section.id}">
-                            <div class="container bordered-x ${pt} ${pb} rpy-80">
-                                <div class="row justify-content-center">
-                                    <div class="col-lg-12">
-                                        <div class="section-title text-center mb-50" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
-                                            <span class="subtitle" style="padding: 15px 40px; display: inline-block;">${section.title}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 justify-content-center" id="section-container-${section.id}"></div>
-                            </div>
-                        </section>
-                    `;
-                        root.insertAdjacentHTML('beforeend', sectionHTML);
-
-                        const container = document.getElementById(`section-container-${section.id}`);
-                        const wrapper = document.getElementById(`section-wrapper-${section.id}`);
-
-                        if (sectionServices.length === 0) {
-                            wrapper.style.display = 'none';
-                        } else {
-                            let delay = 50;
-                            sectionServices.forEach(service => {
-                                const serviceItem = document.createElement('div');
-                                serviceItem.className = 'col px-3';
-                                serviceItem.innerHTML = `
-                                 <div class="service-card" data-aos="fade-up" data-aos-delay="${delay}" data-aos-duration="1500" data-aos-offset="50">
-                                    <a href="${service.path}" class="card-link"></a>
-                                    <div class="icon-wrapper ${service.wrapperClass || 'icon-default'}">
-                                        <i class="${service.iconClass}"></i>
-                                    </div>
-                                    <h4>${service.title}</h4>
-                                    <p>${service.description}</p>
-                                </div>
-                            `;
-                                container.appendChild(serviceItem);
-                                delay += 50;
-                            });
-                        }
-                    });
-
-                    if (window.AOS) setTimeout(() => AOS.refresh(), 500);
-
-                } catch (error) {
-                    console.error("[FunPage] Init Error:", error);
-                    root.innerHTML = `<div class="text-center py-5 text-danger"><p>Failed to load content.</p></div>`;
-                }
+                // Real-time subscription
+                subscribeToFunZone((services, sections) => {
+                    renderFunPage(services, sections);
+                });
             }
 
             if (document.readyState === 'loading') {
