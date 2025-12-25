@@ -1,4 +1,4 @@
-﻿@charset "UTF-8";
+@charset "UTF-8";
 /*----------------------------------------------------------------------
     Site Name: Gridify
     developed by : Abhinand & Abhijith
@@ -3610,9 +3610,9 @@ h6, .h6, .tab-style-one li button, .about-circles .circle, .faq-nav li a {
   -webkit-box-flex: 0;
   -ms-flex: none;
   flex: none; }
-  @media only screen and (max-width: 575px) {
+  /* @media only screen and (max-width: 575px) {
     .menu-btns {
-      display: none; } }
+      display: none; } } */
 
 /* White Menu */
 .main-header.white-menu .bordered-bottom {
