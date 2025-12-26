@@ -11,6 +11,3 @@ main = "src/index.js"
 name = "gridify-2-0"
 route = "*"
 zone_name = "gridify.in"
-
-[[send_email]]
-name = "SEALER_EMAIL"
