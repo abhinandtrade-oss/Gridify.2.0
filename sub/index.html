@@ -11,10 +11,12 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <!-- Bootstrap CSS -->
+    <!-- Cloudflare Web Analytics -->
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS (Excel Export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -455,6 +457,9 @@
                                 class="fas fa-search text-muted"></i></span>
                         <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search...">
                     </div>
+                    <button class="btn btn-outline-success rounded-pill px-4" id="exportBtn">
+                        <i class="fas fa-file-excel me-md-2"></i><span>Export</span>
+                    </button>
                     <button class="btn btn-premium btn-add" data-bs-toggle="modal" data-bs-target="#subModal"
                         onclick="resetForm()">
                         <i class="fas fa-plus me-md-2"></i><span>Add Subscriber</span>
