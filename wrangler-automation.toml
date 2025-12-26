@@ -1,0 +1,6 @@
+name = "gridify-expiry-automation"
+main = "functions/expiry-automation.js"
+compatibility_date = "2024-04-01"
+
+[triggers]
+crons = ["30 3 * * *"] # Runs at 03:30 UTC every day (9:00 AM IST)
