@@ -39,6 +39,43 @@ class SubManager {
         $('#btnSendAlerts').on('click', () => this.handleExpiryAlerts());
         $('#logoutBtn').on('click', () => AdminManager.logout());
         $('#subModal').on('show.bs.modal', () => this.populateProductDropdown());
+        $('#subType, #subActivatedDate').on('change', () => this.updateExpiryDate());
+    }
+
+    updateExpiryDate() {
+        const type = $('#subType').val();
+        const activatedDate = $('#subActivatedDate').val();
+
+        if (!activatedDate) return;
+
+        let date = new Date(activatedDate);
+        if (isNaN(date.getTime())) return;
+
+        switch (type) {
+            case 'Days':
+                date.setDate(date.getDate() + 1);
+                break;
+            case 'Weekly':
+                date.setDate(date.getDate() + 7);
+                break;
+            case 'Monthly':
+                date.setDate(date.getDate() + 30);
+                break;
+            case 'Quarterly':
+                date.setDate(date.getDate() + 90);
+                break;
+            case 'Yearly':
+                date.setDate(date.getDate() + 365);
+                break;
+            case 'Lifetime':
+                date.setFullYear(date.getFullYear() + 100); // 100 years
+                break;
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        $('#subExpiryDate').val(`${year}-${month}-${day}`);
     }
 
     // --- Product Management ---
