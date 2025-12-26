@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Subscribers | Gridify Admin</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon.png">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-soft: rgba(67, 97, 238, 0.1);
+            --success: #10b981;
+            --success-soft: rgba(16, 185, 129, 0.1);
+            --danger: #ef4444;
+            --danger-soft: rgba(239, 68, 68, 0.1);
+            --warning: #f59e0b;
+            --warning-soft: rgba(245, 158, 11, 0.1);
+            --dark: #1e293b;
+            --slate: #64748b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: var(--dark);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        .brand-name {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Session Guard Overlay */
+        #authOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--primary-soft);
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Header */
+        header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-title {
+            font-weight: 800;
+            font-size: 1.25rem;
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, #3a7bd5 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Main Content */
+        .main-container {
+            padding: 2rem 0;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Table Styles */
+        .sub-table-wrapper {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            padding: 1.25rem 1rem;
+            font-weight: 700;
+            color: var(--slate);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .sub-name {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0px;
+        }
+
+        .sub-email {
+            font-size: 0.85rem;
+            color: var(--slate);
+        }
+
+        .badge-pill {
+            padding: 6px 12px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Buttons */
+        .btn-premium {
+            padding: 0.6rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn-add:hover {
+            background: #3046bc;
+            box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+            border-radius: 24px 24px 0 0;
+            padding: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--slate);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            transition: all 0.2s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--slate);
+            margin-left: 5px;
+        }
+
+        .action-btn:hover {
+            background: var(--light);
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-delete:hover {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .editing-mode {
+            background-color: #fffbeb !important;
+            /* Light amber */
+            border: 2px solid var(--warning) !important;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .admin-header-row {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .search-action-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-action-bar>div,
+            .search-action-bar>button {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .stat-card {
+                padding: 1rem;
+            }
+
+            .admin-title {
+                font-size: 1.1rem;
+            }
+
+            /* Hide less critical columns on mobile */
+            .hide-mobile {
+                display: none !important;
+            }
+
+            .sub-table-wrapper {
+                border-radius: 16px;
+            }
+
+            .table thead th {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.65rem;
+            }
+
+            .table tbody td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .header-actions button span {
+                display: none;
+                /* Hide text, show only icons on very small screens */
+            }
+
+            .header-actions button i {
+                margin-right: 0 !important;
+            }
+
+            .header-actions button {
+                padding: 0.5rem 0.75rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Session Guard Overlay -->
+    <div id="authOverlay">
+        <div class="loader"></div>
+        <p class="fw-600 text-slate">Verifying Admin Session...</p>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container d-flex justify-content-between align-items-center admin-header-row">
+            <div class="d-flex align-items-center gap-3">
+                <img src="../assets/images/logos/logo.png" alt="Gridify"
+                    style="height: 100px; width: auto; object-fit: contain;">
+                <h1 class="admin-title">Subscriber Management</h1>
+            </div>
+            <div class="d-flex gap-2 header-actions">
+                <button class="btn btn-outline-primary rounded-pill px-3 px-md-4" data-bs-toggle="modal"
+                    data-bs-target="#productMgtModal" onclick="loadProductTableOnly()">
+                    <i class="fas fa-boxes me-md-2"></i><span>Manage Products</span>
+                </button>
+                <button class="btn btn-light rounded-pill px-3 px-md-4" onclick="window.close()">
+                    <i class="fas fa-times me-md-2"></i><span>Close</span>
+                </button>
+                <button class="btn btn-danger rounded-pill px-3 px-md-4" id="logoutBtn">
+                    <i class="fas fa-power-off me-md-2"></i><span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main-container">
+        <!-- Expiry Alert Banner -->
+        <div id="expiryAlertBanner" class="alert alert-warning border-warning rounded-4 mb-4 d-none shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-box bg-warning text-white mb-0" style="width: 40px; height: 40px;">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-800 mb-0">Subscription Expiry Alert</h6>
+                        <p class="small mb-0"><span id="expiryCount">0</span> users have subscriptions expiring today.
+                        </p>
+                    </div>
+                </div>
+                <button class="btn btn-warning btn-sm rounded-pill px-4 fw-700" id="btnSendAlerts">
+                    <i class="fas fa-paper-plane me-2"></i>Notify All via Email
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Stats -->
+        <div class="row g-3 g-md-4 mb-4 mb-md-5">
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="icon-box bg-primary-soft text-primary">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="text-slate small fw-600 mb-1">Total Subscribers</div>
+                    <div class="h3 fw-800 mb-0" id="stat-total">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="icon-box bg-success-soft text-success">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="text-slate small fw-600 mb-1">Active Plans</div>
+                    <div class="h3 fw-800 mb-0" id="stat-active">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="icon-box bg-warning-soft text-warning">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="text-slate small fw-600 mb-1">Expiring Soon</div>
+                    <div class="h3 fw-800 mb-0" id="stat-expiring">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-card">
+                    <div class="icon-box bg-danger-soft text-danger">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="text-slate small fw-600 mb-1">Expired</div>
+                    <div class="h3 fw-800 mb-0" id="stat-expired">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="subs-panel">
+            <div class="d-flex justify-content-between align-items-center mb-4 search-action-bar">
+                <div>
+                    <h4 class="fw-800 mb-1">Subscriber List</h4>
+                    <p class="text-slate small mb-0 hide-mobile">View and manage all your platform subscribers.</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <div class="input-group" style="width: 250px;">
+                        <span class="input-group-text bg-white border-end-0"><i
+                                class="fas fa-search text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search...">
+                    </div>
+                    <button class="btn btn-premium btn-add" data-bs-toggle="modal" data-bs-target="#subModal"
+                        onclick="resetForm()">
+                        <i class="fas fa-plus me-md-2"></i><span>Add Subscriber</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sub-table-wrapper">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Subscriber</th>
+                                <th class="hide-mobile">Product</th>
+                                <th class="hide-mobile">Website</th>
+                                <th>Contact & Amount</th>
+                                <th class="hide-mobile">Plan Details</th>
+                                <th>Dates</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subTableBody">
+                            <!-- Content populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="noResults" class="text-center py-5 d-none">
+                    <div class="mb-3 opacity-25">
+                        <i class="fas fa-users fa-3x"></i>
+                    </div>
+                    <h5 class="fw-700">No subscribers found</h5>
+                    <p class="text-slate">Try adjusting your search or add a new subscriber.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Subscriber Modal -->
+    <div class="modal fade" id="subModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title fw-800" id="modalTitle">Add New Subscriber</h5>
+                        <p class="text-slate small mb-0">Fill in the details for the new subscription.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="subForm">
+                        <input type="hidden" id="subId">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" id="subName" class="form-control" placeholder="John Doe" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Product *</label>
+                                <select id="subProduct" class="form-select" required>
+                                    <option value="" disabled selected>Select a product</option>
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" id="subEmail" class="form-control" placeholder="john@example.com"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mobile Number *</label>
+                                <input type="tel" id="subMobile" class="form-control" placeholder="+91 9876543210"
+                                    required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Website URL</label>
+                                <input type="url" id="subWebsite" class="form-control"
+                                    placeholder="https://www.example.com">
+                            </div>
+
+                            <hr class="my-4 text-border">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Type of Subscription *</label>
+                                <select id="subType" class="form-select" required>
+                                    <option value="Days">Days</option>
+                                    <option value="Weekly">Weekly</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Yearly">Yearly</option>
+                                    <option value="Lifetime">Lifetime</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mode of Payment *</label>
+                                <select id="subPaymentMode" class="form-select" required>
+                                    <option value="GPay">Google Pay (GPay)</option>
+                                    <option value="PhonePe">PhonePe</option>
+                                    <option value="Paytm">Paytm</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Cash">Cash</option>
+                                    <option value="Credit/Debit Card">Credit/Debit Card</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Activation Date *</label>
+                                <input type="date" id="subActivatedDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Expiry Date *</label>
+                                <input type="date" id="subExpiryDate" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label">Plan Amount (₹) *</label>
+                                <input type="number" id="subAmount" class="form-control" placeholder="e.g. 5000"
+                                    required>
+                            </div>
+
+                            <div class="col-12 mt-3">
+                                <label class="form-label">Subscription Briefing</label>
+                                <textarea id="subBriefing" class="form-control" rows="3"
+                                    placeholder="Brief details about the subscription..."></textarea>
+                            </div>
+
+                            <div class="col-12 mt-4">
+                                <div
+                                    class="form-check form-switch card p-3 border-light flex-row align-items-center justify-content-between">
+                                    <label class="form-check-label fw-600" for="subStatus">Subscription Status
+                                        Active</label>
+                                    <input class="form-check-input" type="checkbox" id="subStatus" checked>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-light rounded-pill px-4"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-add rounded-pill px-4">
+                                <i class="fas fa-save me-2"></i>Save Subscriber
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Management Modal -->
+    <div class="modal fade" id="productMgtModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title fw-800">Product Management</h5>
+                        <p class="text-slate small mb-0">Create and manage your subscription products.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Create Form -->
+                    <form id="productMgtForm" class="bg-light p-3 rounded-4 mb-4 border">
+                        <input type="hidden" id="manageProductId">
+                        <div class="row align-items-end g-2">
+                            <div class="col">
+                                <label class="form-label mb-1">Product Name</label>
+                                <input type="text" id="manageProductName" class="form-control form-control-sm"
+                                    placeholder="e.g. Website Maintenance" required>
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4">
+                                    <i class="fas fa-save me-1"></i>Save
+                                </button>
+                                <button type="button" onclick="resetProductForm()"
+                                    class="btn btn-light btn-sm rounded-pill">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Product Table -->
+                    <div class="sub-table-wrapper border">
+                        <div class="table-responsive" style="max-height: 400px;">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th>Created On</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productTableBody">
+                                    <!-- Content populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="../assets/js/bootstrap.min.js"></script>
+
+    <script type="module" src="./sub-manager.js"></script>
+</body>
+
+</html>
