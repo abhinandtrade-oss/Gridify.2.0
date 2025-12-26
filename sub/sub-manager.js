@@ -37,6 +37,7 @@ class SubManager {
         $('#productMgtForm').on('submit', (e) => { e.preventDefault(); this.handleProductSave(); });
         $('#searchInput').on('input', () => this.renderTable());
         $('#btnSendAlerts').on('click', () => this.handleExpiryAlerts());
+        $('#exportBtn').on('click', () => this.exportToExcel());
         $('#logoutBtn').on('click', () => AdminManager.logout());
         $('#subModal').on('show.bs.modal', () => this.populateProductDropdown());
         $('#subType, #subActivatedDate').on('change', () => this.updateExpiryDate());
@@ -341,6 +342,37 @@ class SubManager {
             console.error("Email Sending Error:", e);
             throw e;
         }
+    }
+
+    exportToExcel() {
+        if (this.subscribers.length === 0) {
+            alert("No data to export");
+            return;
+        }
+
+        const data = this.subscribers.map(s => ({
+            'Name': s.name,
+            'Email': s.email,
+            'Product': s.product || 'N/A',
+            'Mobile': s.mobile,
+            'Website': s.website || 'N/A',
+            'Amount (₹)': s.amount || '0',
+            'Type': s.type,
+            'Payment Mode': s.paymentMode,
+            'Activated Date': s.activatedDate,
+            'Expiry Date': s.expiryDate,
+            'Status': s.status,
+            'Briefing': s.briefing || '',
+            'Created At': s.createdAt ? new Date(s.createdAt).toLocaleString() : 'N/A'
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Subscribers");
+
+        // Generate and download the file
+        const timestamp = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(workbook, `Subscribers_Export_${timestamp}.xlsx`);
     }
 }
 
