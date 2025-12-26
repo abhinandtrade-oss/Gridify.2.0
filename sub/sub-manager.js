@@ -248,7 +248,7 @@ class SubManager {
                         <td><div class="small"><b>Starts:</b> ${s.activatedDate}</div><div class="small text-danger"><b>Expires:</b> ${s.expiryDate}</div></td>
                         <td><span class="badge-pill ${s.status === 'active' ? 'badge-active' : 'badge-inactive'}">${s.status === 'active' ? 'Active' : 'Inactive'}</span></td>
                         <td class="text-end">
-                            <a href="https://wa.me/${s.mobile}?text=${encodeURIComponent(`Dear ${s.name}, your ${s.product} subscription expires today. Kindly make the payment to continue service. Regards, Gridify.`)}" target="_blank" class="action-btn text-success" title="WhatsApp Alert"><i class="fab fa-whatsapp"></i></a>
+                            <a href="https://wa.me/${s.mobile.replace(/\D/g, '')}?text=${encodeURIComponent(`Dear ${s.name}, your ${s.product} subscription expires today. Kindly make the payment to continue service. Regards, Gridify.`)}" target="_blank" class="action-btn text-success" title="WhatsApp Alert"><i class="fab fa-whatsapp"></i></a>
                             <button class="action-btn" onclick="window.editSub('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button>
                             <button class="action-btn btn-delete" onclick="window.deleteSub('${s.id}')" title="Delete"><i class="fas fa-trash"></i></button>
                         </td>
