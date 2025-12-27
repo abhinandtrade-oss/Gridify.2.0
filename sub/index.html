@@ -126,6 +126,12 @@
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .stat-card.active-filter {
+            border-color: var(--primary);
+            background-color: var(--primary-soft);
         }
 
         .icon-box {
@@ -191,6 +197,24 @@
         .badge-inactive {
             background: #fee2e2;
             color: #991b1b;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-dot-active {
+            background-color: var(--success);
+            box-shadow: 0 0 0 3px var(--success-soft);
+        }
+
+        .status-dot-inactive {
+            background-color: var(--danger);
+            box-shadow: 0 0 0 3px var(--danger-soft);
         }
 
         /* Buttons */
@@ -408,7 +432,7 @@
         <!-- Dashboard Stats -->
         <div class="row g-3 g-md-4 mb-4 mb-md-5">
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" id="filter-all">
                     <div class="icon-box bg-primary-soft text-primary">
                         <i class="fas fa-users"></i>
                     </div>
@@ -417,7 +441,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" id="filter-active">
                     <div class="icon-box bg-success-soft text-success">
                         <i class="fas fa-user-check"></i>
                     </div>
@@ -426,7 +450,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" id="filter-expiring">
                     <div class="icon-box bg-warning-soft text-warning">
                         <i class="fas fa-hourglass-half"></i>
                     </div>
@@ -435,7 +459,7 @@
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="stat-card">
+                <div class="stat-card" id="filter-expired">
                     <div class="icon-box bg-danger-soft text-danger">
                         <i class="fas fa-user-clock"></i>
                     </div>
@@ -448,7 +472,7 @@
         <div id="subs-panel">
             <div class="d-flex justify-content-between align-items-center mb-4 search-action-bar">
                 <div>
-                    <h4 class="fw-800 mb-1">Subscriber List</h4>
+                    <h4 class="fw-800 mb-1" id="table-title">Subscriber List</h4>
                     <p class="text-slate small mb-0 hide-mobile">View and manage all your platform subscribers.</p>
                 </div>
                 <div class="d-flex gap-2">
