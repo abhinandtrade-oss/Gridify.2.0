@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Portal | Gridify</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon.png">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-soft: rgba(67, 97, 238, 0.1);
+            --success: #10b981;
+            --success-soft: rgba(16, 185, 129, 0.1);
+            --danger: #ef4444;
+            --danger-soft: rgba(239, 68, 68, 0.1);
+            --warning: #f59e0b;
+            --warning-soft: rgba(245, 158, 11, 0.1);
+            --dark: #1e293b;
+            --slate: #64748b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top right, #f8fafc, #e2e8f0);
+            color: var(--dark);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h1,
+        h2,
+        h3,
+        .brand-name {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .portal-card {
+            background: white;
+            border-radius: 32px;
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            border: 1px solid white;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .logo-box {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-box img {
+            height: 180px;
+            /* Increased by 100px */
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .btn-check-status {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 16px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-check-status:hover {
+            background: #3046bc;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(67, 97, 238, 0.4);
+        }
+
+        /* Result View */
+        #resultView {
+            display: none;
+        }
+
+        .sub-details {
+            background: var(--light);
+            border-radius: 24px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .detail-label {
+            color: var(--slate);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-renew {
+            background: #25d366;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 16px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-renew:hover {
+            background: #128c7e;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            color: var(--slate);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 1.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+        }
+
+        /* Plan Chips */
+        .plan-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .plan-chip {
+            flex: 1 1 calc(33.33% - 10px);
+            min-width: 100px;
+            position: relative;
+        }
+
+        .plan-chip input {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .plan-chip label {
+            display: block;
+            padding: 10px 5px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--slate);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .plan-chip input:checked+label {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        .plan-chip label:hover {
+            border-color: var(--primary);
+        }
+
+        .portal-footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--slate);
+        }
+
+        .portal-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 576px) {
+            .portal-card {
+                padding: 1.5rem;
+                padding-top: 2rem;
+                border-radius: 24px;
+            }
+
+            .logo-box img {
+                height: 120px;
+                /* Scaling down for mobile but keeping it large */
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .btn-check,
+            .btn-renew {
+                padding: 0.75rem;
+                font-size: 0.95rem;
+            }
+
+            .sub-details {
+                padding: 1rem;
+                border-radius: 16px;
+                margin: 1rem 0;
+            }
+
+            .detail-item {
+                font-size: 0.85rem;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+
+            .plan-chip {
+                flex: 1 1 calc(50% - 10px);
+            }
+        }
+
+        /* Glassmorphism background elements */
+        .glass-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+        }
+
+        .circle-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            top: -100px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--success);
+            bottom: -50px;
+            left: -50px;
+        }
+
+        .error-msg {
+            color: var(--danger);
+            background: var(--danger-soft);
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            display: none;
+            text-align: center;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="glass-bg">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+    </div>
+
+    <div class="portal-card shadow-lg">
+        <div class="logo-box">
+            <img src="../assets/images/logos/logo.png" alt="Gridify">
+            <h2 class="fw-800 mb-1">Subscription Portal</h2>
+            <p class="text-slate small">Enter your details to check your status</p>
+        </div>
+
+        <!-- Lookup View -->
+        <div id="lookupView">
+            <div id="errorMsg" class="error-msg">No subscription found for these details.</div>
+            <div class="mb-4">
+                <label class="form-label fw-700 small text-slate">Email or Mobile Number</label>
+                <div class="input-group mb-3">
+                    <input type="text" id="userInput" class="form-control" placeholder="example@gmail.com / Mobile No.">
+                </div>
+                <button class="btn-check-status shadow-sm" id="btnCheck">
+                    <i class="fas fa-search me-2"></i>
+                    <span>Check Subscription Status</span>
+                </button>
+            </div>
+            <p class="text-center small text-slate mb-0">
+                Need help? <a href="https://wa.me/919544852462" class="text-primary fw-600">Contact Support</a>
+            </p>
+        </div>
+
+        <!-- Result View -->
+        <div id="resultView">
+            <div class="text-center mb-4">
+                <div id="statusBadgeContainer"></div>
+                <h4 class="fw-800 mt-3 mb-0" id="resName">--</h4>
+                <p class="text-slate small" id="resProduct">--</p>
+            </div>
+
+            <div class="sub-details">
+                <div class="detail-item">
+                    <span class="detail-label">Plan Type</span>
+                    <span class="detail-value" id="resType">--</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Amount</span>
+                    <span class="detail-value text-success" id="resAmount">--</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Activated On</span>
+                    <span class="detail-value" id="resStart">--</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Expiry Date</span>
+                    <span class="detail-value text-danger" id="resExpiry">--</span>
+                </div>
+            </div>
+
+            <div class="mb-4 text-start">
+                <label class="form-label fw-800 small text-dark">Choose Renewal Plan</label>
+                <div class="plan-selector">
+                    <div class="plan-chip">
+                        <input type="radio" name="renewalPlan" id="planDays" value="Days">
+                        <label for="planDays">Days</label>
+                    </div>
+                    <div class="plan-chip">
+                        <input type="radio" name="renewalPlan" id="planWeekly" value="Weekly">
+                        <label for="planWeekly">Weekly</label>
+                    </div>
+                    <div class="plan-chip">
+                        <input type="radio" name="renewalPlan" id="planMonthly" value="Monthly" checked>
+                        <label for="planMonthly">Monthly</label>
+                    </div>
+                    <div class="plan-chip">
+                        <input type="radio" name="renewalPlan" id="planQuarterly" value="Quarterly">
+                        <label for="planQuarterly">Quarterly</label>
+                    </div>
+                    <div class="plan-chip">
+                        <input type="radio" name="renewalPlan" id="planYearly" value="Yearly">
+                        <label for="planYearly">Yearly</label>
+                    </div>
+                    <div class="plan-chip">
+                        <input type="radio" name="renewalPlan" id="planLifetime" value="Lifetime">
+                        <label for="planLifetime">Lifetime</label>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btnRenew" class="btn-renew">
+                <i class="fab fa-whatsapp"></i>
+                <span>Renew Subscription via WhatsApp</span>
+            </button>
+
+            <a href="#" class="back-btn" onclick="location.reload()">
+                <i class="fas fa-chevron-left"></i>
+                <span>Check Another</span>
+            </a>
+        </div>
+
+        <div class="portal-footer">
+            Powered by <a href="http://www.gridify.in" target="_blank">Gridify</a>
+        </div>
+    </div>
+
+    <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <script type="module" src="./check-portal.js"></script>
+</body>
+
+</html>
