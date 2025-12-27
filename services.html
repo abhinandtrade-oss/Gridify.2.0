@@ -290,78 +290,12 @@
                     </div>
                 </div>
 
-                <div class="row justify-content-center gap-y-4">
-                    <!-- Item 01 -->
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="javascript:void(0)" onclick="openServiceModal('web-design')"
-                            class="service-card d-block">
-                            <div class="image">
-                                <img src="https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764756085037-gf63o3u98am-1764756071640_8eq71f_rectangle_35.png"
-                                    alt="Web Design">
-                            </div>
-                            <div class="content">
-                                <h5>Web Design</h5>
-                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
-                            </div>
-                        </a>
+                <div class="row justify-content-center gap-y-4" id="servicesContainer">
+                    <!-- Services will be loaded here dynamically -->
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="text-muted mt-2">Loading services...</p>
                     </div>
-
-                    <!-- Item 02 -->
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="javascript:void(0)" onclick="openServiceModal('poster-designing')"
-                            class="service-card d-block">
-                            <div class="image">
-                                <img src="https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764492678080-2b1b2t4tqvg-1764492668501_0qiyyq_untitled-1.png"
-                                    alt="Poster Designing">
-                            </div>
-                            <div class="content">
-                                <h5>Poster Designing</h5>
-                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Item 03 -->
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="javascript:void(0)" onclick="openServiceModal('seo')" class="service-card d-block">
-                            <div class="image">
-                                <img src="https://i.postimg.cc/ZKyVgH2d/image.png" alt="SEO">
-                            </div>
-                            <div class="content">
-                                <h5>SEO</h5>
-                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Item 04 -->
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="javascript:void(0)" onclick="openServiceModal('brand-making')"
-                            class="service-card d-block">
-                            <div class="image">
-                                <img src="https://i.postimg.cc/VkDSKx9Z/unnamed.jpg" alt="Brand Making">
-                            </div>
-                            <div class="content">
-                                <h5>Brand Making</h5>
-                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
-                            </div>
-                        </a>
-                    </div>
-
-                    <!-- Item 05 -->
-                    <div class="col-xl-4 col-md-6 mb-4">
-                        <a href="javascript:void(0)" onclick="openServiceModal('property-listing')"
-                            class="service-card d-block">
-                            <div class="image">
-                                <img src="https://i.postimg.cc/x1wrVCPQ/unnamed.jpg" alt="Property Listing">
-                            </div>
-                            <div class="content">
-                                <h5>Property Listing</h5>
-                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
-                            </div>
-                        </a>
-                    </div>
-
                 </div>
             </div>
         </section>
@@ -1182,6 +1116,7 @@
 
 </body>
 
+</html>
 
 <!-- Service Details Modal -->
 <div id="serviceModal" class="package-modal">
@@ -1283,58 +1218,56 @@
 <!-- Data and Script for Service Modal -->
 <script type="module">
     import { db } from './assets/js/firebase-config.js';
-    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
     const ORDERS_COLLECTION = 'inquiries'; // Separate collection for service inquiries
+    const SERVICES_COLLECTION = 'services';
 
-    const servicesData = {
-        'web-design': {
-            title: 'Web Design',
-            image: 'https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764756085037-gf63o3u98am-1764756071640_8eq71f_rectangle_35.png',
-            description: 'Custom, responsive, and performance-optimized websites tailored to your brand.',
-            plans: [
-                { name: 'Regular', price: 3799, displayPrice: '₹ 3,799', desc: 'Up to 2 pages, 2 forms, Basic Support' },
-                { name: 'Standard', price: 11799, displayPrice: '₹ 11,799', desc: '3-5 pages, 4 forms, Email Alerts, SEO Basic' },
-                { name: 'Premium', price: 18999, displayPrice: '₹ 18999', desc: 'Custom size (4-6 pages), Advanced SEO, Priority Support' }
-            ]
-        },
-        'poster-designing': {
-            title: 'Poster Designing',
-            image: 'https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764492678080-2b1b2t4tqvg-1764492668501_0qiyyq_untitled-1.png',
-            description: 'Eye-catching posters for events, promotions, and branding.',
-            plans: [
-                { name: 'Basic Poster', price: 499, displayPrice: '₹ 499', desc: '1 Concept, HD Digital File' },
-                { name: 'Pro Poster', price: 999, displayPrice: '₹ 999', desc: '3 Concepts, Source File, Print Ready' }
-            ]
-        },
-        'seo': {
-            title: 'SEO Services',
-            image: 'https://i.postimg.cc/ZKyVgH2d/image.png',
-            description: 'Boost your visibility and rank higher on search engines.',
-            plans: [
-                { name: 'Starter SEO', price: 4999, displayPrice: '₹ 4,999/mo', desc: 'On-page Optimization, 5 Keywords' },
-                { name: 'Growth SEO', price: 9999, displayPrice: '₹ 9,999/mo', desc: 'On-page & Off-page, 15 Keywords, Monthly Report' }
-            ]
-        },
-        'brand-making': {
-            title: 'Brand Making',
-            image: 'https://i.postimg.cc/VkDSKx9Z/unnamed.jpg',
-            description: 'Complete branding solutions including logo, guidelines, and stationery.',
-            plans: [
-                { name: 'Logo Design', price: 1999, displayPrice: '₹ 1,999', desc: '3 Logo Concepts, Vector Files' },
-                { name: 'Full Branding', price: 9999, displayPrice: '₹ 9,999', desc: 'Logo, Business Card, Letterhead, Brand Guidelines' }
-            ]
-        },
-        'property-listing': {
-            title: 'Property Listing',
-            image: 'https://i.postimg.cc/x1wrVCPQ/unnamed.jpg',
-            description: 'Professional listing management for real estate.',
-            plans: [
-                { name: 'Single Listing', price: 999, displayPrice: '₹ 999', desc: '1 Property, 1 Month Visibility' },
-                { name: 'Premium Bundle', price: 4999, displayPrice: '₹ 4,999', desc: '10 Properties, 3 Months Visibility, Featured Tag' }
-            ]
+    // Initialize as empty, strictly DB driven
+    let servicesData = {};
+
+    // Auto-fetch data realtime
+    const unsubscribe = onSnapshot(collection(db, SERVICES_COLLECTION), (snapshot) => {
+        servicesData = {};
+        const container = document.getElementById('servicesContainer');
+        if (container) container.innerHTML = '';
+
+        if (!snapshot.empty) {
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const id = doc.id;
+                servicesData[id] = data;
+
+                // Only render if active is not explicitly false
+                if (data.active !== false) {
+                    const col = document.createElement('div');
+                    col.className = 'col-xl-4 col-md-6 mb-4';
+                    col.innerHTML = `
+                        <a href="javascript:void(0)" onclick="openServiceModal('${id}')" class="service-card d-block">
+                            <div class="image">
+                                <img src="${data.image || 'https://via.placeholder.com/300x200'}" alt="${data.title}">
+                            </div>
+                            <div class="content">
+                                <h5>${data.title}</h5>
+                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    `;
+                    if (container) container.appendChild(col);
+                }
+            });
+            console.log("Services updated realtime");
+        } else {
+            if (container) container.innerHTML = '<div class="col-12 text-center py-5"><p>No services currently available.</p></div>';
         }
-    };
+    }, (error) => {
+        console.error("Error fetching services real-time", error);
+        const container = document.getElementById('servicesContainer');
+        if (container) container.innerHTML = '<div class="col-12 text-center py-5"><p class="text-danger">Failed to load services.</p></div>';
+    });
+
+
+
 
     let selectedServiceId = null;
     let selectedPlanIndex = 0;
@@ -1386,6 +1319,12 @@
             selectedServiceId = serviceId;
             const data = servicesData[serviceId];
             if (!data) return;
+
+            // Check formatted status
+            if (data.active === false) {
+                alert("This service is currently unavailable.");
+                return;
+            }
 
             document.getElementById('modal-service-title').textContent = data.title;
             document.getElementById('modal-service-image').src = data.image;
