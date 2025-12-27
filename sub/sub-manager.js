@@ -15,6 +15,7 @@ class SubManager {
         this.subscribers = [];
         this.products = [];
         this.todayExpiring = [];
+        this.currentFilter = 'all';
         this.init();
     }
 
@@ -47,6 +48,30 @@ class SubManager {
             bootstrap.Modal.getInstance(document.getElementById('waModal')).hide();
             openWhatsAppPopup(phone, text);
         });
+
+        // Filter Cards
+        $('#filter-all').on('click', () => this.setFilter('all'));
+        $('#filter-active').on('click', () => this.setFilter('active'));
+        $('#filter-inactive').on('click', () => this.setFilter('inactive'));
+        $('#filter-expiring').on('click', () => this.setFilter('expiring'));
+        $('#filter-expired').on('click', () => this.setFilter('expired'));
+    }
+
+    setFilter(filter) {
+        this.currentFilter = filter;
+        $('.stat-card').removeClass('active-filter');
+        $(`#filter-${filter}`).addClass('active-filter');
+
+        const titles = {
+            'all': 'All Subscribers',
+            'active': 'Active Subscriptions',
+            'inactive': 'Inactive Subscriptions',
+            'expiring': 'Expiring Soon',
+            'expired': 'Expired Subscriptions'
+        };
+        $('#table-title').text(titles[filter] || 'Subscriber List');
+
+        this.renderTable();
     }
 
     updateExpiryDate() {
@@ -213,7 +238,16 @@ class SubManager {
         const todayStr = now.toISOString().split('T')[0];
 
         $('#stat-total').text(this.subscribers.length);
-        $('#stat-active').text(this.subscribers.filter(s => s.status === 'active').length);
+
+        const activeCount = this.subscribers.filter(s => {
+            const expiryDate = new Date(s.expiryDate);
+            expiryDate.setHours(23, 59, 59, 999);
+            return s.status === 'active' && expiryDate >= now;
+        }).length;
+        $('#stat-active').text(activeCount);
+
+        const inactiveCount = this.subscribers.filter(s => s.status === 'inactive').length;
+        $('#stat-inactive').text(inactiveCount);
 
         // Find subscribers expiring today
         this.todayExpiring = this.subscribers.filter(s => s.expiryDate === todayStr && s.status === 'active');
@@ -225,35 +259,99 @@ class SubManager {
             $('#expiryAlertBanner').addClass('d-none');
         }
 
-        $('#stat-expiring').text(this.subscribers.filter(s => {
-            const diff = new Date(s.expiryDate) - now;
+        const expiringCount = this.subscribers.filter(s => {
+            const expiryDate = new Date(s.expiryDate);
+            expiryDate.setHours(23, 59, 59, 999);
+            const diff = expiryDate - now;
             return diff > 0 && diff < (7 * 24 * 60 * 60 * 1000);
-        }).length);
-        $('#stat-expired').text(this.subscribers.filter(s => new Date(s.expiryDate) < now).length);
+        }).length;
+        $('#stat-expiring').text(expiringCount);
+
+        const expiredCount = this.subscribers.filter(s => {
+            const expiryDate = new Date(s.expiryDate);
+            expiryDate.setHours(23, 59, 59, 999);
+            return expiryDate < now;
+        }).length;
+        $('#stat-expired').text(expiredCount);
+
+        // Update total card as active by default if no filter
+        if (this.currentFilter === 'all') $('#filter-all').addClass('active-filter');
     }
 
     renderTable() {
         const search = $('#searchInput').val().toLowerCase();
         const tbody = $('#subTableBody').empty();
-        const filtered = this.subscribers.filter(s =>
+        const now = new Date();
+
+        let filtered = this.subscribers.filter(s =>
             s.name.toLowerCase().includes(search) ||
             s.product?.toLowerCase().includes(search) ||
             s.email.toLowerCase().includes(search)
         );
 
+        // Apply Status Filter
+        if (this.currentFilter !== 'all') {
+            filtered = filtered.filter(s => {
+                const expiryDate = new Date(s.expiryDate);
+                expiryDate.setHours(23, 59, 59, 999);
+                const isExpired = expiryDate < now;
+                const diff = expiryDate - now;
+                const isExpiringSoon = diff > 0 && diff < (7 * 24 * 60 * 60 * 1000);
+
+                if (this.currentFilter === 'active') return s.status === 'active' && !isExpired;
+                if (this.currentFilter === 'inactive') return s.status === 'inactive';
+                if (this.currentFilter === 'expiring') return s.status === 'active' && isExpiringSoon;
+                if (this.currentFilter === 'expired') return isExpired;
+                return true;
+            });
+        }
+
         if (filtered.length === 0) $('#noResults').removeClass('d-none');
         else {
             $('#noResults').addClass('d-none');
             filtered.forEach(s => {
+                const expiryDate = new Date(s.expiryDate);
+                expiryDate.setHours(23, 59, 59, 999);
+                const isExpired = expiryDate < now;
+                const diff = expiryDate - now;
+                const isExpiringSoon = diff > 0 && diff < (7 * 24 * 60 * 60 * 1000);
+                const isToday = now.toISOString().split('T')[0] === s.expiryDate;
+
+                let statusBadge = '';
+                if (s.status === 'inactive') {
+                    statusBadge = `<span class="badge-pill badge-inactive">Inactive</span>`;
+                } else if (isExpired) {
+                    statusBadge = `<span class="badge-pill bg-danger text-white">Expired</span>`;
+                } else if (isToday) {
+                    statusBadge = `<span class="badge-pill bg-warning text-dark">Expires Today</span>`;
+                } else if (isExpiringSoon) {
+                    statusBadge = `<span class="badge-pill bg-warning-soft text-warning">Expiring Soon</span>`;
+                } else {
+                    statusBadge = `<span class="badge-pill badge-active">Active</span>`;
+                }
+
                 tbody.append(`
                     <tr>
-                        <td><div class="sub-name">${s.name}</div><div class="sub-email">${s.email}</div></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <span class="status-dot ${s.status === 'active' ? 'status-dot-active' : 'status-dot-inactive'}"></span>
+                                <div>
+                                    <div class="sub-name">${s.name}</div>
+                                    <div class="sub-email">${s.email}</div>
+                                </div>
+                            </div>
+                        </td>
                         <td class="hide-mobile"><div class="fw-600 text-dark">${s.product || 'N/A'}</div></td>
                         <td class="hide-mobile"><a href="${s.website}" target="_blank" class="text-primary small">${s.website || 'N/A'}</a></td>
                         <td><div class="small fw-600">${s.mobile}</div><div class="small text-success fw-600 text-nowrap">₹ ${s.amount || '0'}</div></td>
                         <td class="hide-mobile"><div class="badge bg-light text-dark border mb-1">${s.type}</div><div class="small text-slate">${s.paymentMode}</div></td>
-                        <td><div class="small"><b>Starts:</b> ${s.activatedDate}</div><div class="small text-danger"><b>Expires:</b> ${s.expiryDate}</div></td>
-                        <td><span class="badge-pill ${s.status === 'active' ? 'badge-active' : 'badge-inactive'}">${s.status === 'active' ? 'Active' : 'Inactive'}</span></td>
+                        <td>
+                            <div class="small"><b>Starts:</b> ${s.activatedDate}</div>
+                            <div class="small ${isExpired ? 'text-danger fw-bold' : (isToday ? 'text-danger fw-bold' : (isExpiringSoon ? 'text-warning fw-bold' : 'text-slate'))}">
+                                <b>Expires:</b> ${s.expiryDate}
+                            </div>
+                        </td>
+                        <td>${statusBadge}</td>
                         <td class="text-end">
                             <button onclick="window.sendWhatsAppAlert('${s.id}')" class="action-btn text-success" title="WhatsApp Alert"><i class="fab fa-whatsapp"></i></button>
                             <button class="action-btn" onclick="window.editSub('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button>
