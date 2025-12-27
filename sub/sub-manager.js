@@ -41,6 +41,12 @@ class SubManager {
         $('#logoutBtn').on('click', () => AdminManager.logout());
         $('#subModal').on('show.bs.modal', () => this.populateProductDropdown());
         $('#subType, #subActivatedDate').on('change', () => this.updateExpiryDate());
+        $('#btnConfirmWASend').on('click', () => {
+            const phone = $('#waPhone').text().replace(/\D/g, '');
+            const text = $('#waMessage').val();
+            bootstrap.Modal.getInstance(document.getElementById('waModal')).hide();
+            openWhatsAppPopup(phone, text);
+        });
     }
 
     updateExpiryDate() {
@@ -249,7 +255,7 @@ class SubManager {
                         <td><div class="small"><b>Starts:</b> ${s.activatedDate}</div><div class="small text-danger"><b>Expires:</b> ${s.expiryDate}</div></td>
                         <td><span class="badge-pill ${s.status === 'active' ? 'badge-active' : 'badge-inactive'}">${s.status === 'active' ? 'Active' : 'Inactive'}</span></td>
                         <td class="text-end">
-                            <a href="https://wa.me/${s.mobile.replace(/\D/g, '')}?text=${encodeURIComponent(`Dear ${s.name}, your ${s.product} subscription expires today. Kindly make the payment to continue service. Regards, Gridify.`)}" target="_blank" class="action-btn text-success" title="WhatsApp Alert"><i class="fab fa-whatsapp"></i></a>
+                            <button onclick="window.sendWhatsAppAlert('${s.id}')" class="action-btn text-success" title="WhatsApp Alert"><i class="fab fa-whatsapp"></i></button>
                             <button class="action-btn" onclick="window.editSub('${s.id}')" title="Edit"><i class="fas fa-edit"></i></button>
                             <button class="action-btn btn-delete" onclick="window.deleteSub('${s.id}')" title="Delete"><i class="fas fa-trash"></i></button>
                         </td>
@@ -378,6 +384,28 @@ class SubManager {
 
 const manager = new SubManager();
 
+// --- WhatsApp Helper ---
+const openWhatsAppPopup = (phone, text) => {
+    // Falls back to deep link to avoid new window/tab
+    const protocolUrl = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    const webUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+
+    // Try deep link first (most "internal" feel)
+    window.location.href = protocolUrl;
+
+    // Optional: Fallback to web if nothing happens after 500ms
+    setTimeout(() => {
+        if (document.hasFocus()) {
+            console.log("Deep link likely failed, falling back to web popup...");
+            const width = 600;
+            const height = 700;
+            const left = (window.innerWidth / 2) - (width / 2);
+            const top = (window.innerHeight / 2) - (height / 2);
+            window.open(webUrl, 'WhatsApp', `width=${width},height=${height},top=${top},left=${left},status=no,toolbar=no,menubar=no,location=no`);
+        }
+    }, 1500);
+};
+
 // --- Window Globals ---
 
 window.editSub = (id) => {
@@ -425,6 +453,20 @@ window.deleteProduct = (id) => {
     if (confirm("Delete product?")) {
         deleteDoc(doc(db, PROD_COLLECTION, id)).then(() => manager.loadProducts());
     }
+};
+
+window.sendWhatsAppAlert = (id) => {
+    const s = manager.subscribers.find(sub => sub.id === id);
+    if (!s) return;
+
+    // Populate Modal
+    $('#waRecipient').text(s.name);
+    $('#waPhone').text(s.mobile);
+    $('#waTime').text(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    $('#waMessage').val(`Dear ${s.name}, your ${s.product} subscription expires today. Kindly make the payment to continue service. Regards, Gridify.`);
+
+    // Show Modal
+    new bootstrap.Modal(document.getElementById('waModal')).show();
 };
 
 window.resetForm = () => {
