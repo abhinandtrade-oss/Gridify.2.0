@@ -484,24 +484,20 @@ const manager = new SubManager();
 
 // --- WhatsApp Helper ---
 const openWhatsAppPopup = (phone, text) => {
-    // Falls back to deep link to avoid new window/tab
+    // Protocol for mobile/desktop apps - stays in same "window" by switching to app
     const protocolUrl = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    // Web fallback if protocol fails - use current window to avoid new tabs
     const webUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 
-    // Try deep link first (most "internal" feel)
+    // Try protocol first
     window.location.href = protocolUrl;
 
-    // Optional: Fallback to web if nothing happens after 500ms
+    // Fallback logic: If focus is still on the browser after 1s, the protocol might have failed
     setTimeout(() => {
         if (document.hasFocus()) {
-            console.log("Deep link likely failed, falling back to web popup...");
-            const width = 600;
-            const height = 700;
-            const left = (window.innerWidth / 2) - (width / 2);
-            const top = (window.innerHeight / 2) - (height / 2);
-            window.open(webUrl, 'WhatsApp', `width=${width},height=${height},top=${top},left=${left},status=no,toolbar=no,menubar=no,location=no`);
+            window.location.href = webUrl;
         }
-    }, 1500);
+    }, 1000);
 };
 
 // --- Window Globals ---
@@ -557,22 +553,10 @@ window.sendWhatsAppAlert = (id) => {
     const s = manager.subscribers.find(sub => sub.id === id);
     if (!s) return;
 
-    // Populate Modal
-    $('#waRecipient').text(s.name);
-    $('#waPhone').text(s.mobile);
-    $('#waTime').text(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    $('#waMessage').val(
-        `Dear ${s.name},
+    const text = `Dear ${s.name},\n\nYour ${s.product} subscription expires today.\nKindly make the payment to continue the service.\n\nRegards,\nGridify`;
+    const phone = s.mobile.replace(/\D/g, '');
 
-Your ${s.product} subscription expires today.
-Kindly make the payment to continue the service.
-
-Regards,
-Gridify`
-    );
-
-    // Show Modal
-    new bootstrap.Modal(document.getElementById('waModal')).show();
+    openWhatsAppPopup(phone, text);
 };
 
 window.resetForm = () => {
