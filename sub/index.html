@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Subscribers | Gridify Admin</title>
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="../assets/images/logos/favicon.png">
     <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
@@ -187,6 +187,24 @@
             border-radius: 100px;
             font-size: 0.75rem;
             font-weight: 700;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .bg-primary-soft {
+            background-color: var(--primary-soft) !important;
+        }
+
+        .bg-success-soft {
+            background-color: var(--success-soft) !important;
+        }
+
+        .bg-danger-soft {
+            background-color: var(--danger-soft) !important;
+        }
+
+        .bg-warning-soft {
+            background-color: var(--warning-soft) !important;
         }
 
         .badge-active {
@@ -412,6 +430,42 @@
 
             .header-actions button {
                 padding: 0.5rem 0.75rem !important;
+            }
+
+            .admin-title {
+                font-size: 1rem;
+                /* Smaller title */
+            }
+
+            header img {
+                height: 40px !important;
+                /* Smaller logo */
+            }
+
+            .main-container {
+                padding-top: 0.5rem;
+            }
+
+            /* Compact Table for Mobile */
+            .table td {
+                padding: 0.5rem 0.25rem !important;
+                font-size: 0.75rem;
+            }
+
+            .sub-name {
+                font-size: 0.85rem;
+            }
+
+            .badge-pill {
+                padding: 4px 8px;
+                font-size: 0.7rem;
+            }
+
+            .action-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+                margin-left: 2px;
             }
         }
     </style>
