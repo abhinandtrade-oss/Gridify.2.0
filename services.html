@@ -209,6 +209,164 @@
         <!-- What We ProvideArea end -->
 
 
+
+        <!-- Services Area Start -->
+        <section class="services-area">
+            <style>
+                .service-card {
+                    background: white;
+                    border: 1px solid #eee;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    transition: all 0.3s ease;
+                    height: 100%;
+                    position: relative;
+                }
+
+                .service-card:hover {
+                    transform: translateY(-5px);
+                    border-color: var(--ridda-secondary-color);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+                }
+
+                .service-card .image {
+                    width: 100%;
+                    height: 200px;
+                    overflow: hidden;
+                    background: #f9f9f9;
+                }
+
+                .service-card .image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.5s ease;
+                }
+
+                .service-card:hover .image img {
+                    transform: scale(1.1);
+                }
+
+                .service-card .content {
+                    padding: 20px;
+                    position: relative;
+                }
+
+                .service-card .content h5 {
+                    margin-bottom: 0;
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: var(--ridda-heading-color);
+                }
+
+                .service-card .icon-arrow {
+                    position: absolute;
+                    right: 20px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    width: 35px;
+                    height: 35px;
+                    line-height: 35px;
+                    text-align: center;
+                    border-radius: 50%;
+                    background: #f0f0f0;
+                    color: var(--ridda-heading-color);
+                    transition: all 0.3s ease;
+                }
+
+                .service-card:hover .icon-arrow {
+                    background: var(--ridda-heading-color);
+                    color: white;
+                }
+            </style>
+            <div class="container px-0 bordered-x bordered-top" style="padding-top: 50px; padding-bottom: 50px;">
+                <div class="row justify-content-center">
+                    <div class="col-xl-7 col-lg-9 col-md-11">
+                        <div class="section-title mb-40 text-center" data-aos="fade-up" data-aos-duration="1500"
+                            data-aos-offset="50">
+                            <span class="subtitle mt-10 mb-15">Services</span>
+                            <h2>Creative & Modern Services</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center gap-y-4">
+                    <!-- Item 01 -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="javascript:void(0)" onclick="openServiceModal('web-design')"
+                            class="service-card d-block">
+                            <div class="image">
+                                <img src="https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764756085037-gf63o3u98am-1764756071640_8eq71f_rectangle_35.png"
+                                    alt="Web Design">
+                            </div>
+                            <div class="content">
+                                <h5>Web Design</h5>
+                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Item 02 -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="javascript:void(0)" onclick="openServiceModal('poster-designing')"
+                            class="service-card d-block">
+                            <div class="image">
+                                <img src="https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764492678080-2b1b2t4tqvg-1764492668501_0qiyyq_untitled-1.png"
+                                    alt="Poster Designing">
+                            </div>
+                            <div class="content">
+                                <h5>Poster Designing</h5>
+                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Item 03 -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="javascript:void(0)" onclick="openServiceModal('seo')" class="service-card d-block">
+                            <div class="image">
+                                <img src="https://i.postimg.cc/ZKyVgH2d/image.png" alt="SEO">
+                            </div>
+                            <div class="content">
+                                <h5>SEO</h5>
+                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Item 04 -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="javascript:void(0)" onclick="openServiceModal('brand-making')"
+                            class="service-card d-block">
+                            <div class="image">
+                                <img src="https://i.postimg.cc/VkDSKx9Z/unnamed.jpg" alt="Brand Making">
+                            </div>
+                            <div class="content">
+                                <h5>Brand Making</h5>
+                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Item 05 -->
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <a href="javascript:void(0)" onclick="openServiceModal('property-listing')"
+                            class="service-card d-block">
+                            <div class="image">
+                                <img src="https://i.postimg.cc/x1wrVCPQ/unnamed.jpg" alt="Property Listing">
+                            </div>
+                            <div class="content">
+                                <h5>Property Listing</h5>
+                                <div class="icon-arrow"><i class="far fa-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        <!-- Services Area End -->
+
         <!-- Pricing Area start -->
         <section class="pricing-area rel z-2">
             <div class="container px-sm-0 bordered-x pt-130 rpt-100 pb-100 rpb-70">
@@ -485,51 +643,6 @@
         <!-- Working Process Area End -->
 
 
-        <!-- Services Area Start -->
-        <!--section class="services-area bgc-black text-white">
-            <div class="container px-0 bordered-x bordered-top py-130 rpy-100">
-                <div class="row justify-content-center">
-                    <div class="col-xl-7 col-lg-9 col-md-11">
-                        <div class="section-title mb-50 text-center" data-aos="fade-up" data-aos-duration="1500"
-                            data-aos-offset="50">
-                            <span class="subtitle mt-10 mb-15">Services</span>
-                            <h2>Creative & Modern Services</h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="service-limeline-item">
-                    <span class="number">01</span>
-                    <span class="h1"><a href="service-details.html">Web Design</a></span>
-                    <div class="image"><img src="assets/images/services/service-timeline1.jpg" alt="Service"></div>
-                    <a href="service-details.html" class="detail-btn"><i class="far fa-arrow-right"></i></a>
-                </div>
-                <div class="service-limeline-item">
-                    <span class="number">02</span>
-                    <span class="h1"><a href="service-details.html">Branding</a></span>
-                    <div class="image"><img src="assets/images/services/service-timeline2.jpg" alt="Service"></div>
-                    <a href="service-details.html" class="detail-btn"><i class="far fa-arrow-right"></i></a>
-                </div>
-                <div class="service-limeline-item">
-                    <span class="number">03</span>
-                    <span class="h1"><a href="service-details.html">SEO</a></span>
-                    <div class="image"><img src="assets/images/services/service-timeline3.jpg" alt="Service"></div>
-                    <a href="service-details.html" class="detail-btn"><i class="far fa-arrow-right"></i></a>
-                </div>
-                <div class="service-limeline-item">
-                    <span class="number">04</span>
-                    <span class="h1"><a href="service-details.html">Motion Design</a></span>
-                    <div class="image"><img src="assets/images/services/service-timeline4.jpg" alt="Service"></div>
-                    <a href="service-details.html" class="detail-btn"><i class="far fa-arrow-right"></i></a>
-                </div>
-                <div class="service-limeline-item">
-                    <span class="number">05</span>
-                    <span class="h1"><a href="service-details.html">3D Animation</a></span>
-                    <div class="image"><img src="assets/images/services/service-timeline5.jpg" alt="Service"></div>
-                    <a href="service-details.html" class="detail-btn"><i class="far fa-arrow-right"></i></a>
-                </div>
-            </div>
-        </section-->
-        <!-- Services Area End -->
 
 
         <!-- Why Choose Us Area start -->
@@ -1070,5 +1183,514 @@
 </body>
 
 
-</html>
+<!-- Service Details Modal -->
+<div id="serviceModal" class="package-modal">
+    <div class="package-modal-content service-modal-content">
+        <span class="close-service-modal close-modal">&times;</span>
+        <div class="row">
+            <div class="col-md-5">
+                <img id="modal-service-image" src="" alt="Service Image" class="modal-img">
+                <h3 id="modal-service-title" class="modal-title service-title"></h3>
+                <p id="modal-service-desc" class="modal-subtitle service-desc"></p>
+            </div>
+            <div class="col-md-7">
 
+                <!-- Step 1: Select Plan -->
+                <div id="step-plans">
+                    <h4 class="plans-heading">Select a Plan</h4>
+                    <div id="modal-plans-container" class="plans-container">
+                        <!-- Plans injected via JS -->
+                    </div>
+                    <div class="form-group mt-30 btn-container">
+                        <button type="button" class="theme-btn style-three w-100" id="proceedBtn"
+                            data-hover="Proceed to Inquiry"
+                            style="background: #fab702 !important; border-color: #fab702 !important; padding: 12px 10px; position: relative; z-index: 5;">
+                            <span style="color: #2a2a2a !important; position: relative; z-index: 10;">Proceed to
+                                Inquiry</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Inquiry Form -->
+                <div id="step-form" style="display: none;">
+                    <h4 class="plans-heading">Your Details</h4>
+                    <form id="detailsForm">
+                        <div class="form-group">
+                            <label class="text-white">Full Name</label>
+                            <input type="text" id="custName" class="form-control" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="text-white">Email Address</label>
+                            <input type="email" id="custEmail" class="form-control" placeholder="john@example.com"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="text-white">Phone Number</label>
+                            <input type="tel" id="custPhone" class="form-control" placeholder="+91 98765 43210"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="text-white">Business Type</label>
+                            <input type="text" id="custBusinessType" class="form-control"
+                                placeholder="e.g. Retail, Tech, Agency">
+                        </div>
+                        <div class="form-group">
+                            <label class="text-white">Category</label>
+                            <select id="custCategory" class="form-control"
+                                style="background-color: #2a2a2a; color: white; border-color: #333;">
+                                <option value="Business">Business</option>
+                                <option value="Education">Education</option>
+                                <option value="Personal">Personal</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mt-30 btn-container"
+                            style="display: flex; gap: 10px; width: 100%; align-items: center;">
+                            <button type="button" class="theme-btn style-three" id="backBtn" data-hover="Back"
+                                style="flex: 1; background: #fab702 !important; border-color: #fab702 !important; min-width: 0; padding: 12px 10px; text-align: center; justify-content: center; position: relative; z-index: 5;">
+                                <span
+                                    style="white-space: nowrap; position: relative; z-index: 10; color: #2a2a2a !important;">Back</span>
+                            </button>
+                            <button type="submit" class="theme-btn style-three" data-hover="Send Inquiry"
+                                style="flex: 1.5; min-width: 0; background: #fab702 !important; border-color: #fab702 !important; padding: 12px 10px; text-align: center; justify-content: center; position: relative; z-index: 5;">
+                                <span
+                                    style="white-space: nowrap; position: relative; z-index: 10; color: #2a2a2a !important;">Send
+                                    Inquiry</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div id="successModal" class="success-modal">
+    <div class="success-modal-content">
+        <span class="close-modal">&times;</span>
+        <div class="text-center">
+            <i class="fas fa-check-circle text-success mb-3" style="font-size: 4rem;"></i>
+            <h3 class="modal-title">Thank You!</h3>
+            <p class="modal-subtitle">Your inquiry has been received.<br>We will contact you within 24-48 hours.</p>
+            <button id="closeSuccessBtn" class="theme-btn btn-small mt-3"><span>Close</span></button>
+        </div>
+    </div>
+</div>
+
+<!-- Data and Script for Service Modal -->
+<script type="module">
+    import { db } from './assets/js/firebase-config.js';
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const ORDERS_COLLECTION = 'inquiries'; // Separate collection for service inquiries
+
+    const servicesData = {
+        'web-design': {
+            title: 'Web Design',
+            image: 'https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764756085037-gf63o3u98am-1764756071640_8eq71f_rectangle_35.png',
+            description: 'Custom, responsive, and performance-optimized websites tailored to your brand.',
+            plans: [
+                { name: 'Regular', price: 3799, displayPrice: '₹ 3,799', desc: 'Up to 2 pages, 2 forms, Basic Support' },
+                { name: 'Standard', price: 11799, displayPrice: '₹ 11,799', desc: '3-5 pages, 4 forms, Email Alerts, SEO Basic' },
+                { name: 'Premium', price: 18999, displayPrice: '₹ 18999', desc: 'Custom size (4-6 pages), Advanced SEO, Priority Support' }
+            ]
+        },
+        'poster-designing': {
+            title: 'Poster Designing',
+            image: 'https://pub-141831e61e69445289222976a15b6fb3.r2.dev/1764492678080-2b1b2t4tqvg-1764492668501_0qiyyq_untitled-1.png',
+            description: 'Eye-catching posters for events, promotions, and branding.',
+            plans: [
+                { name: 'Basic Poster', price: 499, displayPrice: '₹ 499', desc: '1 Concept, HD Digital File' },
+                { name: 'Pro Poster', price: 999, displayPrice: '₹ 999', desc: '3 Concepts, Source File, Print Ready' }
+            ]
+        },
+        'seo': {
+            title: 'SEO Services',
+            image: 'https://i.postimg.cc/ZKyVgH2d/image.png',
+            description: 'Boost your visibility and rank higher on search engines.',
+            plans: [
+                { name: 'Starter SEO', price: 4999, displayPrice: '₹ 4,999/mo', desc: 'On-page Optimization, 5 Keywords' },
+                { name: 'Growth SEO', price: 9999, displayPrice: '₹ 9,999/mo', desc: 'On-page & Off-page, 15 Keywords, Monthly Report' }
+            ]
+        },
+        'brand-making': {
+            title: 'Brand Making',
+            image: 'https://i.postimg.cc/VkDSKx9Z/unnamed.jpg',
+            description: 'Complete branding solutions including logo, guidelines, and stationery.',
+            plans: [
+                { name: 'Logo Design', price: 1999, displayPrice: '₹ 1,999', desc: '3 Logo Concepts, Vector Files' },
+                { name: 'Full Branding', price: 9999, displayPrice: '₹ 9,999', desc: 'Logo, Business Card, Letterhead, Brand Guidelines' }
+            ]
+        },
+        'property-listing': {
+            title: 'Property Listing',
+            image: 'https://i.postimg.cc/x1wrVCPQ/unnamed.jpg',
+            description: 'Professional listing management for real estate.',
+            plans: [
+                { name: 'Single Listing', price: 999, displayPrice: '₹ 999', desc: '1 Property, 1 Month Visibility' },
+                { name: 'Premium Bundle', price: 4999, displayPrice: '₹ 4,999', desc: '10 Properties, 3 Months Visibility, Featured Tag' }
+            ]
+        }
+    };
+
+    let selectedServiceId = null;
+    let selectedPlanIndex = 0;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const serviceModal = document.getElementById('serviceModal');
+        const successModal = document.getElementById('successModal'); // New Success Modal
+        const closeBtn = document.querySelector('.close-service-modal');
+        // Close Success Modal Btn
+        const closeSuccessBtn = document.querySelector('.success-modal .close-modal'); // Specific to success modal
+        const closeSuccessBtnBtn = document.getElementById('closeSuccessBtn');
+
+        const stepPlans = document.getElementById('step-plans');
+        const stepForm = document.getElementById('step-form');
+        const proceedBtn = document.getElementById('proceedBtn');
+        const backBtn = document.getElementById('backBtn');
+        const detailsForm = document.getElementById('detailsForm');
+        const modalPlansContainer = document.getElementById('modal-plans-container');
+        const submitBtn = detailsForm.querySelector('button[type="submit"]');
+
+        // Close Modal Logic
+        closeBtn.addEventListener('click', () => {
+            serviceModal.classList.remove('show');
+        });
+
+        // Success Modal Close Logic
+        if (closeSuccessBtn) {
+            closeSuccessBtn.addEventListener('click', () => {
+                successModal.classList.remove('show');
+            });
+        }
+        if (closeSuccessBtnBtn) {
+            closeSuccessBtnBtn.addEventListener('click', () => {
+                successModal.classList.remove('show');
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target == serviceModal) {
+                serviceModal.classList.remove('show');
+            }
+            if (e.target == successModal) {
+                successModal.classList.remove('show');
+            }
+        });
+
+        // Make openServiceModal global
+        window.openServiceModal = function (serviceId) {
+            selectedServiceId = serviceId;
+            const data = servicesData[serviceId];
+            if (!data) return;
+
+            document.getElementById('modal-service-title').textContent = data.title;
+            document.getElementById('modal-service-image').src = data.image;
+            document.getElementById('modal-service-desc').textContent = data.description;
+
+            modalPlansContainer.innerHTML = '';
+
+            data.plans.forEach((plan, index) => {
+                const planDiv = document.createElement('div');
+                planDiv.className = `plan-item ${index === 0 ? 'selected' : ''}`;
+                planDiv.onclick = () => selectPlan(index);
+                planDiv.innerHTML = `
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 style="margin:0; color: #fff;">${plan.name}</h6>
+                            <span style="color: #cab40e; font-weight: bold;">${plan.displayPrice}</span>
+                        </div>
+                        <p style="margin: 5px 0 0 0; font-size: 13px; color: #ccc;">${plan.desc}</p>
+                    `;
+                modalPlansContainer.appendChild(planDiv);
+            });
+
+            selectedPlanIndex = 0; // Reset to first plan
+            // View Reset
+            stepPlans.style.display = 'block';
+            stepForm.style.display = 'none';
+            // Scroll to top of modal content
+            document.querySelector('.service-modal-content').scrollTop = 0;
+
+            serviceModal.classList.add('show');
+        };
+
+        function selectPlan(index) {
+            selectedPlanIndex = index;
+            const items = document.querySelectorAll('.plan-item');
+            items.forEach(item => item.classList.remove('selected'));
+            items[index].classList.add('selected');
+        }
+
+        // Navigation Handlers
+        proceedBtn.addEventListener('click', () => {
+            stepPlans.style.display = 'none';
+            stepForm.style.display = 'block';
+            document.querySelector('.service-modal-content').scrollTop = 0;
+        });
+
+        backBtn.addEventListener('click', () => {
+            stepForm.style.display = 'none';
+            stepPlans.style.display = 'block';
+        });
+
+        // Form Submission Logic
+        detailsForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Processing...</span>';
+
+            const name = document.getElementById('custName').value;
+            const email = document.getElementById('custEmail').value;
+            const phone = document.getElementById('custPhone').value;
+            const businessType = document.getElementById('custBusinessType').value;
+            const category = document.getElementById('custCategory').value;
+
+            const service = servicesData[selectedServiceId];
+            const plan = service.plans[selectedPlanIndex];
+
+            // Prepare Order Data
+            const orderData = {
+                serviceId: selectedServiceId,
+                serviceName: service.title,
+                planName: plan.name,
+                planPrice: plan.price,
+                customerName: name,
+                email: email,
+                phone: phone,
+                businessType: businessType,
+                category: category,
+                orderDate: new Date().toISOString(),
+                status: 'New Inquiry',
+                type: 'Service Inquiry'
+            };
+
+            try {
+                // Submit to Firestore
+                await addDoc(collection(db, ORDERS_COLLECTION), orderData);
+                console.log("Inquiry submitted successfully");
+
+                // Google Sheet Submission (Optional, mimicking checkout)
+                submitToGoogleSheet(orderData);
+
+                // Show Success Modal
+                serviceModal.classList.remove('show');
+                successModal.classList.add('show');
+                detailsForm.reset();
+
+            } catch (error) {
+                console.error("Error submitting inquiry:", error);
+                alert("There was an error submitting your inquiry. Please try again.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            }
+        });
+    });
+
+    // Helper to mimic checkout logic
+    function submitToGoogleSheet(data) {
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw4YvkpUDud3FclE0_qV1LgIefohke3PI2OKjUVSP_mw8mnHZSzuwsK_fyuhADlOmUW/exec';
+        const payload = new FormData();
+        payload.append('action', 'createOrder');
+        payload.append('orderId', 'INQ-' + Date.now());
+        payload.append('date', data.orderDate);
+        payload.append('customerName', data.customerName);
+        payload.append('email', data.email);
+        payload.append('phone', data.phone);
+        payload.append('address', 'N/A (Inquiry)');
+        payload.append('total', data.planPrice);
+        payload.append('paymentMethod', 'Inquiry');
+        payload.append('items', `${data.serviceName} - ${data.planName}`);
+
+        fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: payload
+        }).catch(err => console.error("Google Sheet Error", err));
+    }
+</script>
+
+<style>
+    /* Success Modal Styles (Shared with Checkout) */
+    .success-modal {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: rgba(0, 0, 0, 0.85);
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+
+    .success-modal.show {
+        display: flex;
+    }
+
+    .success-modal-content {
+        background-color: #1a1a1a;
+        padding: 30px 20px;
+        border: 1px solid #333;
+        width: 90%;
+        max-width: 450px;
+        border-radius: 15px;
+        position: relative;
+        text-align: center;
+    }
+
+    .success-modal .close-modal {
+        /* Specific selector for success modal close button */
+        color: #aaa;
+        position: absolute;
+        right: 15px;
+        top: 10px;
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+    .modal-title {
+        color: #fff;
+        margin-bottom: 10px;
+        font-size: 24px;
+    }
+
+    .modal-subtitle {
+        color: #ccc;
+        margin-bottom: 20px;
+        font-size: 15px;
+    }
+
+    .text-success {
+        color: #28a745 !important;
+    }
+
+    .service-modal-content {
+        max-width: 800px;
+        width: 95%;
+        margin: 20px auto;
+        max-height: 90vh;
+        overflow-y: auto;
+        padding: 40px;
+    }
+
+    .modal-img {
+        width: 100%;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        max-height: 250px;
+        object-fit: cover;
+    }
+
+    .service-title {
+        font-size: 28px;
+        margin-bottom: 10px;
+    }
+
+    .service-desc {
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+
+    .plans-heading {
+        color: white;
+        margin-bottom: 15px;
+    }
+
+    .plans-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .plan-item {
+        border: 1px solid #333;
+        background: #2a2a2a;
+        padding: 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .plan-item:hover {
+        border-color: #555;
+        background: #333;
+    }
+
+    .plan-item.selected {
+        border-color: #cab40e;
+        background: rgba(202, 180, 14, 0.1);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #333;
+        background-color: #2a2a2a;
+        color: #fff;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .d-flex.gap-2 {
+        gap: 10px;
+    }
+
+    /* Enforce button styles on hover */
+    .btn-container .theme-btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn-container .theme-btn:hover {
+        background: #e5a700 !important;
+        /* Slightly darker shade for interactive feel */
+        border-color: #e5a700 !important;
+    }
+
+    .btn-container .theme-btn:hover span {
+        color: #2a2a2a !important;
+    }
+
+    /* Mobile Optimization */
+    @media (max-width: 767px) {
+        .service-modal-content {
+            padding: 20px 15px;
+            width: 90%;
+            margin-top: 10px;
+        }
+
+        .modal-img {
+            height: 180px;
+            margin-bottom: 15px;
+        }
+
+        .service-title {
+            font-size: 22px;
+        }
+
+        .plans-heading {
+            font-size: 18px;
+        }
+
+        .plan-item {
+            padding: 12px;
+        }
+
+        /* Better button rendering on mobile */
+        .btn-container button {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+            font-size: 14px !important;
+        }
+    }
+</style>
+
+</html>
