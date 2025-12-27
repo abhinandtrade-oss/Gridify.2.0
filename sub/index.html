@@ -481,6 +481,10 @@
                                 class="fas fa-search text-muted"></i></span>
                         <input type="text" id="searchInput" class="form-control border-start-0" placeholder="Search...">
                     </div>
+                    <button class="btn btn-outline-primary rounded-pill px-4"
+                        onclick="window.open('./check.html', '_blank')">
+                        <i class="fas fa-external-link-alt me-md-2"></i><span>Customer Portal</span>
+                    </button>
                     <button class="btn btn-outline-success rounded-pill px-4" id="exportBtn">
                         <i class="fas fa-file-excel me-md-2"></i><span>Export</span>
                     </button>
@@ -572,7 +576,7 @@
                                 <select id="subType" class="form-select" required>
                                     <option value="Days">Days</option>
                                     <option value="Weekly">Weekly</option>
-                                    <option value="Monthly">Monthly</option>
+                                    <option value="Monthly" selected>Monthly</option>
                                     <option value="Quarterly">Quarterly</option>
                                     <option value="Yearly">Yearly</option>
                                     <option value="Lifetime">Lifetime</option>
