@@ -463,7 +463,15 @@ window.sendWhatsAppAlert = (id) => {
     $('#waRecipient').text(s.name);
     $('#waPhone').text(s.mobile);
     $('#waTime').text(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-    $('#waMessage').val(`Dear ${s.name}, your ${s.product} subscription expires today. Kindly make the payment to continue service. Regards, Gridify.`);
+    $('#waMessage').val(
+        `Dear ${s.name},
+
+Your ${s.product} subscription expires today.
+Kindly make the payment to continue the service.
+
+Regards,
+Gridify`
+    );
 
     // Show Modal
     new bootstrap.Modal(document.getElementById('waModal')).show();
