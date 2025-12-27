@@ -627,9 +627,33 @@ class SubManager {
             area.val('Failed to load logs: ' + e.message);
         }
     }
+
+    async forceRunAutomation() {
+        if (!confirm("Are you sure you want to FORCE RUN the automation now?\nThis will send emails/WhatsApp messages regardless of schedule.")) return;
+
+        const area = $('#automationLogsArea');
+        area.val('Triggering Force Run... Please wait...');
+
+        try {
+            const WORKER_URL = "https://gridify-expiry-automation.abhinandsofficial.workers.dev/?run=true";
+
+            const response = await fetch(WORKER_URL);
+            const text = await response.text();
+
+            area.val(`[FORCE RUN RESPONSE]\n\n${text}`);
+            alert("Force Run Completed. Check logs below.");
+
+            setTimeout(() => this.fetchLogs(), 3000);
+        } catch (e) {
+            console.error(e);
+            area.val('Force Run Failed (Network Error or CORS): ' + e.message);
+            alert("Failed to trigger worker. Check console.");
+        }
+    }
 }
 
 const manager = new SubManager();
+window.subManager = manager;
 
 // --- Window Globals ---
 
