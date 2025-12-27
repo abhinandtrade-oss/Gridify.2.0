@@ -395,6 +395,10 @@
                 <h1 class="admin-title">Subscriber Management</h1>
             </div>
             <div class="d-flex gap-2 header-actions">
+                <button class="btn btn-outline-secondary rounded-pill px-3 px-md-4" data-bs-toggle="modal"
+                    data-bs-target="#settingsModal" onclick="loadSettings()">
+                    <i class="fas fa-cog me-md-2"></i><span>Settings</span>
+                </button>
                 <button class="btn btn-outline-primary rounded-pill px-3 px-md-4" data-bs-toggle="modal"
                     data-bs-target="#productMgtModal" onclick="loadProductTableOnly()">
                     <i class="fas fa-boxes me-md-2"></i><span>Manage Products</span>
@@ -743,6 +747,35 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title fw-800">Admin Settings</h5>
+                        <p class="text-slate small mb-0">Configure your automation preferences.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label">Automatic Alert Time (IST)</label>
+                        <input type="time" id="alertTimeInput" class="form-control" value="09:00">
+                        <div class="form-text text-muted">
+                            The system will send automated emails and WhatsApp summaries at this time daily.
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-primary rounded-pill px-4" onclick="saveSettings()">
+                            <i class="fas fa-save me-2"></i>Save Settings
+                        </button>
                     </div>
                 </div>
             </div>
