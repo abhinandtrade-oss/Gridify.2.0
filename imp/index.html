@@ -348,6 +348,20 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 11000">
+        <div id="permissionToast" class="toast align-items-center text-white bg-danger border-0 shadow-lg" role="alert"
+            aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body fw-600">
+                    <i class="fas fa-exclamation-circle me-2"></i> <span id="toastMessage">Permission Denied</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../assets/js/jquery-3.6.0.min.js"></script>
     <script src="../assets/js/bootstrap.min.js"></script>
