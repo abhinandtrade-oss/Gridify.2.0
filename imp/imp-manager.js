@@ -38,6 +38,21 @@ class ImpManager {
         $('#logoutBtn').on('click', () => AdminManager.logout());
     }
 
+    showToast(message, type = 'danger') {
+        const toastEl = document.getElementById('permissionToast');
+        const toastBody = document.getElementById('toastMessage');
+
+        // Update message
+        toastBody.textContent = message;
+
+        // Update color
+        toastEl.className = `toast align-items-center text-white bg-${type} border-0 shadow-lg`;
+
+        // Show toast
+        const toast = new bootstrap.Toast(toastEl);
+        toast.show();
+    }
+
     async loadNotes() {
         try {
             const q = query(collection(db, NOTES_COLLECTION), orderBy('updatedAt', 'desc'));
@@ -84,12 +99,6 @@ class ImpManager {
         filtered.forEach(note => {
             // Updated Card Design: Only Show ID and Title
             const isAuthor = note.createdBy === this.currentUser;
-            const editBtnClass = isAuthor ? '' : 'd-none'; // Hide edit/delete if not author? User said "allow only author to edit". Delete usually follows suit.
-
-            // To be safe, I'm disabling the buttons visually or hiding them.
-            // But let's keep them visible but standard "disabled" or handle in click.
-            // Actually cleaner to just hide them if they can't use them, OR show them but show alert.
-            // Requirements: "only allow the auter to edit".
 
             const html = `
                 <div class="col-md-6 col-lg-4">
@@ -102,10 +111,10 @@ class ImpManager {
                         <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center" onclick="event.stopPropagation();">
                             <small class="text-slate"><i class="far fa-user me-1"></i> ${this.escapeHtml(note.createdBy || 'Unknown')}</small>
                             <div class="d-flex gap-2">
-                                <button class="action-btn ${isAuthor ? '' : 'opacity-25'}" ${isAuthor ? '' : 'disabled'} onclick="window.editNote('${note.id}')" title="Edit">
+                                <button class="action-btn" onclick="window.editNote('${note.id}')" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="action-btn btn-delete ${isAuthor ? '' : 'opacity-25'}" ${isAuthor ? '' : 'disabled'} onclick="window.deleteNote('${note.id}')" title="Delete">
+                                <button class="action-btn btn-delete" onclick="window.deleteNote('${note.id}')" title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -133,11 +142,6 @@ class ImpManager {
         try {
             if (id && id.trim() !== '') {
                 // Update
-                // Important: Existing 'createdAt' and 'createdBy' should persist.
-                // We should only update specific fields if we want to be safe, but since we are loading valid data:
-                // We need to fetch the existing doc to not overwrite createdAt if we don't have it in form (we don't).
-                // Actually updateDoc only updates fields passed.
-
                 // Security Check Again (Frontend)
                 const existing = this.notes.find(n => n.id === id);
                 if (existing && existing.createdBy !== this.currentUser) {
@@ -162,7 +166,7 @@ class ImpManager {
             await this.loadNotes();
         } catch (e) {
             console.error("Save Error:", e);
-            alert("Failed to save note: " + e.message);
+            this.showToast("Failed to save note: " + e.message, 'danger');
         } finally {
             btn.prop('disabled', false).html(originalText);
         }
@@ -173,7 +177,7 @@ class ImpManager {
         const note = this.notes.find(n => n.id === id);
         if (!note) return;
         if (note.createdBy !== this.currentUser) {
-            alert("Only the author can delete this note.");
+            this.showToast("Only the author can delete this note.", 'danger');
             return;
         }
 
@@ -183,7 +187,7 @@ class ImpManager {
             await this.loadNotes();
         } catch (e) {
             console.error("Delete Error:", e);
-            alert("Failed to delete note.");
+            this.showToast("Failed to delete note.", 'danger');
         }
     }
 
@@ -233,7 +237,7 @@ window.editNote = (id) => {
     if (!note) return;
 
     if (note.createdBy !== manager.currentUser) {
-        alert("Permission Denied: Only the author can edit this note.");
+        manager.showToast("Permission Denied: Only the author is allowed to edit this note.", 'danger');
         return;
     }
 
