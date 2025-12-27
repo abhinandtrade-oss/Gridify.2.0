@@ -232,16 +232,21 @@ async function runExpiryCheck(isManual = false) {
             log(`WA Resp: ${waResp.status}`);
         }
 
-        // 4. Update Last Run Date + Configured Time
+        // 4. Update Last Run Date + Configured Time + Time
         log("Saving Run State...");
-        await fetch(`${firestoreBaseUrl}/admin_settings/general?updateMask.fieldPaths=lastRunDate&updateMask.fieldPaths=lastConfiguredTime`, {
+        const d = new Date();
+        const istDate = new Date(d.getTime() + (5.5 * 60 * 60 * 1000));
+        const istTimeStr = istDate.toISOString().split('T')[1].substring(0, 5); // HH:MM
+
+        await fetch(`${firestoreBaseUrl}/admin_settings/general?updateMask.fieldPaths=lastRunDate&updateMask.fieldPaths=lastConfiguredTime&updateMask.fieldPaths=lastRunTime`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 fields: {
                     lastRunDate: { stringValue: todayStr },
+                    lastRunTime: { stringValue: istTimeStr },
                     alertTime: { stringValue: preferredTime },
-                    lastConfiguredTime: { stringValue: preferredTime } // IMPORTANT: Save this to prevent infinite loops
+                    lastConfiguredTime: { stringValue: preferredTime }
                 }
             })
         });
