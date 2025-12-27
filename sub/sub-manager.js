@@ -32,6 +32,7 @@ class SubManager {
         this.bindEvents();
         await this.loadProducts();
         await this.loadSubscribers();
+        this.loadAutomationStatus();
     }
 
     bindEvents() {
@@ -507,27 +508,110 @@ class SubManager {
             console.error("Load Settings Error:", e);
         }
     }
+
+    async loadAutomationStatus() {
+        try {
+            const docSnap = await getDoc(doc(db, SETTINGS_COLLECTION, 'general'));
+            let status = 'unknown';
+            let alertTime = '09:00';
+            let lastRun = null;
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                alertTime = data.alertTime || '09:00';
+                lastRun = data.lastRunDate || null;
+            }
+
+            // Update UI Fields
+            $('#statusScheduled').text(alertTime);
+            $('#statusLastRun').text(lastRun || 'Never');
+
+            // Logic to determine State
+            const todayStr = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const [h, m] = alertTime.split(':').map(Number);
+            const alertDate = new Date();
+            alertDate.setHours(h, m, 0, 0);
+
+            if (lastRun === todayStr) {
+                // Automation Ran Successfully Today
+                this.updateStatusUI('active', 'System Active', 'Daily automation completed successfully.');
+            } else {
+                // Has not run yet today
+                if (now < alertDate) {
+                    // Waiting for time
+                    const diffMs = alertDate - now;
+                    const diffHrs = Math.floor((diffMs % 86400000) / 3600000);
+                    const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+                    this.updateStatusUI('waiting', 'System Sleeping', `Next run in ${diffHrs}h ${diffMins}m`);
+                } else {
+                    // It is PAST the time, but LastRun is not today
+                    // Allow 1 hour buffer before showing error (maybe worker is running right now)
+                    const oneHourPast = new Date(alertDate.getTime() + 60 * 60 * 1000);
+                    if (now > oneHourPast) {
+                        this.updateStatusUI('error', 'Status Unknown', 'Automation missed schedule or no data found.');
+                    } else {
+                        this.updateStatusUI('running', 'Processing...', 'System should be running now.');
+                    }
+                }
+            }
+
+            // Calculate "Next Check" roughly (worker runs every 30 mins)
+            const minutes = now.getMinutes();
+            const next30 = minutes >= 30 ? 60 : 30;
+            const nextCheckDate = new Date(now.getTime() + (next30 - minutes) * 60000);
+            $('#statusNextCheck').text(nextCheckDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
+        } catch (e) {
+            console.error("Status Load Error", e);
+            this.updateStatusUI('error', 'Connection Error', 'Could not fetch status.');
+        }
+    }
+
+    updateStatusUI(state, title, msg) {
+        const iconBox = $('#statusIconBg');
+        const icon = $('#statusIcon');
+        const text = $('#statusText');
+        const pulse = $('#statusPulse');
+        const bar = $('#statusProgressBar');
+
+        // Reset classes
+        iconBox.removeClass('bg-success bg-warning bg-danger bg-secondary');
+        pulse.css('animation', 'none');
+
+        $('#statusIconBg').parent().find('h6').text(title);
+        text.text(msg);
+
+        switch (state) {
+            case 'active':
+                iconBox.addClass('bg-success');
+                icon.attr('class', 'fas fa-check-circle fa-lg');
+                pulse.css({ 'animation': 'pulse-ring 2s infinite', 'box-shadow': '0 0 0 0 rgba(25, 135, 84, 0.7)' }); // Green pulse
+                bar.addClass('bg-success').css('width', '100%');
+                break;
+            case 'waiting':
+                iconBox.addClass('bg-warning'); // Yellow/Orange
+                icon.attr('class', 'fas fa-hourglass-half fa-lg');
+                pulse.css('animation', 'none'); // No pulse when sleeping
+                bar.addClass('bg-warning').css('width', '50%');
+                break;
+            case 'running':
+                iconBox.addClass('bg-info');
+                icon.attr('class', 'fas fa-sync fa-spin fa-lg');
+                pulse.css('animation', 'pulse-ring 1s infinite'); // Fast pulse
+                bar.addClass('bg-info').css('width', '75%');
+                break;
+            case 'error':
+                iconBox.addClass('bg-danger');
+                icon.attr('class', 'fas fa-exclamation-triangle fa-lg');
+                pulse.css({ 'animation': 'pulse-ring 2s infinite', 'box-shadow': '0 0 0 0 rgba(220, 53, 69, 0.7)' }); // Red pulse
+                bar.addClass('bg-danger').css('width', '100%');
+                break;
+        }
+    }
 }
 
 const manager = new SubManager();
-
-// --- WhatsApp Helper ---
-const openWhatsAppPopup = (phone, text) => {
-    // Protocol for mobile/desktop apps - stays in same "window" by switching to app
-    const protocolUrl = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}`;
-    // Web fallback if protocol fails - use current window to avoid new tabs
-    const webUrl = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-
-    // Try protocol first
-    window.location.href = protocolUrl;
-
-    // Fallback logic: If focus is still on the browser after 1s, the protocol might have failed
-    setTimeout(() => {
-        if (document.hasFocus()) {
-            window.location.href = webUrl;
-        }
-    }, 1000);
-};
 
 // --- Window Globals ---
 
