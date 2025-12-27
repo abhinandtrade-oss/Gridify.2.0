@@ -526,7 +526,22 @@ class SubManager {
 
             // Update UI Fields
             $('#statusScheduled').text(alertTime);
-            $('#statusLastRun').text((lastRun ? (lastRun + ' ' + lastRunTime) : 'Never').trim());
+
+            if (lastRun && lastRunTime) {
+                // Parse YYYY-MM-DD and HH:MM
+                const [y, m, d] = lastRun.split('-');
+                const [hr, min] = lastRunTime.split(':');
+                const dateObj = new Date(y, m - 1, d, hr, min);
+
+                // Format: Dec 27
+                const datePart = dateObj.toLocaleString('en-US', { month: 'short', day: 'numeric' });
+                // Format: 06:53 PM
+                const timePart = dateObj.toLocaleString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                $('#statusLastRun').html(`${datePart} <span class="text-muted small fw-600" style="font-size: 0.8rem;">${timePart}</span>`);
+            } else {
+                $('#statusLastRun').text(lastRun || 'Never');
+            }
 
             // Logic to determine State
             const todayStr = new Date().toISOString().split('T')[0];
