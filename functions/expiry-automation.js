@@ -67,6 +67,7 @@ async function runExpiryCheck() {
                     <p><strong>Plan :</strong> ${sub.briefing}</p>
                     <p><strong>Amount :</strong> ₹ ${sub.amount}</p>
                     <p>Please complete the payment to continue the service without any interruption.</p>
+                    <p>visit to check the status and repay : <a href="https://gridify.in/developments/url-shortener/?s=sub">https://gridify.in/developments/url-shortener/?s=sub</a></p>
                     <p>For further details or assistance, contact us at <a href="mailto:sales@gridify.in">sales@gridify.in</a>.</p>
                     <br><p>Regards, Team Gridify</p><p><i>Please do not reply to this email.</i></p><br>
                     <img src="https://ci3.googleusercontent.com/mail-sig/AIorK4ywg6tSP5RqQc6O7l55MEke1l3Bf38GklDFOob5Ogvc1rx0SJ6nCrQ8z6h5v8C5_T-vC8HicKpcH8ih" alt="Gridify Signature" style="max-width: 400px; display: block;">
