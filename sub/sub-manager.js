@@ -515,16 +515,18 @@ class SubManager {
             let status = 'unknown';
             let alertTime = '09:00';
             let lastRun = null;
+            let lastRunTime = null;
 
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 alertTime = data.alertTime || '09:00';
                 lastRun = data.lastRunDate || null;
+                lastRunTime = data.lastRunTime || '';
             }
 
             // Update UI Fields
             $('#statusScheduled').text(alertTime);
-            $('#statusLastRun').text(lastRun || 'Never');
+            $('#statusLastRun').text((lastRun ? (lastRun + ' ' + lastRunTime) : 'Never').trim());
 
             // Logic to determine State
             const todayStr = new Date().toISOString().split('T')[0];
