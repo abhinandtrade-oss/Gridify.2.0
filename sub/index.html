@@ -610,6 +610,61 @@
         </div>
     </div>
 
+    <!-- WhatsApp Preview Modal (Redesigned) -->
+    <div class="modal fade" id="waModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 overflow-hidden shadow-lg" style="border-radius: 20px;">
+                <!-- WA Header -->
+                <div class="p-3 d-flex align-items-center justify-content-between"
+                    style="background: #075e54; color: white;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="position-relative">
+                            <i class="fas fa-user-circle fs-1 opacity-75"></i>
+                            <span
+                                class="position-absolute bottom-0 end-0 p-1 bg-success border border-light rounded-circle"
+                                style="width: 12px; height: 12px;"></span>
+                        </div>
+                        <div>
+                            <h6 class="modal-title fw-700 mb-0" id="waRecipient">--</h6>
+                            <small class="opacity-75">Online</small>
+                            <span id="waPhone" class="d-none">--</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- WA Body (Chat Background) -->
+                <div class="modal-body p-4"
+                    style="background: #e5ddd5 url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');">
+                    <div class="chat-bubble left position-relative p-3 mb-3 shadow-sm"
+                        style="background: #fff; border-radius: 0 15px 15px 15px; max-width: 90%;">
+                        <label class="small fw-700 text-success mb-1">Preview Message</label>
+                        <textarea id="waMessage" class="form-control border-0 p-0" rows="5"
+                            style="background: transparent; resize: none; font-size: 0.95rem; line-height: 1.4; color: #303030;"
+                            placeholder="Type your message here..."></textarea>
+                        <div class="text-end mt-2">
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <span id="waTime">--:--</span>
+                                <i class="fas fa-check-double text-info ms-1"></i>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WA Footer -->
+                <div class="p-3 bg-white d-flex justify-content-end gap-2 border-top">
+                    <button type="button" class="btn btn-light rounded-pill px-4 btn-sm fw-600"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btnConfirmWASend" class="btn text-white rounded-pill px-4 btn-sm fw-600"
+                        style="background: #25d366;">
+                        <i class="fab fa-whatsapp me-2"></i>Send via WhatsApp
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Product Management Modal -->
     <div class="modal fade" id="productMgtModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
