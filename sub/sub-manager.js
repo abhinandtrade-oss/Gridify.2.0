@@ -609,6 +609,24 @@ class SubManager {
                 break;
         }
     }
+
+    async fetchLogs() {
+        const area = $('#automationLogsArea');
+        area.val('Loading logs from Firestore...');
+        try {
+            const docSnap = await getDoc(doc(db, SETTINGS_COLLECTION, 'logs'));
+            if (docSnap.exists() && docSnap.data().latestLog) {
+                const logs = docSnap.data().latestLog;
+                const updated = docSnap.data().updatedAt ? new Date(docSnap.data().updatedAt).toLocaleString() : '';
+                area.val(`[Last Updated: ${updated}]\n\n${logs}`);
+            } else {
+                area.val('No logs found yet. Wait for the next automation run.');
+            }
+        } catch (e) {
+            console.error(e);
+            area.val('Failed to load logs: ' + e.message);
+        }
+    }
 }
 
 const manager = new SubManager();
