@@ -726,9 +726,21 @@ window.sendWhatsAppAlert = (id) => {
     if (!s) return;
 
     const text = `Dear ${s.name},\n\nYour ${s.product} subscription expires today.\nKindly make the payment to continue the service.\n\nVisit to check status and repay: https://gridify.in/developments/url-shortener/?s=sub\n\nRegards,\nGridify`;
-    const phone = s.mobile.replace(/\D/g, '');
 
-    openWhatsAppPopup(phone, text);
+    // Populate Modal
+    $('#waRecipient').text(s.name);
+    $('#waPhone').text(s.mobile); // Store raw mobile, will be cleaned on send
+    $('#waMessage').val(text);
+
+    const now = new Date();
+    $('#waTime').text(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+
+    new bootstrap.Modal(document.getElementById('waModal')).show();
+};
+
+const openWhatsAppPopup = (phone, text) => {
+    const url = `whatsapp://send?phone=${phone}&text=${encodeURIComponent(text)}`;
+    window.location.href = url;
 };
 
 window.resetForm = () => {
