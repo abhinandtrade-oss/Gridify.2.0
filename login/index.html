@@ -47,19 +47,36 @@
             width: 100vw;
             display: flex;
             overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+            background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+
+        /* Full Page Overlay */
+        .auth-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
+            z-index: 0;
         }
 
         .auth-container {
             display: flex;
             width: 100%;
             height: 100%;
+            position: relative;
+            z-index: 1;
         }
 
         /* Sidebar Stylings */
         .auth-sidebar {
             flex: 1;
-            background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
-            background-size: cover;
+            /* Background removed -> handled by parent */
             position: relative;
             display: none;
             /* Hidden on mobile */
@@ -72,18 +89,14 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
-                max-width: 45%;
+                max-width: 50%;
+                /* Adjusted for better balance */
             }
         }
 
+        /* Remove old overlay */
         .sidebar-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.7));
-            z-index: 1;
+            display: none;
         }
 
         .sidebar-content {
@@ -167,7 +180,8 @@
         /* Form Area Stylings */
         .auth-form-wrapper {
             flex: 1;
-            background: white;
+            background: transparent;
+            /* Changed from light grey to transparent */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -178,22 +192,29 @@
         .auth-form-container {
             width: 100%;
             max-width: 480px;
+            /* Slightly tighter card */
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
         .form-header {
-            margin-bottom: 35px;
+            margin-bottom: 30px;
+            text-align: center;
         }
 
         .form-header h2 {
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 28px;
+            font-weight: 800;
             margin-bottom: 10px;
-            color: #111;
+            color: #000;
         }
 
         .form-header p {
             color: #666;
-            font-size: 16px;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         /* Social Buttons */
@@ -255,10 +276,10 @@
 
         /* Form Controls */
         .form-label {
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 700;
+            font-size: 13px;
             margin-bottom: 8px;
-            color: #333;
+            color: #1a1a1a;
         }
 
         .input-with-icon {
@@ -267,58 +288,79 @@
 
         .input-with-icon i {
             position: absolute;
-            left: 15px;
+            left: 25px;
             top: 50%;
             transform: translateY(-50%);
-            color: #999;
+            color: #9ca3af;
             transition: color 0.2s;
+            font-size: 14px;
         }
 
         .input-with-icon i.toggle-password {
             left: auto;
-            right: 15px;
+            right: 25px;
             cursor: pointer;
         }
 
         .input-with-icon .form-control {
-            padding: 14px 15px 14px 45px;
-            border-radius: 12px;
-            border: 1.5px solid #eee;
-            background: #fafafa;
-            font-size: 16px;
+            padding: 14px 25px 14px 55px;
+            border-radius: 50px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            font-size: 14px;
             transition: all 0.2s;
+            height: 50px;
         }
 
         .input-with-icon .form-control:focus {
-            border-color: var(--ridda-primary-color);
+            border-color: #8ceba4;
             background: #fff;
-            box-shadow: 0 0 0 4px rgba(255, 208, 67, 0.1);
+            box-shadow: none;
         }
 
         .input-with-icon .form-control:focus+i {
-            color: var(--ridda-primary-color);
+            color: #8ceba4;
         }
 
-
         .form-check-input:checked {
-            background-color: var(--ridda-primary-color);
-            border-color: var(--ridda-primary-color);
+            background-color: #8ceba4;
+            border-color: #8ceba4;
         }
 
         .form-footer {
             text-align: center;
-            font-size: 15px;
+            font-size: 14px;
             color: #666;
         }
 
         .form-footer a {
-            color: var(--ridda-primary-color);
+            color: #1a1a1a;
             font-weight: 700;
             text-decoration: none;
         }
 
         .form-footer a:hover {
             text-decoration: underline;
+        }
+
+        /* Green Button Style */
+        .theme-btn {
+            background-color: #86efac;
+            /* Light Mint Green */
+            color: #ffffff;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 20px;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .theme-btn:hover {
+            background-color: #4ade80;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
         }
 
         /* Modern Admin Panel Stylings */
