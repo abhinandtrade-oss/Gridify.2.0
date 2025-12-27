@@ -8,6 +8,7 @@ import { AdminManager } from '../assets/js/admin-manager.js';
 
 const SUB_COLLECTION = 'subscribers';
 const PROD_COLLECTION = 'subscription_products';
+const SETTINGS_COLLECTION = 'admin_settings';
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwRAffAw-c1Ya_drBWP2EMFHhPxHDeDygUXObRels0BX-rAyEmHqEC_D2-9MSUAl1kbMw/exec";
 
 class SubManager {
@@ -479,6 +480,33 @@ class SubManager {
         const timestamp = new Date().toISOString().split('T')[0];
         XLSX.writeFile(workbook, `Subscribers_Export_${timestamp}.xlsx`);
     }
+
+    async saveSettings(time) {
+        try {
+            await setDoc(doc(db, SETTINGS_COLLECTION, 'general'), {
+                alertTime: time
+            }, { merge: true });
+            alert("Settings saved! Automations will run at " + time + " daily.");
+            $('#settingsModal').modal('hide');
+        } catch (e) {
+            console.error("Save Settings Error:", e);
+            alert("Failed to save settings.");
+        }
+    }
+
+    async loadSettings() {
+        try {
+            const docSnap = await getDoc(doc(db, SETTINGS_COLLECTION, 'general'));
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.alertTime) {
+                    $('#alertTimeInput').val(data.alertTime);
+                }
+            }
+        } catch (e) {
+            console.error("Load Settings Error:", e);
+        }
+    }
 }
 
 const manager = new SubManager();
@@ -569,3 +597,5 @@ window.resetForm = () => {
 
 window.resetProductForm = () => manager.resetProductForm();
 window.loadProductTableOnly = () => manager.loadProducts();
+window.saveSettings = () => manager.saveSettings($('#alertTimeInput').val());
+window.loadSettings = () => manager.loadSettings();
