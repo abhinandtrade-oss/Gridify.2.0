@@ -407,6 +407,7 @@ class SubManager {
                         <p><strong>Plan :</strong> ${sub.briefing || 'N/A'}</p>
                         <p><strong>Amount :</strong> ₹ ${sub.amount || '0'}</p>
                         <p>Please complete the payment to continue the service without any interruption.</p>
+                        <p>visit to check the status and repay : <a href="https://gridify.in/developments/url-shortener/?s=sub">https://gridify.in/developments/url-shortener/?s=sub</a></p>
                         <p>For further details or assistance, contact us at <a href="mailto:sales@gridify.in">sales@gridify.in</a>.</p>
                         <br>
                         <p>Regards, Team Gridify</p>
@@ -553,7 +554,7 @@ window.sendWhatsAppAlert = (id) => {
     const s = manager.subscribers.find(sub => sub.id === id);
     if (!s) return;
 
-    const text = `Dear ${s.name},\n\nYour ${s.product} subscription expires today.\nKindly make the payment to continue the service.\n\nRegards,\nGridify`;
+    const text = `Dear ${s.name},\n\nYour ${s.product} subscription expires today.\nKindly make the payment to continue the service.\n\nVisit to check status and repay: https://gridify.in/developments/url-shortener/?s=sub\n\nRegards,\nGridify`;
     const phone = s.mobile.replace(/\D/g, '');
 
     openWhatsAppPopup(phone, text);
