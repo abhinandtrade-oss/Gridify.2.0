@@ -228,6 +228,7 @@
         }
 
         /* Responsive */
+        /* Responsive */
         @media (max-width: 768px) {
             .main-container {
                 padding: 1rem;
@@ -235,6 +236,140 @@
 
             .hide-mobile {
                 display: none;
+            }
+
+            /* Header Adjustments */
+            header .container {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .admin-title {
+                font-size: 1.1rem;
+            }
+
+            /* Top Controls */
+            .d-flex.justify-content-between.mb-4 {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .btn-add {
+                width: 100%;
+                margin-top: 0.5rem;
+                padding: 0.8rem;
+            }
+
+            /* Table to Card Transformation */
+            .table-wrapper {
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .table thead {
+                display: none;
+            }
+
+            .table,
+            .table tbody,
+            .table tr,
+            .table td {
+                display: block;
+                width: 100%;
+            }
+
+            .table tr {
+                background: white;
+                margin-bottom: 1rem;
+                border-radius: 16px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+                border: 1px solid var(--border);
+                padding: 1.25rem;
+                position: relative;
+            }
+
+            .table td {
+                padding: 0.5rem 0;
+                border: none;
+                text-align: center;
+            }
+
+            /* Image styling in card */
+            .table td:first-child {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 0.75rem;
+            }
+
+            .service-img {
+                width: 70px;
+                height: 70px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            }
+
+            /* Title & Desc */
+            .table td:nth-child(2) div.fw-bold {
+                font-size: 1.1rem;
+                margin-bottom: 0.25rem;
+            }
+
+            .table td:nth-child(2) div.small {
+                max-width: 100% !important;
+                white-space: normal;
+                /* Allow nice wrapping */
+            }
+
+            /* Status Row - Styled as a row inside the card */
+            .table td:nth-child(4) {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #f8fafc;
+                padding: 0.75rem 1rem;
+                border-radius: 12px;
+                margin-top: 1rem;
+                border: 1px solid var(--border);
+            }
+
+            .table td:nth-child(4)::before {
+                content: "Visibility Status";
+                font-weight: 600;
+                color: var(--slate);
+                font-size: 0.85rem;
+            }
+
+            /* Actions Row */
+            .table td:last-child {
+                margin-top: 1rem;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                padding-top: 1rem;
+                border-top: 1px dashed var(--border);
+            }
+
+            .action-btn {
+                width: 100%;
+                margin: 0;
+                border-radius: 8px;
+                height: 42px;
+                font-size: 1rem;
+                border-color: var(--border);
+                background: white;
+            }
+
+            .action-btn:first-child {
+                background: var(--primary-soft);
+                color: var(--primary);
+                border-color: transparent;
+            }
+
+            .action-btn.btn-delete {
+                background: #fef2f2;
+                color: #ef4444;
+                border-color: transparent;
             }
         }
     </style>
