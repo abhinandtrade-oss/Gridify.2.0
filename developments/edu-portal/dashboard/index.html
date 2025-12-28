@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - EduPortal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+</head>
+
+<body style="background-color: #f3f4f6;">
+
+    <!-- Navbar Reused -->
+    <header>
+        <div class="container navbar">
+            <a href="../index.html" class="logo"><i class="fas fa-graduation-cap"></i> EduPortal</a>
+            <div class="nav-cta" style="display: flex; gap: 1rem; align-items: center;">
+                <!-- Notifications Bell -->
+                <div style="position: relative; margin-right: 0.5rem;" id="notification-container">
+                    <button id="notif-bell-btn" class="btn btn-sm"
+                        style="background: transparent; border: 1px solid #e5e7eb; color: var(--text-main); position: relative; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-bell"></i>
+                        <span id="notif-badge"
+                            style="display: none; position: absolute; top: -5px; right: -5px; background: var(--danger-color); color: white; font-size: 0.65rem; padding: 2px 5px; border-radius: 10px; border: 2px solid white;">0</span>
+                    </button>
+
+                    <!-- Notifications Dropdown -->
+                    <div id="notif-dropdown"
+                        style="display: none; position: absolute; top: 120%; right: 0; width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: var(--shadow-lg); z-index: 10002; flex-direction: column;">
+                        <div
+                            style="padding: 1rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                            <h4 style="margin: 0;">Notifications</h4>
+                            <button onclick="clearAllNotifications()"
+                                style="background: none; border: none; color: var(--primary-color); font-size: 0.75rem; cursor: pointer;">Mark
+                                all as read</button>
+                        </div>
+                        <div id="notif-list" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Notifications injected here -->
+                            <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                <i class="fas fa-bell-slash fa-2x" style="margin-bottom: 0.5rem; opacity: 0.3;"></i>
+                                <p>No new notifications</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <span style="font-weight: 600;" id="user-name-display">Student</span>
+                <button onclick="document.getElementById('change-pass-modal').style.display='flex'"
+                    class="btn btn-sm btn-primary">Change Password</button>
+                <button id="logout-btn" class="btn btn-sm btn-secondary">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" style="padding: var(--spacing-lg) var(--spacing-sm);">
+        <!-- ... existing content ... -->
+        <!-- Welcome & Stats -->
+        <div style="margin-bottom: var(--spacing-lg);">
+            <h1 style="margin-bottom: var(--spacing-sm);">My Dashboard</h1>
+
+            <div class="card-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1rem;">
+                <!-- ... stats cards ... -->
+                <div class="card" style="padding: 1.5rem; flex-direction: row; align-items: center; gap: 1rem;">
+                    <div style="background: #e0e7ff; padding: 1rem; border-radius: 50%; color: var(--primary-color);">
+                        <i class="fas fa-book-open fa-2x"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700;" id="stat-courses-count">0</div>
+                        <div style="color: var(--text-muted);">Enrolled Courses</div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 1.5rem; flex-direction: row; align-items: center; gap: 1rem;">
+                    <div style="background: #fee2e2; padding: 1rem; border-radius: 50%; color: var(--danger-color);">
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700;" id="stat-watch-time">0 min 0s</div>
+                        <div style="color: var(--text-muted);">Watch Time</div>
+                    </div>
+                </div>
+
+                <div class="card"
+                    style="padding: 1.5rem; flex-direction: row; align-items: center; gap: 1rem; cursor: pointer;"
+                    onclick="document.getElementById('certificates-output-area').scrollIntoView({behavior: 'smooth'})">
+                    <div style="background: #fffbeb; padding: 1rem; border-radius: 50%; color: #d97706;">
+                        <i class="fas fa-medal fa-2x"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700;" id="stat-certs-count">0</div>
+                        <div style="color: var(--text-muted);">Certificates</div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 1.5rem; flex-direction: row; align-items: center; gap: 1rem;">
+                    <div style="background: #d1fae5; padding: 1rem; border-radius: 50%; color: var(--accent-color);">
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 1.5rem; font-weight: 700; text-transform: capitalize;" id="sub-status">-
+                        </div>
+                        <div style="color: var(--text-muted);">Subscription</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Class (Empty State) -->
+        <div style="margin-bottom: var(--spacing-xl);">
+            <h2 class="section-title" style="text-align: left; display: flex; align-items: center; gap: 1rem;">
+                Live Sessions
+            </h2>
+            <div class="card" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                <i class="fas fa-video-slash fa-3x" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+                <h3>No Live Classes Scheduled</h3>
+                <p>Check back later for upcoming sessions.</p>
+            </div>
+        </div>
+
+        <!-- Enrolled Courses -->
+        <div style="margin-bottom: var(--spacing-xl);">
+            <h2 class="section-title" style="text-align: left;">My Courses</h2>
+            <div id="courses-output-area">
+                <div class="card" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                    <i class="fas fa-folder-open fa-3x" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <h3>You haven't enrolled in any courses yet.</h3>
+                    <p style="margin-bottom: 1rem;">Browse our catalog to get started.</p>
+                    <a href="../courses.html" class="btn btn-primary">Browse Courses</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificates -->
+        <div style="margin-bottom: var(--spacing-xl);">
+            <h2 class="section-title" style="text-align: left; display: flex; align-items: center; gap: 1rem;">
+                My Certificates
+                <span class="badge badge-primary" id="cert-count">0</span>
+            </h2>
+            <div id="certificates-output-area" class="card-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div class="card"
+                    style="padding: 2rem; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
+                    <i class="fas fa-certificate fa-3x" style="margin-bottom: 1rem; opacity: 0.3;"></i>
+                    <p>Complete your exams to earn certificates.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="change-pass-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10001;">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Change Password</h3>
+            <form id="change-pass-form">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="current-pass" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="new-pass" class="form-control" required minlength="4"
+                        placeholder="Min 4 characters">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" id="confirm-pass" class="form-control" required minlength="4">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="document.getElementById('change-pass-modal').style.display='none'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Player Modal (Full Screen) -->
+    <div id="course-player-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f3f4f6; z-index: 20000; flex-direction: column;">
+        <!-- Player Header -->
+        <header style="background: #1F2937; color: white; padding: 0.75rem 0;">
+            <div class="container navbar"
+                style="max-width: 1400px; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button onclick="closeCoursePlayer()"
+                        style="background: none; border: none; color: white; cursor: pointer; font-size: 1.25rem;">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h3 id="player-course-title"
+                        style="margin-right: 1rem; border-right: 1px solid rgba(255,255,255,0.2); padding-right: 1.5rem;">
+                        Course Title</h3>
+                    <div id="player-item-meta"
+                        style="font-size: 0.85rem; background: rgba(255,255,255,0.1); padding: 0.25rem 0.75rem; border-radius: 4px; display: flex; align-items: center; gap: 0.5rem;">
+                        <span id="player-item-index">1 / 10</span>
+                        <span id="player-item-type-badge"
+                            style="font-weight: 700; text-transform: uppercase; font-size: 0.7rem; color: var(--accent-color);">Lesson</span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span id="player-item-title"
+                        style="font-weight: 500; opacity: 0.8; font-size: 0.95rem;">Introduction</span>
+                    <div
+                        style="width: 150px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden;">
+                        <div id="header-progress-bar"
+                            style="height: 100%; background: var(--accent-color); width: 0%; transition: width 0.3s;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div style="flex: 1; display: flex; overflow: hidden;">
+            <!-- Main Content Area -->
+            <div
+                style="flex: 1; overflow-y: auto; background: #000; display: flex; flex-direction: column; position: relative;">
+
+                <!-- Video Section -->
+                <div id="video-content-area"
+                    style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="width: 100%; max-width: 1000px; margin: 0 auto; position: relative;">
+                        <!-- 16:9 Container -->
+                        <div
+                            style="position: relative; padding-bottom: 56.25%; height: 0; background: black; overflow: hidden;">
+                            <div id="yt-player" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                            </div>
+                            <div
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent;">
+                            </div>
+                        </div>
+
+                        <!-- Custom Controls -->
+                        <div
+                            style="background: #1F2937; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <input type="range" id="video-seeker" class="custom-range" value="0" min="0" max="100"
+                                    step="0.1" style="width: 100%; cursor: default; pointer-events: none;"
+                                    onkeydown="return false;">
+                                <div
+                                    style="display: flex; justify-content: space-between; color: white; font-size: 0.85rem;">
+                                    <span id="time-display">00:00 / 00:00</span>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="color: rgba(255,255,255,0.6);">Lesson Progress:</span>
+                                        <span id="course-status-badge"
+                                            style="font-weight: 600; color: var(--accent-color);">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <button id="player-prev-btn" class="btn btn-secondary" onclick="prevItem()">
+                                    <i class="fas fa-step-backward"></i> Previous
+                                </button>
+                                <button id="custom-play-btn" class="btn btn-primary" onclick="togglePlay()">
+                                    <i class="fas fa-play"></i> Play
+                                </button>
+                                <button class="btn btn-secondary" onclick="restartVideo()">
+                                    <i class="fas fa-redo"></i> Restart
+                                </button>
+                                <button class="btn btn-secondary" onclick="rewindVideo()">
+                                    <i class="fas fa-undo"></i> -10s
+                                </button>
+                                <button id="player-next-btn" class="btn btn-primary" onclick="nextItem()" disabled
+                                    style="margin-left: auto; background: var(--accent-color); border-color: var(--accent-color);">
+                                    Next <i class="fas fa-step-forward"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Section (Hidden by Default) -->
+                <div id="exam-content-area"
+                    style="display: none; flex: 1; background: white; padding: 2rem; overflow-y: auto;">
+                    <div style="max-width: 800px; margin: 0 auto;">
+                        <h2 id="exam-display-title" style="margin-bottom: 1.5rem;">Exam Title</h2>
+                        <div id="exam-questions-container"></div>
+                        <button class="btn btn-primary btn-lg" style="margin-top: 2rem; width: 100%;"
+                            onclick="submitExam()">
+                            Submit Exam
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Complete Section (Hidden) -->
+                <div id="complete-content-area"
+                    style="display: none; flex: 1; background: white; align-items:center; justify-content:center; flex-direction:column; text-align:center;">
+                    <i class="fas fa-check-circle fa-5x" style="color: var(--accent-color); margin-bottom: 1.5rem;"></i>
+                    <h2>Congratulations!</h2>
+                    <p>You have successfully completed this section.</p>
+                </div>
+            </div>
+
+            <!-- Sidebar (Syllabus) -->
+            <div
+                style="width: 350px; background: white; border-left: 1px solid #e5e7eb; display: flex; flex-direction: column;">
+                <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb;">
+                    <h4 style="margin-bottom: 0.5rem;">Course Content</h4>
+                    <div style="height: 6px; background: #f3f4f6; border-radius: 3px; overflow: hidden;">
+                        <div id="overall-progress-bar"
+                            style="height: 100%; background: var(--primary-color); width: 0%; transition: width 0.3s;">
+                        </div>
+                    </div>
+                </div>
+                <div id="sidebar-syllabus-list" style="flex: 1; overflow-y: auto; padding: 1rem;">
+                    <!-- Items rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.85rem;">
+        powered by <a href="https://www.gridify.in" target="_blank"
+            style="color: inherit; text-decoration: underline;">Gridify</a>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script type="module" src="../scripts/firebase-config.js"></script>
+    <script src="../scripts/auth.js"></script>
+    <script src="../scripts/db.js"></script>
+    <!-- YouTube API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // State
+        let player;
+        let isPlayerReady = false;
+        let currentCourse = null;
+        let currentItem = null;
+        let currentItemIdx = 0;
+        let progressInterval = null;
+        let completedItems = new Set(); // IDs of completed syllabus items
+        let examAttempts = {}; // { itemId: count }
+        let sessionWatchTime = 0; // Current session watch time in seconds
+
+        function onYouTubeIframeAPIReady() {
+            isPlayerReady = true;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            let attempts = 0;
+            while ((!window.auth || !window.db) && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                attempts++;
+            }
+
+            if (!window.auth || !window.db) return;
+
+            const isAuth = await Auth.checkProtection('student');
+            if (!isAuth) return;
+
+            if (window.auth.currentUser) {
+                const uid = window.auth.currentUser.uid;
+                loadMyCourses(uid);
+                loadCertificates(uid);
+                loadWatchTime(uid);
+                initNotifications(uid);
+
+                // Fetch Profile
+                const doc = await window.db.collection('users').doc(uid).get();
+                if (doc.exists) {
+                    Auth.userProfile = doc.data();
+                    document.getElementById('user-name-display').innerText = Auth.userProfile.name;
+                    document.getElementById('sub-status').innerText = Auth.userProfile.subscription || 'Inactive';
+                }
+            }
+        });
+
+        // --- Notifications Logic ---
+        let userNotifications = [];
+
+        function initNotifications(uid) {
+            const bellBtn = document.getElementById('notif-bell-btn');
+            const dropdown = document.getElementById('notif-dropdown');
+
+            // Toggle Dropdown
+            bellBtn.onclick = (e) => {
+                e.stopPropagation();
+                dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+            };
+
+            // Close when clicking outside
+            document.addEventListener('click', () => { dropdown.style.display = 'none'; });
+            dropdown.onclick = (e) => e.stopPropagation();
+
+            // Real-time listener
+            DB.listenToNotifications(uid, (notifs) => {
+                userNotifications = notifs;
+                renderNotifications();
+            });
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            const unreadCount = userNotifications.filter(n => !n.read).length;
+            const badge = document.getElementById('notif-badge');
+
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (userNotifications.length === 0) {
+                list.innerHTML = `
+                    <div style="padding: 2.5rem; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-bell-slash fa-2x" style="margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                        <p style="font-size: 0.9rem;">No notifications yet.</p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = userNotifications.map(n => {
+                const iconMap = {
+                    'success': { icon: 'fa-check-circle', color: '#10B981', bg: '#ecfdf5' },
+                    'info': { icon: 'fa-info-circle', color: '#3B82F6', bg: '#eff6ff' },
+                    'warning': { icon: 'fa-exclamation-triangle', color: '#F59E0B', bg: '#fffbeb' },
+                    'error': { icon: 'fa-times-circle', color: '#EF4444', bg: '#fef2f2' }
+                };
+                const style = iconMap[n.type] || iconMap['info'];
+
+                return `
+                    <div onclick="handleNotifClick('${n.id}', '${n.link || ''}')" 
+                         style="padding: 1rem; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.2s; display: flex; gap: 0.75rem; position: relative; ${n.read ? '' : 'background: #fafbff;'}">
+                        ${n.read ? '' : '<div style="position: absolute; top: 1rem; right: 1rem; width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%;"></div>'}
+                        <div style="width: 36px; height: 36px; border-radius: 50%; background: ${style.bg}; color: ${style.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas ${style.icon}"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 0.85rem; margin-bottom: 0.15rem; color: #1F2937;">${n.title}</div>
+                            <div style="font-size: 0.8rem; color: #6B7280; line-height: 1.4;">${n.message}</div>
+                            <div style="font-size: 0.7rem; color: #9CA3AF; margin-top: 0.4rem;">${timeSince(n.createdAt)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.handleNotifClick = async (id, link) => {
+            await DB.markNotificationAsRead(id);
+            if (link) {
+                // Determine if link is relative or absolute
+                if (link.startsWith('http') || link.includes('.html')) {
+                    if (link.includes('certificate.html')) {
+                        window.open('../' + link, '_blank');
+                    } else if (link.includes('dashboard/index.html')) {
+                        document.getElementById('notif-dropdown').style.display = 'none';
+                    } else {
+                        window.location.href = link;
+                    }
+                }
+            }
+        };
+
+        window.clearAllNotifications = async () => {
+            const unread = userNotifications.filter(n => !n.read);
+            for (const n of unread) {
+                await DB.markNotificationAsRead(n.id);
+            }
+        };
+
+        function timeSince(date) {
+            if (!date) return 'Just now';
+            // Handle Firestore Timestamp or JS Date
+            const timeMs = date.seconds ? date.seconds * 1000 : (date.toDate ? date.toDate().getTime() : new Date(date).getTime());
+            if (isNaN(timeMs)) return 'Just now';
+
+            const seconds = Math.floor((new Date() - timeMs) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " years ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " months ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " days ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hours ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " minutes ago";
+            return Math.floor(seconds) + " seconds ago";
+        }
+
+        async function loadCertificates(uid) {
+            const container = document.getElementById('certificates-output-area');
+            try {
+                const certs = await DB.getCertificates(uid);
+                document.getElementById('cert-count').innerText = certs.length;
+                document.getElementById('stat-certs-count').innerText = certs.length;
+
+                if (certs.length === 0) {
+                    container.innerHTML = `
+                        <div class="card" style="padding: 2rem; text-align: center; color: var(--text-muted); grid-column: 1/-1;">
+                            <i class="fas fa-certificate fa-3x" style="margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p>Complete your exams to earn certificates.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = certs.map(c => `
+                    <div class="card" style="padding: 1.5rem; display: flex; flex-direction: row; align-items: center; gap: 1.5rem;">
+                        <div style="background: #fffbeb; color: #d97706; padding: 1rem; border-radius: 12px; font-size: 1.5rem;">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="margin-bottom: 0.25rem;">${c.courseTitle}</h4>
+                            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                                Issued: ${new Date(c.issuedAt.seconds * 1000).toLocaleDateString()}
+                            </div>
+                            <button class="btn btn-sm btn-secondary" onclick="window.open('../certificate.html?id=${c.id}', '_blank')">
+                                <i class="fas fa-external-link-alt"></i> View Certificate
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadMyCourses(uid) {
+            const container = document.getElementById('courses-output-area');
+            container.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+            try {
+                const courses = await DB.getUserEnrolledCourses(uid);
+                const requests = await DB.getPaymentRequests(uid);
+                const pendingRequests = requests.filter(r => r.status === 'pending');
+
+                // Update Badge
+                document.getElementById('stat-courses-count').innerText = courses.length;
+
+                let html = '';
+
+                // Show Pending Verification Section
+                if (pendingRequests.length > 0) {
+                    html += `<div style="margin-bottom: 2rem;">
+                        <h3 style="margin-bottom: 1rem; color: #F59E0B;"><i class="fas fa-clock"></i> Verification Pending</h3>
+                        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">`;
+                    pendingRequests.forEach(p => {
+                        html += `
+                            <div class="card" style="display:flex; flex-direction:column; border: 1px dashed #F59E0B;">
+                                <div style="background:#fff7ed; height:120px; display:flex; align-items:center; justify-content:center; border-radius:8px 8px 0 0;">
+                                    <i class="fas fa-receipt fa-3x" style="color:#F59E0B; opacity:0.5;"></i>
+                                </div>
+                                <div style="padding:1.5rem; flex:1; display:flex; flex-direction:column;">
+                                    <h3 style="margin-bottom:0.5rem; font-size: 1.1rem;">${p.courseTitle}</h3>
+                                    <p style="color:var(--text-muted); font-size:0.85rem; flex:1;">Payment of ₹${p.price} is under verification.</p>
+                                    <button class="btn btn-sm btn-secondary" style="margin-top:1rem; width:100%; cursor: default; background: #fff7ed; color: #9a3412;" disabled>
+                                        Pending Approval
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div></div>`;
+                }
+
+                if (courses.length === 0 && pendingRequests.length === 0) {
+                    container.innerHTML = `<div class="card" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-folder-open fa-3x" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <h3>No Courses Found</h3>
+                        <a href="../courses.html" class="btn btn-primary">Browse Catalog</a>
+                    </div>`;
+                    return;
+                }
+
+                if (courses.length > 0) {
+                    html += `<h3 style="margin-bottom: 1rem;">Active Enrollments</h3>
+                             <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">`;
+                    courses.forEach(c => {
+                        html += `
+                            <div class="card" style="display:flex; flex-direction:column;">
+                                <div style="background:#e0e7ff; height:140px; display:flex; align-items:center; justify-content:center; border-radius:8px 8px 0 0;">
+                                    <i class="fas fa-layer-group fa-3x" style="color:var(--primary-color); opacity:0.5;"></i>
+                                </div>
+                                <div style="padding:1.5rem; flex:1; display:flex; flex-direction:column;">
+                                    <span class="badge badge-secondary" style="align-self:flex-start; margin-bottom:0.5rem;">${c.category}</span>
+                                    <h3 style="margin-bottom:0.5rem;">${c.title}</h3>
+                                    <p style="color:var(--text-muted); font-size:0.9rem; flex:1;">${c.description}</p>
+                                    <button onclick="openCoursePlayer('${c.id}')" class="btn btn-primary" style="margin-top:1rem; width:100%;">
+                                        <i class="fas fa-book-open"></i> View Course
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+
+                container.innerHTML = html;
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = '<div class="card" style="padding:2rem;">Error loading courses.</div>';
+            }
+        }
+
+        async function loadWatchTime(uid) {
+            try {
+                const totalSeconds = await DB.getTotalWatchTime(uid);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                document.getElementById('stat-watch-time').innerText = `${minutes} min ${seconds}s`;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // --- Course Player Logic ---
+
+        window.openCoursePlayer = async (courseId) => {
+            const courses = await DB.getCourses();
+            currentCourse = courses.find(c => c.id === courseId);
+            if (!currentCourse) {
+                Auth.showToast("Course record not found", "error");
+                return;
+            }
+
+            // Reset progression state for this course view
+            completedItems = new Set();
+            examAttempts = {};
+            // Fetch saved progress from DB if exists
+            if (window.auth.currentUser) {
+                const prog = await DB.getCourseProgress(window.auth.currentUser.uid, courseId);
+                if (prog) {
+                    if (prog.completedItems) completedItems = new Set(prog.completedItems);
+                    if (prog.examAttempts) examAttempts = prog.examAttempts;
+                }
+            }
+
+            document.getElementById('course-player-modal').style.display = 'flex';
+            document.getElementById('player-course-title').innerText = currentCourse.title;
+
+            renderSyllabusSidebar();
+
+            // Auto-Resume: Skip to the first uncompleted item
+            if (currentCourse.syllabus && currentCourse.syllabus.length > 0) {
+                let resumeId = currentCourse.syllabus[0].id;
+                for (const item of currentCourse.syllabus) {
+                    if (!completedItems.has(item.id)) {
+                        resumeId = item.id;
+                        break;
+                    }
+                }
+                selectSyllabusItem(resumeId);
+            }
+            updateOverallProgress();
+        };
+
+        function renderSyllabusSidebar() {
+            const list = document.getElementById('sidebar-syllabus-list');
+            list.innerHTML = '';
+
+            if (!currentCourse.syllabus) return;
+
+            currentCourse.syllabus.forEach((item, idx) => {
+                const isCompleted = completedItems.has(item.id);
+                // Locked if previous item is not completed (and it's not the first item)
+                let isLocked = false;
+                if (idx > 0) {
+                    const prevItem = currentCourse.syllabus[idx - 1];
+                    if (!completedItems.has(prevItem.id)) isLocked = true;
+                }
+
+                const el = document.createElement('div');
+                const isActive = currentItem && currentItem.id === item.id;
+
+                el.style.padding = '1rem';
+                el.style.borderRadius = '8px';
+                el.style.marginBottom = '0.5rem';
+                el.style.display = 'flex';
+                el.style.alignItems = 'center';
+                el.style.gap = '0.75rem';
+                el.style.opacity = isLocked ? '0.5' : '1';
+                el.style.cursor = isLocked ? 'not-allowed' : 'pointer';
+                el.style.background = isActive ? '#EEF2FF' : 'transparent';
+                el.style.border = isActive ? '1px solid var(--primary-color)' : '1px solid transparent';
+
+                let icon = item.type === 'chapter' ? 'fa-play-circle' : 'fa-clipboard-check';
+                if (isLocked) icon = 'fa-lock';
+                else if (isCompleted) icon = 'fa-check-circle';
+
+                const color = isLocked ? '#9ca3af' : (isCompleted ? 'var(--accent-color)' : (item.type === 'chapter' ? 'var(--primary-color)' : 'var(--accent-color)'));
+
+                if (!isLocked) {
+                    el.onclick = () => selectSyllabusItem(item.id);
+                }
+
+                el.innerHTML = `
+                    <i class="fas ${icon}" style="color: ${color}; font-size: 1.1rem;"></i>
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.9rem; font-weight: ${isActive ? '600' : '400'};">${item.title}</div>
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">${item.type === 'chapter' ? 'Video Lesson' : 'Exam'}</small>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        window.selectSyllabusItem = async (itemId) => {
+            const idx = currentCourse.syllabus.findIndex(i => i.id === itemId);
+            if (idx === -1) return;
+
+            // Prerequisite check
+            if (idx > 0) {
+                const prevItem = currentCourse.syllabus[idx - 1];
+                if (!completedItems.has(prevItem.id)) {
+                    Auth.showToast("Please complete the previous lesson first.", "warning");
+                    return;
+                }
+            }
+
+            currentItem = currentCourse.syllabus[idx];
+            currentItemIdx = idx;
+
+            renderSyllabusSidebar();
+            document.getElementById('player-item-title').innerText = currentItem.title;
+            document.getElementById('player-item-index').innerText = `${idx + 1} / ${currentCourse.syllabus.length}`;
+            document.getElementById('player-item-type-badge').innerText = currentItem.type;
+            document.getElementById('player-item-type-badge').style.color = currentItem.type === 'chapter' ? 'var(--accent-color)' : '#f59e0b';
+
+            // Nav Button States
+            document.getElementById('player-prev-btn').disabled = (idx === 0);
+            document.getElementById('player-next-btn').disabled = !completedItems.has(currentItem.id);
+
+            const videoArea = document.getElementById('video-content-area');
+            const examArea = document.getElementById('exam-content-area');
+
+            if (currentItem.type === 'chapter') {
+                videoArea.style.display = 'flex';
+                examArea.style.display = 'none';
+                initChapterVideo(currentItem.videoUrl);
+            } else {
+                videoArea.style.display = 'none';
+                examArea.style.display = 'block';
+                initExamInterface(currentItem);
+            }
+        };
+
+        window.nextItem = () => {
+            if (currentItemIdx < currentCourse.syllabus.length - 1) {
+                const nextId = currentCourse.syllabus[currentItemIdx + 1].id;
+                selectSyllabusItem(nextId);
+            }
+        };
+
+        window.prevItem = () => {
+            if (currentItemIdx > 0) {
+                const prevId = currentCourse.syllabus[currentItemIdx - 1].id;
+                selectSyllabusItem(prevId);
+            }
+        };
+
+        function updateOverallProgress() {
+            if (!currentCourse || !currentCourse.syllabus) return;
+            const total = currentCourse.syllabus.length;
+            const done = completedItems.size;
+            const p = (done / total) * 100;
+
+            document.getElementById('overall-progress-bar').style.width = p + '%';
+            document.getElementById('header-progress-bar').style.width = p + '%';
+        }
+
+        function markItemCompleted() {
+            if (!currentItem || completedItems.has(currentItem.id)) return;
+
+            completedItems.add(currentItem.id);
+            document.getElementById('player-next-btn').disabled = false;
+            Auth.showToast("Lesson Completed!", "success");
+            renderSyllabusSidebar();
+            updateOverallProgress();
+
+            // Save to DB
+            if (window.auth.currentUser && currentCourse) {
+                DB.saveCourseProgress(window.auth.currentUser.uid, currentCourse.id, {
+                    completedItems: Array.from(completedItems),
+                    lastItemId: currentItem.id,
+                    examAttempts: examAttempts
+                });
+            }
+        }
+
+        async function saveAttempts() {
+            if (window.auth.currentUser && currentCourse) {
+                await DB.saveCourseProgress(window.auth.currentUser.uid, currentCourse.id, {
+                    examAttempts: examAttempts
+                });
+            }
+        }
+
+        function initChapterVideo(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            let vId = (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
+
+            if (!vId) {
+                Auth.showToast("Invalid video source", "error");
+                return;
+            }
+
+            // Reset UI
+            document.getElementById('video-seeker').value = 0;
+            updateTimeDisplay(0, 0);
+
+            if (player && typeof player.loadVideoById === 'function') {
+                player.loadVideoById(vId);
+                startTracking();
+            } else {
+                player = new YT.Player('yt-player', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: vId,
+                    playerVars: { 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'rel': 0 },
+                    events: {
+                        'onReady': (e) => { e.target.playVideo(); startTracking(); },
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+        }
+
+        async function initExamInterface(exam) {
+            const container = document.getElementById('exam-questions-container');
+            document.getElementById('exam-display-title').innerText = exam.title;
+            container.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Checking status...</div>';
+
+            const attempts = examAttempts[exam.id] || 0;
+            const isCompleted = completedItems.has(exam.id);
+
+            // 1. Check if already submitted and pending review
+            if (window.auth.currentUser) {
+                const subs = await DB.getExamSubmissions(window.auth.currentUser.uid, currentCourse.id, exam.id);
+                if (subs.length > 0) {
+                    const latest = subs[subs.length - 1]; // Get most recent
+                    if (latest.status === 'pending') {
+                        renderExamPendingUI(container);
+                        return;
+                    } else if (latest.status === 'reviewed') {
+                        renderExamReviewedUI(container, latest);
+                        return;
+                    }
+                }
+            }
+
+            container.innerHTML = '';
+
+            // LOCKOUT CHECK: If failed twice and not completed
+            if (!isCompleted && attempts >= 2) {
+                renderExamFailureUI(container);
+                return;
+            }
+
+            if (!exam.questions || exam.questions.length === 0) {
+                container.innerHTML = '<p>No questions found in this exam.</p>';
+                return;
+            }
+
+            exam.questions.forEach((q, qIdx) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'card';
+                qDiv.style.padding = '1.5rem';
+                qDiv.style.marginBottom = '1rem';
+
+                let optionsHtml = '';
+                if (q.type === 'mcq') {
+                    q.options.forEach((opt, oIdx) => {
+                        optionsHtml += `
+                            <label style="display: block; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="q_${qIdx}" value="${opt}" style="margin-right: 0.5rem;">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                } else {
+                    optionsHtml = `<textarea class="form-control" rows="3" placeholder="Type your answer here..."></textarea>`;
+                }
+
+                qDiv.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 1rem;">Q${qIdx + 1}: ${q.questionText}</div>
+                    ${optionsHtml}
+                `;
+                container.appendChild(qDiv);
+            });
+        }
+
+        window.submitExam = async () => {
+            if (!currentItem || !currentItem.questions) return;
+
+            const isFinal = currentItem.examType === 'end' || currentItem.questions.some(q => q.type === 'text');
+            const container = document.getElementById('exam-questions-container');
+            const qCards = container.querySelectorAll('.card');
+
+            let answers = [];
+            let score = 0;
+            let totalPossible = 0;
+
+            currentItem.questions.forEach((q, idx) => {
+                const qScore = parseInt(q.score) || 5;
+                totalPossible += qScore;
+
+                let userAns = '';
+                if (q.type === 'mcq') {
+                    const selected = qCards[idx].querySelector(`input[name="q_${idx}"]:checked`);
+                    userAns = selected ? selected.value : '';
+                    if (userAns.trim() === (q.correctAnswer || '').trim()) {
+                        score += qScore;
+                    }
+                } else {
+                    userAns = qCards[idx].querySelector('textarea')?.value || '';
+                }
+
+                answers.push({
+                    questionText: q.questionText,
+                    type: q.type,
+                    userAns: userAns,
+                    correctAns: q.correctAnswer || '',
+                    maxScore: qScore,
+                    awardedScore: 0 // Settled by admin
+                });
+            });
+
+            if (isFinal) {
+                // Submit for Review
+                container.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Submitting for review...</div>';
+
+                await DB.submitExam({
+                    uid: window.auth.currentUser.uid,
+                    userName: Auth.userProfile ? Auth.userProfile.name : 'Unknown Student',
+                    courseId: currentCourse.id,
+                    courseTitle: currentCourse.title,
+                    itemId: currentItem.id,
+                    itemTitle: currentItem.title,
+                    answers: answers,
+                    autoScore: score, // Base score from MCQs
+                    totalPossible: totalPossible
+                });
+
+                renderExamPendingUI(container);
+            } else {
+                // Instant Result for MCQs (Quizzes)
+                const percent = totalPossible > 0 ? (score / totalPossible) * 100 : 0;
+                const passThreshold = parseInt(currentItem.passPercentage) || 50;
+                const passed = percent >= passThreshold;
+
+                if (!passed) {
+                    const currentAttempts = (examAttempts[currentItem.id] || 0);
+                    if (currentAttempts >= 2) {
+                        renderExamFailureUI(container);
+                        return;
+                    }
+                    examAttempts[currentItem.id] = currentAttempts + 1;
+                    saveAttempts();
+                }
+
+                const attemptsUsed = examAttempts[currentItem.id] || 0;
+                const hasMoreChances = attemptsUsed < 2;
+
+                if (passed) {
+                    container.innerHTML = `
+                    <div class="card" style="padding: 2rem; text-align: center;">
+                        <i class="fas fa-check-circle fa-4x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
+                        <h2>Exam Passed!</h2>
+                        <p style="font-size: 1.25rem; margin: 1rem 0;">Achieved <strong>${score}</strong> out of <strong>${totalPossible}</strong> points (${Math.floor(percent)}%)</p>
+                        <p style="color: var(--text-muted);">You have unlocked the next section.</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                            <button class="btn btn-primary" onclick="nextItem()">Continue to Next Item</button>
+                            <button class="btn btn-secondary" onclick="prevItem()">Review Previous Lesson</button>
+                        </div>
+                    </div>
+                `;
+                    markItemCompleted();
+                } else {
+                    renderExamResultUI(container, score, totalPossible, percent, passThreshold, attemptsUsed, hasMoreChances);
+                }
+            }
+        };
+
+        function renderExamResultUI(container, score, totalPossible, percent, passThreshold, attemptsUsed, hasMoreChances) {
+            container.innerHTML = `
+                <div class="card" style="padding: 2rem; text-align: center;">
+                    <i class="fas fa-times-circle fa-4x" style="color: var(--danger-color); margin-bottom: 1rem;"></i>
+                    <h2>Exam Failed</h2>
+                    <p style="font-size: 1.25rem; margin: 1rem 0;">Achieved <strong>${score}</strong> out of <strong>${totalPossible}</strong> points (${Math.floor(percent)}%)</p>
+                    <p style="color: var(--danger-color); font-weight: 600;">Chance ${attemptsUsed} of 2 Used. ${passThreshold}% required to pass.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+                        ${hasMoreChances ? 'You have one more attempt before your progress is reset.' : 'All attempts exhausted.'}
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                        ${hasMoreChances ?
+                    `<button class="btn btn-primary" onclick="initExamInterface(currentItem)">Try Again</button>` :
+                    `<button class="btn btn-primary" onclick="handleExamFailure()">Reset Course & Review</button>`
+                }
+                        <button class="btn btn-secondary" onclick="prevItem()">Review Previous Lesson</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderExamFailureUI(container) {
+            container.innerHTML = `
+                <div class="card" style="padding: 3rem; text-align: center;">
+                    <i class="fas fa-lock fa-4x" style="color: var(--danger-color); margin-bottom: 1.5rem;"></i>
+                    <h2>Attempts Exhausted</h2>
+                    <p style="margin: 1rem 0; color: var(--text-muted);">You have failed this exam twice. In order to ensure mastery of the material, you must reset the course and review the lessons again.</p>
+                    <button class="btn btn-primary" onclick="handleExamFailure()">
+                        <i class="fas fa-redo"></i> Reset Course to Beginning
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderExamPendingUI(container) {
+            container.innerHTML = `
+                <div class="card" style="padding: 3rem; text-align: center;">
+                    <i class="fas fa-history fa-4x" style="color: var(--primary-color); margin-bottom: 1.5rem;"></i>
+                    <h2>Submitted for Review</h2>
+                    <p style="margin: 1rem 0; color: var(--text-muted);">Since this exam contains written responses, an instructor will review your answers manually. You will receive your results here once the review is complete.</p>
+                    <button class="btn btn-secondary" onclick="closeCoursePlayer()">Back to Dashboard</button>
+                </div>
+            `;
+        }
+
+        function renderExamReviewedUI(container, sub) {
+            const passed = sub.passed;
+            container.innerHTML = `
+                <div class="card" style="padding: 3rem; text-align: center;">
+                    <i class="fas ${passed ? 'fa-check-circle' : 'fa-times-circle'} fa-4x" style="color: ${passed ? 'var(--accent-color)' : 'var(--danger-color)'}; margin-bottom: 1.5rem;"></i>
+                    <h2>Exam Results Verified</h2>
+                    <p style="font-size: 1.25rem;">Final Score: <strong>${sub.score} / ${sub.totalPossible}</strong></p>
+                    <p style="margin: 1rem 0; color: var(--text-muted); font-style: italic;">" ${sub.feedback || 'No feedback provided.'} "</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; margin-top: 1.5rem;">
+                        ${passed ? `
+                            <button class="btn btn-success" style="width: 100%; max-width: 300px;" onclick="window.open('../certificate.html?id=${sub.certificateId}', '_blank')">
+                                <i class="fas fa-certificate"></i> View Certificate
+                            </button>
+                            <button class="btn btn-primary" style="width: 100%; max-width: 300px;" onclick="nextItem()">Continue to Next Item</button>
+                        ` : `
+                            <button class="btn btn-danger" style="width: 100%; max-width: 300px;" onclick="handleExamFailure()">Reset & Try Again</button>
+                        `}
+                         <button class="btn btn-secondary" style="width: 100%; max-width: 300px;" onclick="closeCoursePlayer()">Close</button>
+                    </div>
+                </div>
+            `;
+            if (passed) markItemCompleted();
+        }
+
+        window.handleExamFailure = async () => {
+            const currentId = currentItem ? currentItem.id : null;
+            if (!currentId) return;
+
+            // 1. Find the "Last Milestone" (Previous Exam)
+            const syllabus = currentCourse.syllabus;
+            const currentIdx = syllabus.findIndex(item => item.id === currentId);
+
+            let milestoneIdx = -1;
+            // Look backwards for the previous exam
+            for (let i = currentIdx - 1; i >= 0; i--) {
+                if (syllabus[i].type === 'exam') {
+                    milestoneIdx = i;
+                    break;
+                }
+            }
+
+            // 2. Calculate New Completion Set
+            let newCompletedList = [];
+            if (milestoneIdx >= 0) {
+                // Keep everything up to and including the milestone
+                newCompletedList = syllabus.slice(0, milestoneIdx + 1).map(item => item.id);
+                Auth.showToast(`Resetting progress to last milestone: ${syllabus[milestoneIdx].title}`, "warning");
+            } else {
+                // No previous milestone, full reset
+                newCompletedList = [];
+                Auth.showToast("Mastery Not Achieved. Resetting course to beginning.", "error");
+            }
+
+            completedItems = new Set(newCompletedList);
+
+            // 3. Clear Attempts for the failed exam
+            delete examAttempts[currentId];
+
+            // 4. Clear submission records so the exam questions can be seen again
+            if (window.auth.currentUser) {
+                await DB.clearFailedSubmission(window.auth.currentUser.uid, currentCourse.id, currentId);
+            }
+
+            // 5. Update UI & Persist
+            updateOverallProgress();
+            renderSyllabusSidebar();
+
+            if (window.auth.currentUser && currentCourse) {
+                await DB.saveCourseProgress(window.auth.currentUser.uid, currentCourse.id, {
+                    completedItems: newCompletedList,
+                    examAttempts: examAttempts,
+                    lastItemId: milestoneIdx >= 0 ? syllabus[milestoneIdx].id : null
+                });
+            }
+
+            // Select the milestone item to show where they are
+            if (milestoneIdx >= 0) {
+                selectSyllabusItem(syllabus[milestoneIdx].id);
+            } else if (syllabus.length > 0) {
+                selectSyllabusItem(syllabus[0].id);
+            }
+        };
+
+        window.closeCoursePlayer = async () => {
+            if (player) player.stopVideo();
+            if (progressInterval) clearInterval(progressInterval);
+            await syncWatchTime();
+            document.getElementById('course-player-modal').style.display = 'none';
+        };
+
+        // Reuse existing control functions
+        window.togglePlay = () => {
+            if (!player) return;
+            const state = player.getPlayerState();
+            if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+            else player.playVideo();
+        };
+
+        window.seekVideo = (percent) => {
+            if (!player) return;
+            player.seekTo(player.getDuration() * (percent / 100), true);
+        };
+
+        window.restartVideo = () => { if (player) player.seekTo(0, true); };
+        window.rewindVideo = () => { if (player) player.seekTo(Math.max(0, player.getCurrentTime() - 10), true); };
+
+        function updateTimeDisplay(cur, total) {
+            const format = (s) => Math.floor(s / 60) + ":" + (Math.floor(s % 60)).toString().padStart(2, '0');
+            document.getElementById('time-display').innerText = format(cur) + " / " + format(total);
+        }
+
+        function startTracking() {
+            if (progressInterval) clearInterval(progressInterval);
+            sessionWatchTime = 0;
+            progressInterval = setInterval(() => {
+                if (!player || typeof player.getCurrentTime !== 'function') return;
+
+                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    sessionWatchTime += 1;
+                    if (sessionWatchTime % 30 === 0) {
+                        syncWatchTime();
+                    }
+                }
+
+                const cur = player.getCurrentTime();
+                const total = player.getDuration();
+                if (total > 0) {
+                    const p = (cur / total) * 100;
+                    document.getElementById('video-seeker').value = p;
+                    updateTimeDisplay(cur, total);
+
+                    const displayP = Math.min(100, Math.round(p));
+                    document.getElementById('course-status-badge').innerText = displayP + "%";
+
+                    // AUTO COMPLETE AT 98%
+                    if (p >= 98) {
+                        markItemCompleted();
+                    }
+                }
+            }, 1000);
+        }
+
+        async function syncWatchTime() {
+            if (!window.auth.currentUser || !currentCourse || sessionWatchTime <= 0) return;
+            const watchToSync = sessionWatchTime;
+            sessionWatchTime = 0;
+            try {
+                const docId = `${window.auth.currentUser.uid}_${currentCourse.id}`;
+                await window.db.collection('course_progress').doc(docId).set({
+                    uid: window.auth.currentUser.uid,
+                    courseId: currentCourse.id,
+                    watchTime: firebase.firestore.FieldValue.increment(watchToSync),
+                    lastUpdated: new Date()
+                }, { merge: true });
+                loadWatchTime(window.auth.currentUser.uid);
+            } catch (e) {
+                console.error("Sync Watch Time Error:", e);
+                sessionWatchTime += watchToSync;
+            }
+        }
+
+        function onPlayerStateChange(e) {
+            const btn = document.getElementById('custom-play-btn');
+            if (e.data === YT.PlayerState.PLAYING) {
+                btn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i> Play';
+            }
+
+            // SNAP TO 100% ON END
+            if (e.data === YT.PlayerState.ENDED) {
+                document.getElementById('video-seeker').value = 100;
+                document.getElementById('course-status-badge').innerText = "100%";
+                markItemCompleted();
+            }
+        }
+
+        // Change Password Handler
+        document.getElementById('change-pass-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currPass = document.getElementById('current-pass').value;
+            const p1 = document.getElementById('new-pass').value;
+            const p2 = document.getElementById('confirm-pass').value;
+
+            if (p1 !== p2) {
+                Auth.showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            const res = await Auth.changePassword(currPass, p1);
+            if (res.success) {
+                Auth.showToast('Password Updated Successfully', 'success');
+                document.getElementById('change-pass-modal').style.display = 'none';
+                document.getElementById('change-pass-form').reset();
+            } else {
+                Auth.showToast(res.message, 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

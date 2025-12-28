@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - EduPortal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo"><i class="fas fa-graduation-cap"></i> EduPortal</a>
+            <div class="menu-toggle" id="mobile-menu"><i class="fas fa-bars"></i></div>
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="courses.html">Courses</a>
+                <a href="about.html" class="active">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+            <div class="nav-cta" id="auth-buttons">
+                <a href="auth/login.html" class="btn btn-secondary">Login</a>
+                <a href="auth/signup.html" class="btn btn-primary">Get Started</a>
+            </div>
+            <div class="nav-cta hidden" id="user-menu">
+                <a href="dashboard/index.html" class="btn btn-primary">Dashboard</a>
+                <button id="logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" style="padding: var(--spacing-lg) 0; background: var(--bg-color);">
+        <div class="container">
+            <h1>About EduPortal</h1>
+            <p>We are dedicated to democratizing education through technology.</p>
+        </div>
+    </section>
+
+    <section class="container" style="padding: var(--spacing-xl) var(--spacing-sm);">
+        <div style="display: flex; gap: var(--spacing-xl); flex-wrap: wrap; align-items: center;">
+            <div style="flex: 1; min-width: 300px;">
+                <h2 class="section-title" style="text-align: left;">Our Mission</h2>
+                <p style="margin-bottom: 1rem;">At EduPortal, we believe that education is a fundamental right, not a
+                    privilege. Our mission is to provide high-quality, accessible learning resources to students around
+                    the globe.</p>
+                <p>Whether you're looking to master a new skill, advance your career, or simply explore a passion, we
+                    have the tools you need to succeed.</p>
+            </div>
+            <div
+                style="flex: 1; min-width: 300px; height: 300px; background-color: var(--border-color); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-university fa-5x" style="color: var(--text-muted);"></i>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" style="padding: var(--spacing-xl) var(--spacing-sm);">
+        <h2 class="section-title">Meet Our Instructors</h2>
+        <div class="card-grid">
+            <div class="card" style="text-align: center; padding: 1rem;">
+                <div class="card-image"
+                    style="height: 150px; width: 150px; border-radius: 50%; margin: 1rem auto; background: #ddd;"></div>
+                <h3>Dr. Sarah Smith</h3>
+                <p style="color: var(--text-muted);">Physics Dept. Head</p>
+            </div>
+            <div class="card" style="text-align: center; padding: 1rem;">
+                <div class="card-image"
+                    style="height: 150px; width: 150px; border-radius: 50%; margin: 1rem auto; background: #ddd;"></div>
+                <h3>Prof. James Bond</h3>
+                <p style="color: var(--text-muted);">Cyber Security Expert</p>
+            </div>
+            <div class="card" style="text-align: center; padding: 1rem;">
+                <div class="card-image"
+                    style="height: 150px; width: 150px; border-radius: 50%; margin: 1rem auto; background: #ddd;"></div>
+                <h3>Emily Blunt</h3>
+                <p style="color: var(--text-muted);">Creative Arts Lead</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container text-center" style="opacity: 0.6;">&copy; 2024 EduPortal</div>
+        <div class="text-center"
+            style="margin-top: 0.5rem; font-size: 0.85rem; color: rgba(255,255,255,0.6); padding-bottom: 1rem;">
+            powered by <a href="https://www.gridify.in" target="_blank"
+                style="color: inherit; text-decoration: underline;">Gridify</a>
+        </div>
+    </footer>
+
+    <!-- Firebase & DB (Needed for Site Settings) -->
+    <script type="module" src="scripts/firebase-config.js"></script>
+    <script src="scripts/db.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/auth.js"></script>
+</body>
+
+</html>
