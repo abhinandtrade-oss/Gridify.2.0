@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read: if true;
+      allow write: if true; 
+    }
+    
+    // Explicit protection for users collection
+    match /users/{userId} {
+      allow read: if true;
+      // Allow write if:
+      // 1. It's a new document
+      // 2. OR The document is NOT the super admin's document
+      // 3. OR The requester IS the super admin (identified by email in token, if supported, otherwise just strict check)
+      
+      // Since `request.auth.token.email` is available in Firebase Authentication:
+      allow write: if request.auth != null && 
+                   (
+                     !exists(/databases/$(database)/documents/users/$(userId)) || 
+                     resource.data.email != 'admin@gridify.in' ||
+                     request.auth.token.email == 'admin@gridify.in'
+                   );
+    }
+  }
+}

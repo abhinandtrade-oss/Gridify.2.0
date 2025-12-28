@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Reviews - EduPortal Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        .review-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .answer-box {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid #f3f4f6;
+            background: #f9fafb;
+            border-radius: 0 0 16px 16px;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--danger-color);
+        }
+
+        .text-score-input {
+            transition: all 0.2s;
+            border: 2px solid #e5e7eb;
+        }
+
+        .text-score-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        @media (max-width: 600px) {
+
+            .review-header,
+            .review-footer,
+            .meta-grid {
+                flex-direction: column !important;
+                gap: 1rem !important;
+                align-items: flex-start !important;
+                grid-template-columns: 1fr !important;
+            }
+
+            .review-header>div {
+                text-align: left !important;
+                width: 100%;
+            }
+
+            .review-footer {
+                align-items: stretch !important;
+            }
+
+            .review-footer button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body style="background: #f3f4f6;">
+
+    <header style="background: #1F2937; color: white;">
+        <div class="container navbar">
+            <div class="logo" style="color: white; cursor: pointer;" onclick="window.location.href='index.html'">
+                EduPortal Admin
+            </div>
+            <nav style="display: flex; gap: 1.5rem; align-items: center;">
+                <a href="index.html" style="color: white;">Dashboard</a>
+                <a href="courses.html" style="color: white;">Courses</a>
+                <a href="users.html" style="color: white;">Users</a>
+                <a href="reviews.html" style="color: var(--accent-color); font-weight: 600;">Reviews</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container" style="padding: 2rem 1rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Pending Exam Reviews</h1>
+            <div id="review-count" class="badge badge-primary">0 Pending</div>
+        </div>
+
+        <div id="reviews-list">
+            <div style="text-align: center; padding: 4rem;">
+                <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary-color);"></i>
+                <p style="margin-top: 1rem;">Loading submissions...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="modal-title">Review Submission</h2>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content injected here -->
+            </div>
+            <div class="modal-footer" style="flex-direction: column; gap: 1rem; align-items: stretch;">
+                <div class="form-group">
+                    <label class="form-label">Review Feedback</label>
+                    <textarea id="admin-feedback" class="form-control" rows="3"
+                        placeholder="Provide feedback to the student..."></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-success" style="flex: 1;" onclick="submitReview(true)">
+                        <i class="fas fa-check"></i> Approve & Pass
+                    </button>
+                    <button class="btn btn-danger" style="flex: 1;" onclick="submitReview(false)">
+                        <i class="fas fa-times"></i> Mark as Failed
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.85rem; margin-top: auto;">
+        powered by <a href="https://www.gridify.in" target="_blank"
+            style="color: inherit; text-decoration: underline;">Gridify</a>
+    </footer>
+
+    <script type="module" src="../scripts/firebase-config.js"></script>
+    <script src="../scripts/auth.js"></script>
+    <script src="../scripts/db.js"></script>
+    <script>
+        let currentSub = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuth = await Auth.checkProtection('admin');
+            if (!isAuth) return;
+            loadSubmissions();
+        });
+
+        async function loadSubmissions() {
+            const list = document.getElementById('reviews-list');
+            try {
+                const subs = await DB.getPendingSubmissions();
+                document.getElementById('review-count').innerText = `${subs.length} Pending`;
+
+                if (subs.length === 0) {
+                    list.innerHTML = `
+                        <div class="card" style="text-align: center; padding: 4rem;">
+                            <i class="fas fa-check-circle fa-4x" style="color: var(--accent-color); opacity: 0.3; margin-bottom: 1rem;"></i>
+                            <h3>All Caught Up!</h3>
+                            <p>No exams are currently pending review.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                list.innerHTML = subs.map(sub => `
+                    <div class="review-card">
+                        <div class="review-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                            <div>
+                                <h3 style="margin: 0;">${sub.itemTitle}</h3>
+                                <p style="color: var(--text-muted); font-size: 0.9rem;">Course: ${sub.courseTitle}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; color: var(--primary-color);">${sub.userName}</div>
+                                <div style="font-size: 0.8rem; color: var(--text-muted);">${new Date(sub.submittedAt.seconds * 1000).toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="review-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                            <span class="badge badge-secondary">Auto-Score: ${sub.autoScore} / ${sub.totalPossible}</span>
+                            <button class="btn btn-primary btn-sm" onclick="openReview('${sub.id}')">
+                                Review Answers <i class="fas fa-chevron-right" style="margin-left: 5px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = '<p>Error loading submissions.</p>';
+            }
+        }
+
+        window.openReview = async (id) => {
+            const subs = await DB.getPendingSubmissions();
+            currentSub = subs.find(s => s.id === id);
+            if (!currentSub) return;
+
+            const modalBody = document.getElementById('modal-body');
+            document.getElementById('modal-title').innerText = `Reviewing: ${currentSub.userName}`;
+            document.getElementById('admin-feedback').value = '';
+
+            let html = `
+                <div class="meta-grid">
+                    <div><div class="label">Course Name</div><div style="font-weight:600;">${currentSub.courseTitle}</div></div>
+                    <div><div class="label">Exam Title</div><div style="font-weight:600;">${currentSub.itemTitle}</div></div>
+                    <div><div class="label">Auto-Grade (MCQ)</div><div style="font-weight:700; color:var(--primary-color);">${currentSub.autoScore} / ${currentSub.totalPossible} pts</div></div>
+                </div>
+                <h4 style="margin-bottom:1.5rem; color:var(--text-main); border-left:4px solid var(--accent-color); padding-left:10px;">Detailed Student Responses</h4>
+            `;
+
+            currentSub.answers.forEach((ans, idx) => {
+                const isText = ans.type === 'text';
+                html += `
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background:white; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: var(--shadow-sm);">
+                        <div style="font-weight: 700; margin-bottom: 1rem; display:flex; gap:10px; align-items:center;">
+                            <span style="background:var(--primary-color); color:white; width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem;">${idx + 1}</span>
+                            ${ans.questionText}
+                        </div>
+                        
+                        <div class="answer-box">
+                            <div class="label" style="opacity:0.6;">Student's Recorded Answer</div>
+                            <div style="white-space: pre-wrap; font-size:1.05rem; color:#1F2937; margin-top:5px;">${ans.userAns || '<i>No answer provided.</i>'}</div>
+                        </div>
+
+                        ${!isText ? `
+                            <div style="margin-top:0.75rem; padding: 0.5rem 1rem; background: ${(ans.userAns || '').trim() === (ans.correctAns || '').trim() ? '#ecfdf5' : '#fef2f2'}; border-radius: 6px; font-size: 0.9rem; color: ${(ans.userAns || '').trim() === (ans.correctAns || '').trim() ? '#059669' : '#dc2626'}">
+                                <i class="fas ${(ans.userAns || '').trim() === (ans.correctAns || '').trim() ? 'fa-check-circle' : 'fa-times-circle'}"></i> 
+                                <strong>System Verification:</strong> Correct Answer was "${ans.correctAns}"
+                            </div>
+                        ` : `
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed #e5e7eb;">
+                                <label style="font-size: 0.9rem; font-weight: 600; color:var(--text-main);">Manual Score for Written Response:</label>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="number" class="form-control text-score-input" data-idx="${idx}" value="0" max="${ans.maxScore}" style="width: 70px; text-align:center; padding: 0.4rem;">
+                                    <span style="color:var(--text-muted); font-size:0.85rem; font-weight:500;">/ ${ans.maxScore} points</span>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+                `;
+            });
+
+            modalBody.innerHTML = html;
+            document.getElementById('review-modal').style.display = 'flex';
+        };
+
+        window.submitReview = async (isPass) => {
+            if (!currentSub) return;
+
+            const feedback = document.getElementById('admin-feedback').value;
+            let finalScore = currentSub.autoScore;
+
+            // Collect text scores
+            const inputs = document.querySelectorAll('.text-score-input');
+            inputs.forEach(input => {
+                const score = parseInt(input.value) || 0;
+                finalScore += score;
+            });
+
+            const confirmed = confirm(`Are you sure you want to mark this as ${isPass ? 'PASSED' : 'FAILED'} with a total score of ${finalScore}?`);
+            if (!confirmed) return;
+
+            const res = await DB.reviewSubmission(currentSub.id, {
+                score: finalScore,
+                totalPossible: currentSub.totalPossible,
+                passed: isPass,
+                feedback: feedback,
+                reviewedBy: window.auth.currentUser.uid
+            });
+
+            if (res) {
+                Auth.showToast('Review Submitted Successfully', 'success');
+                closeModal();
+                loadSubmissions();
+            } else {
+                Auth.showToast('Error submitting review', 'error');
+            }
+        };
+
+        window.closeModal = () => {
+            document.getElementById('review-modal').style.display = 'none';
+        };
+    </script>
+</body>
+
+</html>
