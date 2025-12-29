@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses - EduPortal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo"><i class="fas fa-graduation-cap"></i> EduPortal</a>
+
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="courses.html" class="active">Courses</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <div class="nav-controls">
+                <div class="nav-cta" id="auth-buttons">
+                    <a href="auth/login.html" class="btn btn-secondary" title="Login">
+                        <i class="fas fa-sign-in-alt"></i> <span class="btn-text-mobile"
+                            style="margin-left: 0.5rem;">Login</span>
+                    </a>
+                    <a href="auth/signup.html" class="btn btn-primary" title="Get Started">
+                        <i class="fas fa-user-plus"></i> <span class="btn-text-mobile" style="margin-left: 0.5rem;">Get
+                            Started</span>
+                    </a>
+                </div>
+
+                <div class="nav-cta hidden" id="user-menu">
+                    <a href="dashboard/" class="btn btn-primary" title="Dashboard">
+                        <i class="fas fa-columns"></i> <span class="btn-text-mobile"
+                            style="margin-left: 0.5rem;">Dashboard</span>
+                    </a>
+                    <button id="logout-btn" class="btn btn-secondary" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i> <span class="btn-text-mobile"
+                            style="margin-left: 0.5rem;">Logout</span>
+                    </button>
+                </div>
+
+                <div class="menu-toggle" id="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="container" style="padding: var(--spacing-xl) var(--spacing-sm);">
+        <div class="text-center" style="margin-bottom: var(--spacing-lg);">
+            <h1 class="section-title">Explore Our Courses</h1>
+            <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">From beginner to advanced, find the
+                perfect course to upgrade your skills.</p>
+        </div>
+
+        <!-- Filter Buttons (Placeholder) -->
+        <div id="category-filters"
+            style="display: flex; justify-content: center; gap: 1rem; margin-bottom: var(--spacing-lg); flex-wrap: wrap;">
+            <button class="btn btn-primary filter-btn active" onclick="filterByCategory('')">All Courses</button>
+            <!-- Categories will be injected here -->
+        </div>
+
+        <div class="card-grid" id="courses-list">
+            <div id="loading" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading courses...</p>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section">
+                <h3 id="footer-site-name">EduPortal</h3>
+                <p style="opacity: 0.8;">Empowering students worldwide with quality education.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center"
+            style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.6; font-size: 0.9rem;">
+            &copy; 2024 <span id="footer-copy-name">EduPortal</span>. All rights reserved.
+            <div style="margin-top: 5px;">
+                powered by <a href="https://www.gridify.in" target="_blank"
+                    style="color: inherit; text-decoration: underline;">Gridify</a>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Firebase & Scripts -->
+    <script type="module" src="scripts/firebase-config.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/db.js"></script>
+    <!-- Firebase & DB (Needed for Site Settings) -->
+    <script type="module" src="scripts/firebase-config.js"></script>
+    <script src="scripts/db.js"></script>
+    <script src="scripts/main.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const list = document.getElementById('courses-list');
+            const filterContainer = document.getElementById('category-filters');
+            let allCourses = [];
+            let currentFilter = '';
+
+            // Listen to Courses
+            DB.listenToCourses((courses) => {
+                // Filter: must be active AND (if premium, must have a price set)
+                allCourses = courses.filter(c => {
+                    const isActive = c.status !== 'inactive';
+                    const hasPriceIfPremium = !c.isPremium || (c.price !== undefined && c.price !== null);
+                    return isActive && hasPriceIfPremium;
+                });
+                if (window.renderCourses) window.renderCourses(currentFilter);
+            });
+
+            // Listen to Categories
+            DB.listenToCategories((categories) => {
+                // Save the "All Courses" button but refresh categories
+                const allBtnNode = filterContainer.querySelector('button[onclick*="filterByCategory(\'\',"]') || filterContainer.querySelector('.filter-btn');
+                filterContainer.innerHTML = '';
+
+                // Re-add "All Courses" button if it doesn't exist or just recreate it
+                const allBtn = document.createElement('button');
+                allBtn.className = `btn filter-btn ${currentFilter === '' ? 'btn-primary active' : 'btn-secondary'}`;
+                allBtn.innerText = 'All Courses';
+                allBtn.onclick = () => filterByCategory('', allBtn);
+                filterContainer.appendChild(allBtn);
+
+                categories.filter(c => c.status !== 'paused').forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = `btn filter-btn ${cat.name === currentFilter ? 'btn-primary active' : 'btn-secondary'}`;
+                    btn.innerText = cat.name;
+                    btn.onclick = () => filterByCategory(cat.name, btn);
+                    filterContainer.appendChild(btn);
+                });
+            });
+
+            // Get current user status safely
+            let currentUser = null;
+            let enrolledIds = [];
+
+            // We need to wait for Auth to initialize
+            window.auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    const doc = await window.db.collection('users').doc(currentUser.uid).get();
+                    if (doc.exists) {
+                        enrolledIds = doc.data().enrolledCourses || [];
+                    }
+                    // Fetch pending payments
+                    const requests = await DB.getPaymentRequests(currentUser.uid);
+                    window.pendingCourseIds = requests.filter(r => r.status === 'pending').map(r => r.courseId);
+                } else {
+                    currentUser = null;
+                    enrolledIds = [];
+                    window.pendingCourseIds = [];
+                }
+                if (window.renderCourses) window.renderCourses(currentFilter);
+            });
+
+            window.renderCourses = (catName = '') => {
+                currentFilter = catName; // Track current filter
+                const filteredNodes = allCourses.filter(c => !catName || c.category === catName);
+
+                if (filteredNodes.length === 0) {
+                    list.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; color: var(--text-muted);">
+                            <i class="fas fa-search fa-3x" style="margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <h3>No courses found in this category.</h3>
+                        </div>`;
+                    return;
+                }
+
+                list.innerHTML = '';
+                filteredNodes.forEach(course => {
+                    const isPremium = course.isPremium;
+                    const price = course.price;
+                    const isFree = !isPremium || price === 0;
+
+                    const priceBadge = isFree
+                        ? `<span class="badge badge-success">Free</span>`
+                        : `<span class="badge" style="background:#8B5CF6; color:white;">₹${price}</span>`;
+
+                    const premiumBadge = isPremium
+                        ? `<span class="badge" style="background:#F59E0B; color:white;">Premium</span>`
+                        : ``;
+
+                    let btnHtml = '';
+                    if (!currentUser) {
+                        btnHtml = `<a href="auth/login.html?redirect=../courses.html" class="btn btn-primary" style="width:100%">Login to Enroll</a>`;
+                    } else {
+                        if (enrolledIds.includes(course.id)) {
+                            btnHtml = `
+                                <div style="position: relative; width: 100%;">
+                                    <a href="dashboard/index.html" class="btn btn-secondary" style="width: 100%; background-color: #10B981; border-color: #10B981; color: white; justify-content: center; margin-bottom: 0;">
+                                        Enrolled <i class="fas fa-check" style="margin-left: 0.5rem;"></i>
+                                    </a>
+                                    <button onclick="event.preventDefault(); unenroll(event, '${course.id}')" style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; background: white; border: 1px solid #fee2e2; color: var(--danger-color); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 2;" title="Un-enroll from course">
+                                        <i class="fas fa-trash-alt" style="font-size: 0.8rem;"></i>
+                                    </button>
+                                </div>
+                            `;
+                        } else if (window.pendingCourseIds && window.pendingCourseIds.includes(course.id)) {
+                            btnHtml = `
+                                <button class="btn btn-secondary" style="width:100%; cursor: default; background: #F59E0B; border-color: #F59E0B; color: white;" disabled>
+                                    <i class="fas fa-clock"></i> Verification Pending
+                                </button>
+                                <p style="font-size: 0.75rem; color: #666; text-align: center; margin-top: 0.5rem;">Our team is verifying your payment. Please wait.</p>
+                            `;
+                        } else {
+                            btnHtml = `<button onclick="enroll(event, '${course.id}')" class="btn btn-primary" style="width:100%">Enroll Now</button>`;
+                        }
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.display = 'flex';
+                    card.style.flexDirection = 'column';
+                    card.innerHTML = `
+                        <div class="card-image" style="background-color: #e0e7ff; height: 160px; display: flex; align-items: center; justify-content: center; border-radius: 8px 8px 0 0;">
+                             <i class="fas fa-graduation-cap fa-3x" style="color: var(--primary-color);"></i>
+                        </div>
+                        <div class="card-body" style="flex: 1; display: flex; flex-direction: column;">
+                          <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+                              <div style="display:flex; gap:0.4rem;">
+                                <span class="badge badge-secondary">${course.category || 'General'}</span>
+                                ${premiumBadge}
+                              </div>
+                              ${priceBadge}
+                          </div>
+                          <h3 class="card-title">${course.title}</h3>
+                          <p class="card-text" style="flex:1;">${course.description}</p>
+                          <div class="card-footer" style="padding-top: 1rem; margin-top: auto;">
+                             ${btnHtml}
+                          </div>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            };
+
+            window.filterByCategory = (catName, btn) => {
+                // Update active button state
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('btn-primary', 'active');
+                    b.classList.add('btn-secondary');
+                });
+
+                if (btn) {
+                    btn.classList.remove('btn-secondary');
+                    btn.classList.add('btn-primary', 'active');
+                } else {
+                    const allBtn = document.querySelector('.filter-btn'); // Fallback to first
+                    allBtn.classList.remove('btn-secondary');
+                    allBtn.classList.add('btn-primary', 'active');
+                }
+
+                renderCourses(catName);
+            };
+
+            // Initial Render is now handled by onAuthStateChanged
+        });
+
+        window.enroll = async (e, courseId) => {
+            if (!Auth.currentUser) {
+                window.location.href = 'auth/login.html';
+                return;
+            }
+            const btn = e.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'Enrolling...';
+            btn.disabled = true;
+
+            try {
+                const res = await DB.enrollUserInCourse(Auth.currentUser.uid, courseId);
+                if (res.success) {
+                    if (res.pendingVerification) {
+                        Auth.showToast(res.message, 'info');
+                    } else {
+                        Auth.showToast('Enrolled Successfully!', 'success');
+                    }
+                    // Reload to update UI state properly
+                    setTimeout(() => window.location.reload(), 1500);
+                } else {
+                    Auth.showToast(res.message, 'info');
+                    btn.innerText = 'Enroll Now';
+                    btn.disabled = false;
+                }
+            } catch (e) {
+                Auth.showToast(e.message, 'error');
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        window.unenroll = async (e, courseId) => {
+            if (!confirm('Are you sure you want to unenroll?')) return;
+            try {
+                const res = await DB.unenrollUserFromCourse(Auth.currentUser.uid, courseId);
+                if (res.success) {
+                    Auth.showToast('Unenrolled Successfully', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            } catch (e) {
+                Auth.showToast(e.message, 'error');
+            }
+        };
+    </script>
+</body>
+
+</html>
+```

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Setup - EduPortal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #1F2937;
+            color: white;
+        }
+
+        .setup-card {
+            width: 100%;
+            max-width: 500px;
+            padding: var(--spacing-xl);
+            background: #374151;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="setup-card">
+        <div class="text-center" style="margin-bottom: var(--spacing-lg);">
+            <h2 style="color: var(--secondary-color); font-weight: 800; margin-bottom: 0.5rem;"><i
+                    class="fas fa-tools"></i> Admin Setup</h2>
+            <p style="opacity: 0.8;">Create the initial Administrator account.</p>
+        </div>
+
+        <form id="setup-form">
+            <div id="status-msg" style="padding: 1rem; border-radius: 4px; margin-bottom: 1rem; display: none;"></div>
+
+            <div class="form-group">
+                <label class="form-label">Admin Name</label>
+                <input type="text" id="name" class="form-control" required placeholder="Administrator">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-control" required placeholder="admin@eduportal.com">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="password" class="form-control" required minlength="6">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="color: var(--secondary-color);">Setup Secret Code</label>
+                <input type="password" id="secret" class="form-control" required placeholder="Enter 'setup code'">
+                <small style="opacity: 0.6;">Verification code to prevent unauthorized access.</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; background-color: var(--secondary-color); color: black;" id="submit-btn">Create
+                Admin</button>
+        </form>
+
+        <div style="margin-top: 1rem; text-align: center;">
+            <a href="../index.html" style="color: white; opacity: 0.6; text-decoration: underline;">Back to Home</a>
+        </div>
+    </div>
+
+    <!--div style="margin-top: 2rem; color: rgba(255,255,255,0.6); font-size: 0.85rem; text-align: center;">
+        powered by <a href="https://www.gridify.in" target="_blank"
+            style="color: inherit; text-decoration: underline;">Gridify</a>
+    </div-->
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { auth, db } from '../scripts/firebase-config.js';
+
+        document.getElementById('setup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            const secret = document.getElementById('secret').value;
+            const btn = document.getElementById('submit-btn');
+
+            if (secret !== 'setup2024') {
+                showMsg('Invalid Secret Code', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'Creating...';
+            showMsg('Creating admin account...', 'info');
+
+            try {
+                // 1. Create Auth User
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
+                const user = userCredential.user;
+
+                // 2. Create User Doc with Admin Role
+                // Compat syntax: db.collection()
+                await db.collection('users').doc(user.uid).set({
+                    name: name,
+                    email: email,
+                    role: 'admin',
+                    createdAt: new Date(),
+                    createdBy: 'setup_script'
+                });
+
+                showMsg('Success! Redirecting to Admin Dashboard...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+
+            } catch (error) {
+                console.error(error);
+                if (error.code === 'auth/email-already-in-use') {
+                    // If email exists, try to FORCE update the role for this user using Firestore
+                    // NOTE: This usually requires the user to be logged in to write to their own doc, 
+                    // but since we just failed to create, we aren't logged in as them.
+                    // We can sign in first.
+                    try {
+                        showMsg('Email exists. Attempting to login and promote to Admin...', 'info');
+                        const loginCred = await auth.signInWithEmailAndPassword(email, pass);
+                        const uid = loginCred.user.uid;
+
+                        await db.collection('users').doc(uid).set({
+                            name: name,
+                            email: email,
+                            role: 'admin',
+                            updatedAt: new Date()
+                        }, { merge: true });
+
+                        showMsg('Account promoted to Admin! Redirecting...', 'success');
+                        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+
+                    } catch (loginErr) {
+                        showMsg('Email in use and could not login (Wrong password?). Manual update required.', 'error');
+                    }
+                } else if (error.code === 'permission-denied') {
+                    showMsg('Permission Denied. Check Firestore Rules (Test Mode required).', 'error');
+                } else {
+                    showMsg(error.message, 'error');
+                }
+                btn.disabled = false;
+                btn.innerText = 'Create Admin';
+            }
+        });
+
+        function showMsg(text, type) {
+            const msg = document.getElementById('status-msg');
+            msg.innerText = text;
+            msg.style.display = 'block';
+            if (type === 'error') {
+                msg.style.backgroundColor = 'var(--danger-color)';
+                msg.style.color = 'white';
+            } else if (type === 'success') {
+                msg.style.backgroundColor = 'var(--accent-color)';
+                msg.style.color = 'white';
+            } else {
+                msg.style.backgroundColor = '#6B7280';
+                msg.style.color = 'white';
+            }
+        }
+    </script>
+</body>
+
+</html>
