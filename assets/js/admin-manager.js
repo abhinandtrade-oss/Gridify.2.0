@@ -1,13 +1,16 @@
 /*
- * Admin Manager (Firebase Firestore Edition)
- * Handles admin authentication and management using Firebase Firestore.
+ * Admin Manager (Gridify Firestore Edition)
+ * Handles admin authentication and management using Gridify (Firebase) Firestore.
  */
 
-import { db } from './firebase-config.js';
+import { db, auth } from './firebase-config.js';
 import {
     collection, getDocs, doc, setDoc, deleteDoc, updateDoc,
     query, where, getDoc, addDoc
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import {
+    signInWithPopup, GoogleAuthProvider
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
 const ADMIN_STORAGE_KEY = 'gridify_admin_session';
 const SESSION_TIMEOUT = 120 * 1000; // 120 Seconds
@@ -16,6 +19,58 @@ const COUPONS_COLLECTION = 'coupons';
 
 class AdminManager {
     static GAS_URL = 'https://script.google.com/macros/s/AKfycbz1YjSVMjZYuouVG62jeCqaIUzyvXa_YNPYQQ2f_WegU0hVqzRWMDrnDICfjev-i69Ksw/exec';
+
+    static sanitizeMessage(msg) {
+        if (!msg) return "";
+        return msg.replace(/Firebase:?/gi, 'Gridify');
+    }
+
+
+    static async googleLogin() {
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            // Check if user exists in Firestore
+            const q = query(collection(db, USERS_COLLECTION), where("username", "==", user.email));
+            const querySnapshot = await getDocs(q);
+
+            let userData = null;
+            if (querySnapshot.empty) {
+                // Fetch Defaults
+                const defaults = await this.getDefaultPrograms();
+                // Create new user document if they don't exist
+                userData = {
+                    username: user.email,
+                    fullName: user.displayName || 'Google User',
+                    role: 'user',
+                    allowedPrograms: defaults,
+                    status: 'active',
+                    authMethod: 'google',
+                    createdAt: new Date().toISOString()
+                };
+                await addDoc(collection(db, USERS_COLLECTION), userData);
+            } else {
+                querySnapshot.forEach((doc) => {
+                    userData = doc.data();
+                });
+            }
+
+            if (userData.status !== 'active') {
+                return { success: false, message: "Account suspended" };
+            }
+
+            // Success
+            this.startSession(userData.username, userData.role, userData.allowedPrograms || []);
+            return { success: true, role: userData.role };
+
+        } catch (error) {
+            console.error("Google Login Error:", error);
+            return { success: false, message: this.sanitizeMessage(error.message) };
+        }
+    }
+
 
     static async login(username, password) {
         try {
@@ -45,7 +100,7 @@ class AdminManager {
             }
         } catch (error) {
             console.error("Login Error:", error);
-            return { success: false, message: "Network Error: " + error.message };
+            return { success: false, message: this.sanitizeMessage(error.message) };
         }
     }
 
