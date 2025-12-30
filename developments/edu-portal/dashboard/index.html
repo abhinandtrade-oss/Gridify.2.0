@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - EduPortal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/dashboard.css">
+</head>
+
+<body class="dashboard-page">
+
+    <!-- Navbar Reused -->
+    <!-- Modern Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container navbar">
+            <div class="header-left">
+                <a href="../index.html" class="logo"><i class="fas fa-graduation-cap"></i> EduPortal</a>
+                <nav class="nav-links">
+                    <a href="../index.html">Home</a>
+                    <a href="../courses.html">Courses</a>
+                    <a href="../about.html">About</a>
+                    <a href="../contact.html">Contact</a>
+                    <a href="index.html" class="active">Dashboard</a>
+                </nav>
+            </div>
+
+            <div class="nav-controls">
+                <!-- User Profile (Desktop only) -->
+                <div id="user-profile-section" class="user-profile-compact dashboard-hide-mobile">
+                    <div class="profile-icon-box">
+                        <i id="header-role-icon" class="fas fa-user-graduate"></i>
+                    </div>
+                    <span class="profile-name" id="user-name-display">Student</span>
+                </div>
+
+                <!-- Hanging Actions -->
+                <div class="hanging-controls" id="dashboard-actions">
+                    <!-- Notifications -->
+                    <div id="notification-container" style="position: relative;">
+                        <button id="notif-bell-btn" class="icon-btn" title="Notifications">
+                            <i class="fas fa-bell"></i>
+                            <span id="notif-badge" class="badge-dot" style="display: none;">0</span>
+                        </button>
+
+                        <!-- Notifications Dropdown -->
+                        <div id="notif-dropdown">
+                            <div
+                                style="padding: 1rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+                                <h4 style="margin: 0; font-size: 0.95rem;">Notifications</h4>
+                                <button onclick="clearAllNotifications()"
+                                    style="background: none; border: none; color: var(--dash-primary); font-size: 0.7rem; cursor: pointer; font-weight: 600;">Mark
+                                    all as read</button>
+                            </div>
+                            <div id="notif-list" style="max-height: 350px; overflow-y: auto;">
+                                <!-- Notifications injected here -->
+                                <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+                                    <i class="fas fa-bell-slash fa-2x" style="margin-bottom: 0.5rem; opacity: 0.3;"></i>
+                                    <p style="font-size: 0.85rem;">No new notifications</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Change Password -->
+                    <button onclick="document.getElementById('change-pass-modal').style.display='flex'" class="icon-btn"
+                        title="Change Password">
+                        <i class="fas fa-key"></i>
+                    </button>
+
+                    <!-- Logout -->
+                    <button id="logout-btn" class="icon-btn logout-btn-style" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+
+                <div class="menu-toggle" id="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container dashboard-main-content" style="padding: 3.5rem var(--spacing-sm) var(--spacing-lg);">
+        <!-- ... existing content ... -->
+        <!-- Welcome & Stats -->
+        <div style="margin-bottom: var(--spacing-lg);">
+            <h1 style="margin-bottom: 1.5rem; font-weight: 800;">My Dashboard</h1>
+
+            <div class="stats-grid">
+                <!-- Enrolled Courses -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #eef2ff; color: #4f46e5;">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-courses-count">0</div>
+                        <div class="stat-label">Enrolled Courses</div>
+                    </div>
+                </div>
+
+                <!-- Watch Time -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #fef2f2; color: #ef4444;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-watch-time">0 min 0s</div>
+                        <div class="stat-label">Watch Time</div>
+                    </div>
+                </div>
+
+                <!-- Certificates -->
+                <div class="stat-card" style="cursor: pointer;"
+                    onclick="document.getElementById('certificates-output-area').scrollIntoView({behavior: 'smooth'})">
+                    <div class="stat-icon" style="background: #fffbeb; color: #d97706;">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-certs-count">0</div>
+                        <div class="stat-label">Certificates</div>
+                    </div>
+                </div>
+
+                <!-- Subscription -->
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f0fdf4; color: #10b981;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="sub-status" style="text-transform: capitalize;">-</div>
+                        <div class="stat-label">Subscription</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Class -->
+        <div style="margin-bottom: var(--spacing-xl);">
+            <div class="dashboard-section-header">
+                <h2 class="dashboard-section-title">Live Sessions</h2>
+            </div>
+            <div id="live-placeholder" class="empty-state-card">
+                <div class="empty-state-icon">
+                    <i class="fas fa-video-slash"></i>
+                </div>
+                <h3 class="empty-state-title">No Live Classes Scheduled</h3>
+                <p class="empty-state-text">Check back later for upcoming sessions. We'll notify you when a session goes
+                    live.</p>
+            </div>
+        </div>
+
+        <!-- Enrolled Courses -->
+        <div style="margin-bottom: var(--spacing-xl);">
+            <div class="dashboard-section-header">
+                <h2 class="dashboard-section-title">My Courses</h2>
+            </div>
+            <div id="courses-output-area">
+                <div class="empty-state-card">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h3 class="empty-state-title">You haven't enrolled in any courses yet.</h3>
+                    <p class="empty-state-text">Browse our catalog to find the perfect course for your learning journey.
+                    </p>
+                    <a href="../courses.html" class="btn btn-primary" style="padding: 0.75rem 2rem;">Browse Courses</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Certificates -->
+        <div style="margin-bottom: var(--spacing-xl);">
+            <div class="dashboard-section-header">
+                <h2 class="dashboard-section-title">
+                    My Certificates
+                    <span class="badge badge-primary" id="cert-count"
+                        style="margin-left: 0.5rem; vertical-align: middle;">0</span>
+                </h2>
+            </div>
+            <div id="certificates-output-area" class="card-grid"
+                style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+                <div class="empty-state-card" style="grid-column: 1/-1;">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <p class="empty-state-text">Complete your course exams to earn professional certificates.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="change-pass-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10001;">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Change Password</h3>
+            <form id="change-pass-form">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="current-pass" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="new-pass" class="form-control" required minlength="4"
+                        placeholder="Min 6 characters">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" id="confirm-pass" class="form-control" required minlength="4">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="document.getElementById('change-pass-modal').style.display='none'">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Course Player Modal (Full Screen) -->
+    <div id="course-player-modal" class="player-modal">
+        <!-- Player Header -->
+        <header class="player-header-main">
+            <div class="container player-header-container">
+                <div class="player-info-section">
+                    <button onclick="closeCoursePlayer()" class="icon-btn" title="Back to Dashboard">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <h3 id="player-course-title" class="player-course-title">Course Title</h3>
+                    <div id="player-item-meta" class="player-meta-badge">
+                        <span id="player-item-index">1 / 10</span>
+                        <span id="player-item-type-badge" class="player-item-type">Lesson</span>
+                    </div>
+                </div>
+                <div class="player-progress-section dashboard-hide-mobile">
+                    <span id="player-item-title" class="player-current-item">Introduction</span>
+                    <div class="player-progress-mini">
+                        <div id="header-progress-bar"
+                            style="height: 100%; background: var(--dash-primary); width: 0%; transition: width 0.3s;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="player-body-container">
+            <!-- Main Content Area -->
+            <div class="player-main-content">
+                <!-- Video Section -->
+                <div id="video-content-area" class="video-player-container">
+                    <div style="width: 100%; max-width: 1100px; margin: 0 auto; position: relative;">
+                        <!-- 16:9 Container -->
+                        <div class="video-aspect-ratio">
+                            <div id="yt-player" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                            </div>
+                            <div
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background: transparent;">
+                            </div>
+                        </div>
+
+                        <!-- Custom Controls -->
+                        <div class="player-controls-bar">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <input type="range" id="video-seeker" class="custom-range" value="0" min="0" max="100"
+                                    step="0.1" style="width: 100%; cursor: pointer;" onkeydown="return false;">
+                                <div
+                                    style="display: flex; justify-content: space-between; color: var(--dash-text-muted); font-size: 0.75rem; font-weight: 500;">
+                                    <span id="time-display">00:00 / 00:00</span>
+                                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                                        <span>Lesson Progress:</span>
+                                        <span id="course-status-badge"
+                                            style="font-weight: 700; color: var(--dash-primary);">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                                <div style="display: flex; gap: 0.75rem; flex: 1;">
+                                    <button id="player-prev-btn" class="btn btn-secondary" onclick="prevItem()"
+                                        style="flex: 1; min-width: auto;">
+                                        <i class="fas fa-step-backward"></i>
+                                    </button>
+                                    <button id="custom-play-btn" class="btn btn-primary" onclick="togglePlay()"
+                                        style="flex: 2;">
+                                        <i class="fas fa-play"></i> Play
+                                    </button>
+                                    <button id="player-next-btn" class="btn btn-primary" onclick="nextItem()" disabled
+                                        style="flex: 2; background: var(--accent-color); border-color: var(--accent-color);">
+                                        Next <i class="fas fa-step-forward"></i>
+                                    </button>
+                                </div>
+                                <div style="display: flex; gap: 0.5rem; justify-content: center; width: 100%;">
+                                    <button class="btn btn-sm btn-secondary" onclick="restartVideo()"
+                                        style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                        <i class="fas fa-redo"></i> Restart
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" onclick="rewindVideo()"
+                                        style="padding: 0.5rem 1rem; font-size: 0.8rem;">
+                                        <i class="fas fa-undo"></i> -10s
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Section (Hidden by Default) -->
+                <div id="exam-content-area"
+                    style="display: none; flex: 1; background: white; padding: 2.5rem; overflow-y: auto;">
+                    <div style="max-width: 800px; margin: 0 auto;">
+                        <h2 id="exam-display-title" style="margin-bottom: 2rem; font-weight: 800;">Exam Title</h2>
+                        <div id="exam-questions-container"></div>
+                        <button class="btn btn-primary btn-lg"
+                            style="margin-top: 2.5rem; width: 100%; padding: 1.25rem;" onclick="submitExam()">
+                            Submit Exam
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Complete Section (Hidden) -->
+                <div id="complete-content-area"
+                    style="display: none; flex: 1; background: white; align-items:center; justify-content:center; flex-direction:column; text-align:center;">
+                    <i class="fas fa-check-circle fa-5x" style="color: var(--accent-color); margin-bottom: 2rem;"></i>
+                    <h2 style="font-weight: 800;">Congratulations!</h2>
+                    <p style="color: var(--dash-text-muted);">You have successfully completed this section.</p>
+                </div>
+            </div>
+
+            <!-- Sidebar (Syllabus) -->
+            <div class="player-sidebar-syllabus">
+                <div style="padding: 1.5rem; border-bottom: 1px solid #e5e7eb; background: #fff;">
+                    <h4 style="margin-bottom: 0.75rem; font-weight: 700;">Course Content</h4>
+                    <div style="height: 8px; background: #f1f5f9; border-radius: 10px; overflow: hidden;">
+                        <div id="overall-progress-bar"
+                            style="height: 100%; background: var(--dash-primary); width: 0%; transition: width 0.4s;">
+                        </div>
+                    </div>
+                </div>
+                <div id="sidebar-syllabus-list" style="flex: 1; overflow-y: auto; padding: 1rem;">
+                    <!-- Items rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Number Collection Modal -->
+    <div id="mobile-number-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 30000; backdrop-filter: blur(4px);">
+        <div class="card"
+            style="width: 90%; max-width: 400px; padding: 2.5rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border-radius: 1rem;">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div
+                    style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                    <i class="fas fa-mobile-alt" style="font-size: 1.75rem; color: white;"></i>
+                </div>
+                <h3 style="margin-bottom: 0.5rem; font-size: 1.5rem; color: #111827;">Mobile Number Required</h3>
+                <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.5;">Please provide your mobile number to
+                    complete your profile and receive important updates.</p>
+            </div>
+            <form id="mobile-number-form">
+                <div class="form-group">
+                    <label class="form-label" style="font-weight: 600; color: #374151;">Mobile Number </label>
+                    <div style="position: relative;">
+                        <i class="fas fa-phone"
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #9ca3af;"></i>
+                        <input type="tel" id="mobile-number-input" class="form-control" required pattern="[6-9][0-9]{9}"
+                            maxlength="10" placeholder="10-digit mobile number"
+                            title="Enter a valid 10-digit Indian mobile number starting with 6-9"
+                            style="padding-left: 2.75rem; border-radius: 0.75rem; border: 1px solid #e5e7eb; font-size: 0.95rem;">
+                    </div>
+                    <small style="display: block; margin-top: 0.5rem; color: #6b7280; font-size: 0.85rem;">
+                        <i class="fas fa-info-circle"></i> Enter 10-digit mobile number
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; padding: 1rem; margin-top: 1rem; font-weight: 600; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">
+                    <i class="fas fa-check-circle" style="margin-right: 0.5rem;"></i> Save Mobile Number
+                </button>
+            </form>
+        </div>
+    </div>
+    <footer style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.85rem;"></footer>
+    <div>&copy; 2024 <span id="footer-copy-name">EduPortal</span>. All rights reserved.</div>
+    <div style="margin-top: 5px;">
+        powered by <a href="https://www.gridify.in" target="_blank"
+            style="color: inherit; text-decoration: underline;">Gridify</a>
+    </div>
+    </footer>
+
+    <!-- Radial Referral Menu -->
+    <div class="radial-menu" id="referral-radial-menu">
+        <div class="menu-items">
+            <button class="menu-item whatsapp" onclick="shareReferral('whatsapp')" title="Share on WhatsApp">
+                <i class="fab fa-whatsapp"></i>
+            </button>
+            <button class="menu-item email" onclick="shareReferral('email')" title="Share via Email">
+                <i class="fas fa-envelope"></i>
+            </button>
+            <button class="menu-item copy" onclick="shareReferral('copy')" title="Copy Link">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
+        <button class="menu-toggle-btn" id="radial-toggle">
+            <i class="fas fa-share-alt"></i>
+        </button>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module" src="../scripts/firebase-config.js"></script>
+    <script src="../scripts/auth.js"></script>
+    <script src="../scripts/db.js"></script>
+    <script src="../scripts/main.js"></script>
+    <!-- YouTube API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <script>
+        // State
+        let player;
+        let isPlayerReady = false;
+        let currentCourse = null;
+        let currentItem = null;
+        let currentItemIdx = 0;
+        let progressInterval = null;
+        let completedItems = new Set(); // IDs of completed syllabus items
+        let examAttempts = {}; // { itemId: count }
+        let sessionWatchTime = 0; // Current session watch time in seconds
+
+        function onYouTubeIframeAPIReady() {
+            isPlayerReady = true;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            let attempts = 0;
+            while ((!window.auth || !window.db) && attempts < 50) {
+                await new Promise(r => setTimeout(r, 100));
+                attempts++;
+            }
+
+            if (!window.auth || !window.db) return;
+
+            const isAuth = await Auth.checkProtection('student');
+            if (!isAuth) return;
+
+            if (window.auth.currentUser) {
+                const uid = window.auth.currentUser.uid;
+
+                // Setup real-time listeners
+                setupRealtimeListeners(uid);
+                initNotifications(uid);
+
+                // Fetch Profile
+                const doc = await window.db.collection('users').doc(uid).get();
+                if (doc.exists) {
+                    Auth.userProfile = doc.data();
+                    document.getElementById('user-name-display').innerText = Auth.userProfile.name;
+                    // Proactive: Update icon based on role if needed
+                    const iconEl = document.getElementById('header-role-icon');
+                    if (iconEl) {
+                        if (Auth.userProfile.role.includes('admin')) iconEl.className = 'fas fa-user-shield';
+                        else if (Auth.userProfile.role === 'student') iconEl.className = 'fas fa-user-graduate';
+                    }
+                    document.getElementById('sub-status').innerText = Auth.userProfile.subscription || 'Inactive';
+
+                    // Check if mobile number is missing
+                    checkAndPromptMobileNumber(uid, Auth.userProfile);
+                }
+            }
+        });
+
+        // Mobile Number Collection Handler
+        function checkAndPromptMobileNumber(uid, userProfile) {
+            // Don't prompt super_admin
+            if (userProfile && userProfile.role === 'super_admin') {
+                return;
+            }
+
+            // Check session storage flag or user profile
+            const needsMobile = sessionStorage.getItem('requireMobileNumber') === 'true' || !userProfile.mobile;
+
+            if (needsMobile) {
+                // Show modal
+                const modal = document.getElementById('mobile-number-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+
+                    // Handle form submission
+                    const form = document.getElementById('mobile-number-form');
+                    if (form) {
+                        form.onsubmit = async (e) => {
+                            e.preventDefault();
+                            const mobileInput = document.getElementById('mobile-number-input');
+                            const mobile = mobileInput.value.trim();
+
+                            // Validate Indian mobile number format (10 digits starting with 6-9)
+                            if (!mobile || !/^[6-9][0-9]{9}$/.test(mobile)) {
+                                Auth.showToast('Please enter a valid 10-digit Indian mobile number starting with 6-9', 'error');
+                                return;
+                            }
+
+                            // Show loading state
+                            const submitBtn = form.querySelector('button[type="submit"]');
+                            const originalText = submitBtn.innerHTML;
+                            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
+                            submitBtn.disabled = true;
+
+                            try {
+                                const result = await DB.updateMobileNumber(uid, mobile);
+
+                                if (result.success) {
+                                    // Clear session flag
+                                    sessionStorage.removeItem('requireMobileNumber');
+
+                                    // Hide modal
+                                    modal.style.display = 'none';
+
+                                    // Update local profile
+                                    Auth.userProfile.mobile = mobile;
+
+                                    // Show success message
+                                    Auth.showToast('Mobile number saved successfully!', 'success');
+                                } else {
+                                    throw new Error(result.message || 'Failed to save mobile number');
+                                }
+                            } catch (error) {
+                                Auth.showToast('Error: ' + error.message, 'error');
+                                submitBtn.innerHTML = originalText;
+                                submitBtn.disabled = false;
+                            }
+                        };
+                    }
+                }
+            }
+        }
+
+
+        function closeCoursePlayer() {
+            document.getElementById('course-player-modal').style.display = 'none';
+            if (player) player.stopVideo();
+            stopLiveAlertCheck();
+        }
+
+        // --- Notifications Logic ---
+        let userNotifications = [];
+
+        function initNotifications(uid) {
+            const bellBtn = document.getElementById('notif-bell-btn');
+            const dropdown = document.getElementById('notif-dropdown');
+
+            // Toggle Dropdown
+            bellBtn.onclick = (e) => {
+                e.stopPropagation();
+                dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+            };
+
+            // Close when clicking outside
+            document.addEventListener('click', () => { dropdown.style.display = 'none'; });
+            dropdown.onclick = (e) => e.stopPropagation();
+
+            // Real-time listener
+            DB.listenToNotifications(uid, (notifs) => {
+                userNotifications = notifs;
+                renderNotifications();
+            });
+        }
+
+        function renderNotifications() {
+            const list = document.getElementById('notif-list');
+            const unreadCount = userNotifications.filter(n => !n.read).length;
+            const badge = document.getElementById('notif-badge');
+
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount;
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (userNotifications.length === 0) {
+                list.innerHTML = `
+                    <div style="padding: 2.5rem; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-bell-slash fa-2x" style="margin-bottom: 0.75rem; opacity: 0.3;"></i>
+                        <p style="font-size: 0.9rem;">No notifications yet.</p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = userNotifications.map(n => {
+                const iconMap = {
+                    'success': { icon: 'fa-check-circle', color: '#10B981', bg: '#ecfdf5' },
+                    'info': { icon: 'fa-info-circle', color: '#3B82F6', bg: '#eff6ff' },
+                    'warning': { icon: 'fa-exclamation-triangle', color: '#F59E0B', bg: '#fffbeb' },
+                    'error': { icon: 'fa-times-circle', color: '#EF4444', bg: '#fef2f2' }
+                };
+                const style = iconMap[n.type] || iconMap['info'];
+
+                return `
+                    <div onclick="handleNotifClick('${n.id}', '${n.link || ''}')" 
+                         style="padding: 1.25rem; border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.2s; display: flex; gap: 1rem; position: relative; ${n.read ? '' : 'background: #fafbff;'}">
+                        ${n.read ? '' : '<div style="position: absolute; top: 1.25rem; right: 1.25rem; width: 8px; height: 8px; background: var(--primary-color); border-radius: 50%;"></div>'}
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${style.bg}; color: ${style.color}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas ${style.icon}" style="font-size: 1.1rem;"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 700; font-size: 0.9rem; margin-bottom: 0.25rem; color: #1F2937;">${n.title}</div>
+                            <div style="font-size: 0.85rem; color: #4B5563; line-height: 1.5;">${n.message}</div>
+                            <div style="font-size: 0.75rem; color: #9CA3AF; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+                                <i class="far fa-clock" style="font-size: 0.7rem;"></i>
+                                ${timeSince(n.createdAt)}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.handleNotifClick = async (id, link) => {
+            await DB.markNotificationAsRead(id);
+            if (link) {
+                // Determine if link is relative or absolute
+                if (link.startsWith('http') || link.includes('.html')) {
+                    if (link.includes('certificate.html')) {
+                        window.open('../' + link, '_blank');
+                    } else if (link.includes('dashboard/index.html')) {
+                        document.getElementById('notif-dropdown').style.display = 'none';
+                    } else {
+                        window.location.href = link;
+                    }
+                }
+            }
+        };
+
+        window.clearAllNotifications = async () => {
+            const unread = userNotifications.filter(n => !n.read);
+            for (const n of unread) {
+                await DB.markNotificationAsRead(n.id);
+            }
+        };
+
+        function timeSince(date) {
+            if (!date) return 'Just now';
+            // Handle Firestore Timestamp or JS Date
+            const timeMs = date.seconds ? date.seconds * 1000 : (date.toDate ? date.toDate().getTime() : new Date(date).getTime());
+            if (isNaN(timeMs)) return 'Just now';
+
+            const seconds = Math.floor((new Date() - timeMs) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + " years ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + " months ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + " days ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hours ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " minutes ago";
+            return Math.floor(seconds) + " seconds ago";
+        }
+
+        // Real-time listeners unsubscribe functions
+        let unsubscribeCourses = null;
+        let unsubscribeCertificates = null;
+        let unsubscribeWatchTime = null;
+        let unsubscribePayments = null;
+        let unsubscribeLiveSessions = null;
+
+        function setupRealtimeListeners(uid) {
+            let latestCourses = [];
+            let latestPayments = [];
+
+            // Listen to enrolled courses
+            unsubscribeCourses = DB.listenToUserEnrolledCourses(uid, (courses) => {
+                latestCourses = courses;
+                renderCourses(uid, latestCourses, latestPayments);
+            });
+
+            // Listen to payment requests
+            unsubscribePayments = DB.listenToPaymentRequests(uid, (requests) => {
+                latestPayments = requests;
+                renderCourses(uid, latestCourses, latestPayments);
+            });
+
+            // Listen to certificates
+            unsubscribeCertificates = DB.listenToCertificates(uid, (certs) => {
+                renderCertificates(certs);
+            });
+
+            // Listen to watch time
+            unsubscribeWatchTime = DB.listenToTotalWatchTime(uid, (totalSeconds) => {
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                document.getElementById('stat-watch-time').innerText = `${minutes} min ${seconds}s`;
+            });
+
+            // Listen to live sessions
+            unsubscribeLiveSessions = DB.listenToActiveLiveClasses((allLive) => {
+                renderLiveSessions(uid, allLive);
+            });
+        }
+
+        function renderCertificates(certs) {
+            const container = document.getElementById('certificates-output-area');
+            document.getElementById('cert-count').innerText = certs.length;
+            document.getElementById('stat-certs-count').innerText = certs.length;
+
+            if (certs.length === 0) {
+                container.innerHTML = `
+                        <div class="empty-state-card" style="grid-column: 1/-1;">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <p class="empty-state-text">Complete your course exams to earn professional certificates.</p>
+                        </div>
+                    `;
+                return;
+            }
+
+            container.innerHTML = certs.map(c => `
+                    <div class="cert-card-modern">
+                        <div class="cert-icon-badge">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="cert-info">
+                            <h4 class="cert-title">${c.courseTitle}</h4>
+                            <div class="cert-date">
+                                <i class="far fa-calendar-alt"></i> Issued: ${new Date(c.issuedAt.seconds * 1000).toLocaleDateString()}
+                            </div>
+                            <button class="btn btn-sm btn-secondary" onclick="window.open('../certificate.html?id=${c.id}', '_blank')" style="border-radius: 6px; font-weight: 500;">
+                                <i class="fas fa-external-link-alt" style="margin-right: 0.25rem;"></i> View Certificate
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        async function renderCourses(uid, courses, paymentRequests = null) {
+            const container = document.getElementById('courses-output-area');
+
+            // Fetch payment requests if not provided
+            if (!paymentRequests) {
+                try {
+                    paymentRequests = await DB.getPaymentRequests(uid);
+                } catch (e) {
+                    paymentRequests = [];
+                }
+            }
+
+            const pendingRequests = paymentRequests.filter(r => r.status === 'pending');
+
+            // Update Badge
+            document.getElementById('stat-courses-count').innerText = courses.length;
+
+            let html = '';
+
+            // Show Pending Verification Section
+            if (pendingRequests.length > 0) {
+                html += `
+                    <div style="margin-bottom: 3rem;">
+                        <div class="dashboard-section-header">
+                            <h3 class="dashboard-section-title" style="color: #d97706;"><i class="fas fa-clock"></i> Verification Pending</h3>
+                        </div>
+                        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">`;
+                pendingRequests.forEach(p => {
+                    html += `
+                            <div class="course-card-modern" style="border: 1px dashed #f59e0b; background: #fffaf5;">
+                                <div class="course-card-banner" style="background: #fff7ed; height: 120px; font-size: 2.5rem; color: #f59e0b;">
+                                    <i class="fas fa-receipt"></i>
+                                </div>
+                                <div class="course-card-content">
+                                    <h3 class="course-card-title">${p.courseTitle}</h3>
+                                    <p class="course-card-description">Payment of ₹${p.price} is under verification. Our team will verify it shortly.</p>
+                                    <button class="btn btn-sm btn-secondary" style="margin-top:auto; width:100%; cursor: default; background: #fff; color: #9a3412; border-color: #f59e0b;" disabled>
+                                        <i class="fas fa-hourglass-half"></i> Pending Approval
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                });
+                html += `</div></div>`;
+            }
+
+            if (courses.length === 0 && pendingRequests.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-card">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h3 class="empty-state-title">No Courses Found</h3>
+                        <p class="empty-state-text">You are not enrolled in any courses. Explore our courses to start learning!</p>
+                        <a href="../courses.html" class="btn btn-primary" style="padding: 0.75rem 2rem;">Browse Catalog</a>
+                    </div>`;
+                return;
+            }
+
+            if (courses.length > 0) {
+                html += `
+                    <div class="dashboard-section-header">
+                        <h3 class="dashboard-section-title">Active Enrollments</h3>
+                    </div>
+                    <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">`;
+                courses.forEach(c => {
+                    html += `
+                            <div class="course-card-modern">
+                                <div class="course-card-banner">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="course-card-content">
+                                    <span class="course-category-tag">${c.category}</span>
+                                    <h3 class="course-card-title">${c.title}</h3>
+                                    <p class="course-card-description">${c.description}</p>
+                                    <button onclick="openCoursePlayer('${c.id}')" class="btn btn-primary" style="margin-top:auto; width:100%; font-weight: 500;">
+                                        <i class="fas fa-book-open" style="margin-right: 0.5rem;"></i> View Course
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                });
+                html += '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // --- Live Session Rendering ---
+        async function renderLiveSessions(uid, allLive) {
+            const placeholder = document.getElementById('live-placeholder');
+
+            if (allLive.length === 0) {
+                if (placeholder) placeholder.style.display = 'block';
+                const container = document.getElementById('live-sessions-container');
+                if (container) container.remove();
+                return;
+            }
+
+            // Get User Context
+            let enrolledCourses = [];
+            try {
+                const userDoc = await window.db.collection('users').doc(uid).get();
+                if (userDoc.exists) {
+                    const enrolledIds = userDoc.data().enrolledCourses || [];
+                    const allCourses = await DB.getCourses();
+                    enrolledCourses = allCourses.filter(c => enrolledIds.includes(c.id));
+                }
+            } catch (e) {
+                console.error("Error fetching enrolled courses:", e);
+            }
+
+            const enrolledIds = enrolledCourses.map(c => c.id);
+
+            const relevantLive = allLive.filter(live => {
+                if (live.courseId) {
+                    return enrolledIds.includes(live.courseId);
+                } else if (live.category && live.category !== 'General') {
+                    return enrolledCourses.some(c => c.category === live.category);
+                } else {
+                    return true; // General shows for everyone
+                }
+            });
+
+            if (relevantLive.length > 0) {
+                let html = `<div id="live-sessions-container" class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">`;
+                relevantLive.forEach(session => {
+                    html += `
+                            <div class="course-card-modern" style="border: 1px solid #fee2e2;">
+                                <div style="position:absolute; top:1rem; right:1rem; z-index:10; background:rgba(239, 68, 68, 0.1); color:#ef4444; padding:0.4rem 0.75rem; font-size:0.7rem; font-weight:800; border-radius:50px; display:flex; align-items:center;">
+                                    <span class="live-pulse"></span> LIVE NOW
+                                </div>
+                                <div class="course-card-banner" style="background:#fef2f2; height: 140px; color:#ef4444; font-size:2.5rem;">
+                                    <i class="fas fa-broadcast-tower"></i>
+                                </div>
+                                <div class="course-card-content">
+                                    <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+                                        <span class="course-category-tag" style="background:#fef2f2; color:#ef4444; margin-bottom:0;">${session.category || 'General'}</span>
+                                        ${session.courseTitle ? `<span class="course-category-tag" style="background:#f0f7ff; color:#3b82f6; margin-bottom:0;">${session.courseTitle}</span>` : ''}
+                                    </div>
+                                    <h3 class="course-card-title">${session.title}</h3>
+                                    <p class="course-card-description">${session.description || 'Join the live session now to interact with the instructor.'}</p>
+                                    
+                                    <button onclick="openLivePlayer('${session.youtubeLink}', '${session.title.replace(/'/g, "\\'")}', '${session.id}')" class="btn btn-primary" style="width:100%; background:#ef4444; border-color:#ef4444; font-weight:600;">
+                                        <i class="fas fa-play" style="margin-right:0.5rem;"></i> Join Stream
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                });
+                html += `</div>`;
+
+                if (placeholder) {
+                    placeholder.style.display = 'none';
+                    // Check if container already exists to update or insert
+                    let container = document.getElementById('live-sessions-container');
+                    if (container) {
+                        container.innerHTML = html.replace('<div id="live-sessions-container"', '<div').slice(0, -6); // Hacky strip, better to Replace Outer
+                        container.outerHTML = html;
+                    } else {
+                        placeholder.insertAdjacentHTML('afterend', html);
+                    }
+                }
+            } else {
+                if (placeholder) placeholder.style.display = 'block';
+                const container = document.getElementById('live-sessions-container');
+                if (container) container.remove();
+            }
+        }
+
+        // --- Live Player Generic (With Chat) ---
+        let chatUnsubscribe = null;
+
+        let liveStatusUnsubscribe = null;
+
+        window.openLivePlayer = (link, title, liveClassId) => {
+            const modal = document.getElementById('live-player-modal');
+            const titleEl = document.getElementById('live-player-title');
+
+            let videoId = '';
+            try {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|live\/)([^#\&\?]*).*/;
+                const match = link.match(regExp);
+                if (match && match[2].length === 11) videoId = match[2];
+            } catch (e) { }
+
+            if (videoId) {
+                titleEl.innerText = title;
+                modal.style.display = 'block';
+
+                // Initialize YT Player API instead of raw src
+                initLivePlayer(videoId);
+
+                if (typeof setupLiveChat === 'function' && liveClassId) {
+                    setupLiveChat(liveClassId);
+                }
+
+                // Listen for Status Changes
+                if (liveClassId) {
+                    if (liveStatusUnsubscribe) liveStatusUnsubscribe();
+                    liveStatusUnsubscribe = window.db.collection('live_classes').doc(liveClassId)
+                        .onSnapshot(doc => {
+                            if (doc.exists && doc.data().status === 'ended') {
+                                alert("The live stream has ended.");
+                                closeLivePlayer();
+                                window.location.reload(); // Refresh to remove the live card
+                            }
+                        });
+                }
+
+            } else {
+                window.open(link, '_blank'); // Fallback
+            }
+        };
+
+        window.closeLivePlayer = () => {
+            const modal = document.getElementById('live-player-modal');
+            // destroy player to stop sound
+            if (livePlayerObj) {
+                try { livePlayerObj.destroy(); } catch (e) { }
+                livePlayerObj = null;
+            }
+            modal.style.display = 'none';
+            if (chatUnsubscribe) chatUnsubscribe();
+            if (liveStatusUnsubscribe) liveStatusUnsubscribe();
+        };
+
+        var livePlayerObj = null;
+
+        // Load YouTube Iframe API if not already present
+        if (!window.YT) {
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        }
+
+        function initLivePlayer(videoId) {
+            if (window.YT && window.YT.Player) {
+                if (livePlayerObj) {
+                    try { livePlayerObj.destroy(); } catch (e) { }
+                    livePlayerObj = null;
+                }
+
+                // Ensure target element exists
+                let playerEl = document.getElementById('live-player-frame');
+                if (!playerEl) {
+                    const container = document.getElementById('live-player-container');
+                    if (container) {
+                        playerEl = document.createElement('div');
+                        playerEl.id = 'live-player-frame';
+                        playerEl.style.position = 'absolute';
+                        playerEl.style.top = '0';
+                        playerEl.style.left = '0';
+                        playerEl.style.width = '100%';
+                        playerEl.style.height = '100%';
+                        playerEl.style.pointerEvents = 'auto'; // Important for API clicks if we allowed them, but here redundant
+                        container.insertBefore(playerEl, container.firstChild);
+                    }
+                }
+
+                livePlayerObj = new YT.Player('live-player-frame', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: videoId,
+                    playerVars: {
+                        'autoplay': 1,
+                        'controls': 0,
+                        'disablekb': 1,
+                        'fs': 0,
+                        'modestbranding': 1,
+                        'rel': 0,
+                        'origin': window.location.origin
+                    },
+                    events: {
+                        'onReady': (event) => { event.target.playVideo(); }
+                    }
+                });
+            } else {
+                // Wait for API
+                setTimeout(() => initLivePlayer(videoId), 500);
+            }
+        }
+
+        window.controlLivePlayer = (action) => {
+            if (!livePlayerObj || typeof livePlayerObj.getPlayerState !== 'function') return;
+
+            const state = livePlayerObj.getPlayerState();
+            const currentTime = livePlayerObj.getCurrentTime();
+
+            switch (action) {
+                case 'playPause':
+                    if (state === YT.PlayerState.PLAYING) {
+                        livePlayerObj.pauseVideo();
+                    } else {
+                        livePlayerObj.playVideo();
+                    }
+                    break;
+                case 'rewind':
+                    livePlayerObj.seekTo(currentTime - 10, true);
+                    break;
+                case 'forward':
+                    livePlayerObj.seekTo(currentTime + 10, true);
+                    break;
+                case 'mute':
+                    if (livePlayerObj.isMuted()) {
+                        livePlayerObj.unMute();
+                    } else {
+                        livePlayerObj.mute();
+                    }
+                    break;
+            }
+        };
+
+        function setupLiveChat(liveId) {
+            const msgContainer = document.getElementById('live-chat-messages');
+            const form = document.getElementById('live-chat-form');
+            if (!msgContainer || !form) return;
+
+            // Clear previous
+            msgContainer.innerHTML = '';
+            if (chatUnsubscribe) chatUnsubscribe(); // Unsub previous
+
+            // Listen
+            chatUnsubscribe = DB.onLiveChatUpdates(liveId, (messages) => {
+                msgContainer.innerHTML = '';
+                messages.forEach(msg => {
+                    const el = document.createElement('div');
+                    el.style.marginBottom = '0.5rem';
+                    el.style.fontSize = '0.9rem';
+
+                    const isAdmin = msg.role === 'admin' || msg.role === 'head_admin' || msg.role === 'super_admin';
+                    const nameColor = isAdmin ? 'var(--danger-color)' : '#999';
+                    const name = `<span style="color:${nameColor}; font-weight:bold;">${msg.userName}</span>`;
+                    const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                    el.innerHTML = `${name} <span style="font-size:0.75em; opacity:0.6;">${time}</span>: <span style="color:white;">${msg.text}</span>`;
+                    msgContainer.appendChild(el);
+                });
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+            });
+
+            // Send
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('live-chat-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const user = Auth.userProfile;
+                await DB.sendLiveMessage(liveId, {
+                    userId: Auth.currentUser.uid,
+                    userName: user ? user.name : 'Student',
+                    role: user ? user.role : 'student',
+                    text: text
+                });
+                input.value = '';
+            };
+        }
+
+        // --- Course Player Alerts ---
+        let liveAlertInterval = null;
+
+        function startLiveAlertCheck(courseId) {
+            if (liveAlertInterval) clearInterval(liveAlertInterval);
+            checkLiveAlert(courseId); // Initial
+            liveAlertInterval = setInterval(() => checkLiveAlert(courseId), 30000); // Poll every 30s
+        }
+
+        function stopLiveAlertCheck() {
+            if (liveAlertInterval) clearInterval(liveAlertInterval);
+            const existingAlert = document.getElementById('player-live-alert');
+            if (existingAlert) existingAlert.remove();
+        }
+
+        async function checkLiveAlert(courseId) {
+            if (!courseId) return;
+            const allLive = await DB.getAllActiveLiveClasses();
+            // Find live class SPECIFIC to this course
+            const courseLive = allLive.find(l => l.courseId === courseId);
+
+            const videoArea = document.getElementById('video-content-area');
+            let alertBox = document.getElementById('player-live-alert');
+
+            if (courseLive) {
+                // Determine Video ID for preview
+                let videoId = '';
+                try {
+                    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                    const match = courseLive.youtubeLink.match(regExp);
+                    if (match && match[2].length === 11) videoId = match[2];
+                } catch (e) { }
+
+                const alertHtml = `
+                    <div style="display:flex; gap: 1rem; align-items: flex-start;">
+                        <div style="width: 120px; height: 68px; background: black; flex-shrink:0; border-radius:4px; overflow:hidden;">
+                            ${videoId ? `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0" frameborder="0" allow="autoplay; encrypted-media"></iframe>` : '<div style="width:100%;height:100%;background:#333;"></div>'}
+                        </div>
+                        <div style="flex:1;">
+                            <div style="font-weight:700; color:var(--danger-color); text-transform:uppercase; font-size:0.75rem; margin-bottom:0.25rem;">
+                                <i class="fas fa-circle" style="font-size:0.6rem;"></i> Live Now
+                            </div>
+                            <div style="font-weight:600; margin-bottom:0.25rem;">${courseLive.title}</div>
+                            <div style="font-size:0.8rem; opacity:0.8;">${courseLive.description || 'Instructor is live for this course.'}</div>
+                        </div>
+                        <a href="${courseLive.youtubeLink}" target="_blank" class="btn btn-sm btn-primary" style="background:var(--danger-color); border-color:var(--danger-color);">Join</a>
+                        <button onclick="this.parentElement.remove()" style="background:none; border:none; color:white; font-size:1rem; cursor:pointer;">&times;</button>
+                    </div>
+                `;
+
+                if (!alertBox) {
+                    alertBox = document.createElement('div');
+                    alertBox.id = 'player-live-alert';
+                    alertBox.style.cssText = "position: absolute; top: 1rem; right: 1rem; width: 400px; background: rgba(0,0,0,0.9); color: white; padding: 1rem; border-radius: 8px; z-index: 100; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid var(--danger-color); animation: slideInRight 0.3s ease-out;";
+                    videoArea.style.position = 'relative'; // Ensure positioning context
+                    videoArea.appendChild(alertBox);
+                }
+                alertBox.innerHTML = alertHtml;
+            } else {
+                if (alertBox) alertBox.remove();
+            }
+        }
+
+
+        window.openCoursePlayer = async (courseId) => {
+            const courses = await DB.getCourses();
+            currentCourse = courses.find(c => c.id === courseId);
+            if (!currentCourse) {
+                Auth.showToast("Course record not found", "error");
+                return;
+            }
+
+            // Reset progression state for this course view
+            completedItems = new Set();
+            examAttempts = {};
+            // Fetch saved progress from DB if exists
+            if (window.auth.currentUser) {
+                const prog = await DB.getCourseProgress(window.auth.currentUser.uid, courseId);
+                if (prog) {
+                    if (prog.completedItems) completedItems = new Set(prog.completedItems);
+                    if (prog.examAttempts) examAttempts = prog.examAttempts;
+                }
+            }
+
+            document.getElementById('course-player-modal').style.display = 'flex';
+            document.getElementById('player-course-title').innerText = currentCourse.title;
+
+            renderSyllabusSidebar();
+
+            // Auto-Resume: Skip to the first uncompleted item
+            if (currentCourse.syllabus && currentCourse.syllabus.length > 0) {
+                let resumeId = currentCourse.syllabus[0].id;
+                for (const item of currentCourse.syllabus) {
+                    if (!completedItems.has(item.id)) {
+                        resumeId = item.id;
+                        break;
+                    }
+                }
+                selectSyllabusItem(resumeId);
+            }
+            updateOverallProgress();
+
+            // Start Live Check for this course
+            startLiveAlertCheck(courseId);
+        };
+
+        function isItemLocked(targetIdx) {
+            if (targetIdx === 0) return false;
+            for (let i = 0; i < targetIdx; i++) {
+                const item = currentCourse.syllabus[i];
+                // Default to mandatory if undefined
+                const isMandatory = item.isMandatory !== false;
+                if (isMandatory && !completedItems.has(item.id)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function renderSyllabusSidebar() {
+            const list = document.getElementById('sidebar-syllabus-list');
+            list.innerHTML = '';
+
+            if (!currentCourse.syllabus) return;
+
+            currentCourse.syllabus.forEach((item, idx) => {
+                const isCompleted = completedItems.has(item.id);
+                const isLocked = isItemLocked(idx);
+
+                const el = document.createElement('div');
+                const isActive = currentItem && currentItem.id === item.id;
+
+                el.style.padding = '1rem';
+                el.style.borderRadius = '8px';
+                el.style.marginBottom = '0.5rem';
+                el.style.display = 'flex';
+                el.style.alignItems = 'center';
+                el.style.gap = '0.75rem';
+                el.style.opacity = isLocked ? '0.5' : '1';
+                el.style.cursor = isLocked ? 'not-allowed' : 'pointer';
+                el.style.background = isActive ? '#EEF2FF' : 'transparent';
+                el.style.border = isActive ? '1px solid var(--primary-color)' : '1px solid transparent';
+
+                let icon = item.type === 'chapter' ? 'fa-play-circle' : 'fa-clipboard-check';
+                if (isLocked) icon = 'fa-lock';
+                else if (isCompleted) icon = 'fa-check-circle';
+
+                const color = isLocked ? '#9ca3af' : (isCompleted ? 'var(--accent-color)' : (item.type === 'chapter' ? 'var(--primary-color)' : 'var(--accent-color)'));
+
+                if (!isLocked) {
+                    el.onclick = () => selectSyllabusItem(item.id);
+                }
+
+                // Sub-labels
+                let subLabel = item.type === 'chapter' ? 'Video Lesson' : 'Exam';
+                if (item.isLiveChapter) subLabel = 'Recorded Live';
+
+                let badges = '';
+                if (item.isMandatory === false) badges = `<span class="badge badge-sm" style="font-size:0.65rem; background:#f3f4f6; color:#6b7280; padding:2px 6px;">Optional</span>`;
+
+                el.innerHTML = `
+                    <i class="fas ${icon}" style="color: ${color}; font-size: 1.1rem;"></i>
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.9rem; font-weight: ${isActive ? '600' : '400'}; display:flex; justify-content:space-between; align-items:center;">
+                            <span>${item.title}</span>
+                            ${badges}
+                        </div>
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">${subLabel}</small>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        window.selectSyllabusItem = async (itemId) => {
+            const idx = currentCourse.syllabus.findIndex(i => i.id === itemId);
+            if (idx === -1) return;
+
+            // Prerequisite check using new locking logic
+            if (isItemLocked(idx)) {
+                Auth.showToast("Please complete the previous mandatory lessons first.", "warning");
+                return;
+            }
+
+            currentItem = currentCourse.syllabus[idx];
+            currentItemIdx = idx;
+
+            renderSyllabusSidebar();
+            document.getElementById('player-item-title').innerText = currentItem.title;
+            document.getElementById('player-item-index').innerText = `${idx + 1} / ${currentCourse.syllabus.length}`;
+
+            let typeLabel = currentItem.type;
+            if (currentItem.isLiveChapter) typeLabel = 'Recorded Live';
+            document.getElementById('player-item-type-badge').innerText = typeLabel;
+
+            document.getElementById('player-item-type-badge').style.color = currentItem.type === 'chapter' ? 'var(--accent-color)' : '#f59e0b';
+
+            // Nav Button States
+            document.getElementById('player-prev-btn').disabled = (idx === 0);
+            document.getElementById('player-next-btn').disabled = !completedItems.has(currentItem.id);
+
+            const videoArea = document.getElementById('video-content-area');
+            const examArea = document.getElementById('exam-content-area');
+
+            if (currentItem.type === 'chapter') {
+                videoArea.style.display = 'flex';
+                examArea.style.display = 'none';
+                initChapterVideo(currentItem.videoUrl);
+            } else {
+                videoArea.style.display = 'none';
+                examArea.style.display = 'block';
+                initExamInterface(currentItem);
+            }
+        };
+
+        window.nextItem = () => {
+            if (currentItemIdx < currentCourse.syllabus.length - 1) {
+                const nextId = currentCourse.syllabus[currentItemIdx + 1].id;
+                selectSyllabusItem(nextId);
+            }
+        };
+
+        window.prevItem = () => {
+            if (currentItemIdx > 0) {
+                const prevId = currentCourse.syllabus[currentItemIdx - 1].id;
+                selectSyllabusItem(prevId);
+            }
+        };
+
+        function updateOverallProgress() {
+            if (!currentCourse || !currentCourse.syllabus) return;
+            const total = currentCourse.syllabus.length;
+            const done = completedItems.size;
+            const p = (done / total) * 100;
+
+            document.getElementById('overall-progress-bar').style.width = p + '%';
+            document.getElementById('header-progress-bar').style.width = p + '%';
+        }
+
+        function markItemCompleted() {
+            if (!currentItem || completedItems.has(currentItem.id)) return;
+
+            completedItems.add(currentItem.id);
+            document.getElementById('player-next-btn').disabled = false;
+            Auth.showToast("Lesson Completed!", "success");
+            renderSyllabusSidebar();
+            updateOverallProgress();
+
+            // Save to DB
+            if (window.auth.currentUser && currentCourse) {
+                DB.saveCourseProgress(window.auth.currentUser.uid, currentCourse.id, {
+                    completedItems: Array.from(completedItems),
+                    lastItemId: currentItem.id,
+                    examAttempts: examAttempts
+                });
+            }
+        }
+
+        async function saveAttempts() {
+            if (window.auth.currentUser && currentCourse) {
+                await DB.saveCourseProgress(window.auth.currentUser.uid, currentCourse.id, {
+                    examAttempts: examAttempts
+                });
+            }
+        }
+
+        function initChapterVideo(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            let vId = (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
+
+            if (!vId) {
+                Auth.showToast("Invalid video source", "error");
+                return;
+            }
+
+            // Reset UI
+            document.getElementById('video-seeker').value = 0;
+            updateTimeDisplay(0, 0);
+
+            if (player && typeof player.loadVideoById === 'function') {
+                player.loadVideoById(vId);
+                startTracking();
+            } else {
+                player = new YT.Player('yt-player', {
+                    height: '100%',
+                    width: '100%',
+                    videoId: vId,
+                    playerVars: { 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'rel': 0 },
+                    events: {
+                        'onReady': (e) => { e.target.playVideo(); startTracking(); },
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+        }
+
+        async function initExamInterface(exam) {
+            const container = document.getElementById('exam-questions-container');
+            document.getElementById('exam-display-title').innerText = exam.title;
+            container.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Checking status...</div>';
+
+            const attempts = examAttempts[exam.id] || 0;
+            const isCompleted = completedItems.has(exam.id);
+
+            // 1. Check if already submitted and pending review
+            if (window.auth.currentUser) {
+                const subs = await DB.getExamSubmissions(window.auth.currentUser.uid, currentCourse.id, exam.id);
+                if (subs.length > 0) {
+                    const latest = subs[subs.length - 1]; // Get most recent
+                    if (latest.status === 'pending') {
+                        renderExamPendingUI(container);
+                        return;
+                    } else if (latest.status === 'reviewed') {
+                        renderExamReviewedUI(container, latest);
+                        return;
+                    }
+                }
+            }
+
+            container.innerHTML = '';
+
+            // LOCKOUT CHECK: If failed twice and not completed
+            if (!isCompleted && attempts >= 2) {
+                renderExamFailureUI(container);
+                return;
+            }
+
+            if (!exam.questions || exam.questions.length === 0) {
+                container.innerHTML = '<p>No questions found in this exam.</p>';
+                return;
+            }
+
+            exam.questions.forEach((q, qIdx) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'card';
+                qDiv.style.padding = '1.5rem';
+                qDiv.style.marginBottom = '1rem';
+
+                let optionsHtml = '';
+                if (q.type === 'mcq') {
+                    q.options.forEach((opt, oIdx) => {
+                        optionsHtml += `
+                            <label style="display: block; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 0.5rem; cursor: pointer;">
+                                <input type="radio" name="q_${qIdx}" value="${opt}" style="margin-right: 0.5rem;">
+                                ${opt}
+                            </label>
+                        `;
+                    });
+                } else {
+                    optionsHtml = `<textarea class="form-control" rows="3" placeholder="Type your answer here..."></textarea>`;
+                }
+
+                qDiv.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 1rem;">Q${qIdx + 1}: ${q.questionText}</div>
+                    ${optionsHtml}
+                `;
+                container.appendChild(qDiv);
+            });
+        }
+
+        window.submitExam = async () => {
+            if (!currentItem || !currentItem.questions) return;
+
+            const isFinal = currentItem.examType === 'end' || currentItem.questions.some(q => q.type === 'text');
+            const container = document.getElementById('exam-questions-container');
+            const qCards = container.querySelectorAll('.card');
+
+            let answers = [];
+            let score = 0;
+            let totalPossible = 0;
+
+            currentItem.questions.forEach((q, idx) => {
+                const qScore = parseInt(q.score) || 5;
+                totalPossible += qScore;
+
+                let userAns = '';
+                if (q.type === 'mcq') {
+                    const selected = qCards[idx].querySelector(`input[name="q_${idx}"]:checked`);
+                    userAns = selected ? selected.value : '';
+                    if (userAns.trim() === (q.correctAnswer || '').trim()) {
+                        score += qScore;
+                    }
+                } else {
+                    userAns = qCards[idx].querySelector('textarea')?.value || '';
+                }
+
+                answers.push({
+                    questionText: q.questionText,
+                    type: q.type,
+                    userAns: userAns,
+                    correctAns: q.correctAnswer || '',
+                    maxScore: qScore,
+                    awardedScore: 0 // Settled by admin
+                });
+            });
+
+            if (isFinal) {
+                // Submit for Review
+                container.innerHTML = '<div style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Submitting for review...</div>';
+
+                await DB.submitExam({
+                    uid: window.auth.currentUser.uid,
+                    userName: Auth.userProfile ? Auth.userProfile.name : 'Unknown Student',
+                    courseId: currentCourse.id,
+                    courseTitle: currentCourse.title,
+                    itemId: currentItem.id,
+                    itemTitle: currentItem.title,
+                    answers: answers,
+                    autoScore: score, // Base score from MCQs
+                    totalPossible: totalPossible
+                });
+
+                renderExamPendingUI(container);
+            } else {
+                // Instant Result for MCQs (Quizzes)
+                const percent = totalPossible > 0 ? (score / totalPossible) * 100 : 0;
+                const passThreshold = parseInt(currentItem.passPercentage) || 50;
+                const passed = percent >= passThreshold;
+
+                if (!passed) {
+                    const currentAttempts = (examAttempts[currentItem.id] || 0);
+                    if (currentAttempts >= 2) {
+                        renderExamFailureUI(container);
+                        return;
+                    }
+                    examAttempts[currentItem.id] = currentAttempts + 1;
+                    saveAttempts();
+                }
+
+                const attemptsUsed = examAttempts[currentItem.id] || 0;
+                const hasMoreChances = attemptsUsed < 2;
+
+                if (passed) {
+                    container.innerHTML = `
+                    <div class="card" style="padding: 2rem; text-align: center;">
+                        <i class="fas fa-check-circle fa-4x" style="color: var(--accent-color); margin-bottom: 1rem;"></i>
+                        <h2>Exam Passed!</h2>
+                        <p style="font-size: 1.25rem; margin: 1rem 0;">Achieved <strong>${score}</strong> out of <strong>${totalPossible}</strong> points (${Math.floor(percent)}%)</p>
+                        <p style="color: var(--text-muted);">You have unlocked the next section.</p>
+                        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                            <button class="btn btn-primary" onclick="nextItem()">Continue to Next Item</button>
+                            <button class="btn btn-secondary" onclick="prevItem()">Review Previous Lesson</button>
+                        </div>
+                    </div>
+                `;
+                    markItemCompleted();
+                } else {
+                    renderExamResultUI(container, score, totalPossible, percent, passThreshold, attemptsUsed, hasMoreChances);
+                }
+            }
+        };
+
+        function renderExamResultUI(container, score, totalPossible, percent, passThreshold, attemptsUsed, hasMoreChances) {
+            container.innerHTML = `
+                <div class="card" style="padding: 2rem; text-align: center;">
+                    <i class="fas fa-times-circle fa-4x" style="color: var(--danger-color); margin-bottom: 1rem;"></i>
+                    <h2>Exam Failed</h2>
+                    <p style="font-size: 1.25rem; margin: 1rem 0;">Achieved <strong>${score}</strong> out of <strong>${totalPossible}</strong> points (${Math.floor(percent)}%)</p>
+                    <p style="color: var(--danger-color); font-weight: 600;">Chance ${attemptsUsed} of 2 Used. ${passThreshold}% required to pass.</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem;">
+                        ${hasMoreChances ? 'You have one more attempt before your progress is reset.' : 'All attempts exhausted.'}
+                    </p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                        ${hasMoreChances ?
+                    `<button class="btn btn-primary" onclick="initExamInterface(currentItem)">Try Again</button>` :
+                    `<button class="btn btn-primary" onclick="handleExamFailure()">Reset Course & Review</button>`
+                }
+                        <button class="btn btn-secondary" onclick="prevItem()">Review Previous Lesson</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderExamFailureUI(container) {
+            container.innerHTML = `
+                <div class="card" style="padding: 3rem; text-align: center;">
+                    <i class="fas fa-lock fa-4x" style="color: var(--danger-color); margin-bottom: 1.5rem;"></i>
+                    <h2>Attempts Exhausted</h2>
+                    <p style="margin: 1rem 0; color: var(--text-muted);">You have failed this exam twice. In order to ensure mastery of the material, you must reset the course and review the lessons again.</p>
+                    <button class="btn btn-primary" onclick="handleExamFailure()">
+                        <i class="fas fa-redo"></i> Reset Course to Beginning
+                    </button>
+                </div>
+            `;
+        }
+
+        function renderExamPendingUI(container) {
+            container.innerHTML = `
+                <div class="card" style="padding: 3rem; text-align: center;">
+                    <i class="fas fa-history fa-4x" style="color: var(--primary-color); margin-bottom: 1.5rem;"></i>
+                    <h2>Submitted for Review</h2>
+                    <p style="margin: 1rem 0; color: var(--text-muted);">Since this exam contains written responses, an instructor will review your answers manually. You will receive your results here once the review is complete.</p>
+                    <button class="btn btn-secondary" onclick="closeCoursePlayer()">Back to Dashboard</button>
+                </div>
+            `;
+        }
+
+        function renderExamReviewedUI(container, sub) {
+            const passed = sub.passed;
+            container.innerHTML = `
+                <div class="card" style="padding: 3rem; text-align: center;">
+                    <i class="fas ${passed ? 'fa-check-circle' : 'fa-times-circle'} fa-4x" style="color: ${passed ? 'var(--accent-color)' : 'var(--danger-color)'}; margin-bottom: 1.5rem;"></i>
+                    <h2>Exam Results Verified</h2>
+                    <p style="font-size: 1.25rem;">Final Score: <strong>${sub.score} / ${sub.totalPossible}</strong></p>
+                    <p style="margin: 1rem 0; color: var(--text-muted); font-style: italic;">" ${sub.feedback || 'No feedback provided.'} "</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1rem; align-items: center; margin-top: 1.5rem;">
+                        ${passed ? `
+                            <button class="btn btn-success" style="width: 100%; max-width: 300px;" onclick="window.open('../certificate.html?id=${sub.certificateId}', '_blank')">
+                                <i class="fas fa-certificate"></i> View Certificate
+                            </button>
+                            <button class="btn btn-primary" style="width: 100%; max-width: 300px;" onclick="nextItem()">Continue to Next Item</button>
+                        ` : `
+                            <button class="btn btn-danger" style="width: 100%; max-width: 300px;" onclick="handleExamFailure()">Reset & Try Again</button>
+                        `}
+                         <button class="btn btn-secondary" style="width: 100%; max-width: 300px;" onclick="closeCoursePlayer()">Close</button>
+                    </div>
+                </div>
+            `;
+            if (passed) markItemCompleted();
+        }
+
+        window.handleExamFailure = async () => {
+            const currentId = currentItem ? currentItem.id : null;
+            if (!currentId) return;
+
+            // 1. Find the "Last Milestone" (Previous Exam)
+            const syllabus = currentCourse.syllabus;
+            const currentIdx = syllabus.findIndex(item => item.id === currentId);
+
+            let milestoneIdx = -1;
+            // Look backwards for the previous exam
+            for (let i = currentIdx - 1; i >= 0; i--) {
+                if (syllabus[i].type === 'exam') {
+                    milestoneIdx = i;
+                    break;
+                }
+            }
+
+            // 2. Calculate New Completion Set
+            let newCompletedList = [];
+            if (milestoneIdx >= 0) {
+                // Keep everything up to and including the milestone
+                newCompletedList = syllabus.slice(0, milestoneIdx + 1).map(item => item.id);
+                Auth.showToast(`Resetting progress to last milestone: ${syllabus[milestoneIdx].title}`, "warning");
+            } else {
+                // No previous milestone, full reset
+                newCompletedList = [];
+                Auth.showToast("Mastery Not Achieved. Resetting course to beginning.", "error");
+            }
+
+            completedItems = new Set(newCompletedList);
+
+            // 3. Clear Attempts for the failed exam
+            delete examAttempts[currentId];
+
+            // 4. Clear submission records so the exam questions can be seen again
+            if (window.auth.currentUser) {
+                await DB.clearFailedSubmission(window.auth.currentUser.uid, currentCourse.id, currentId);
+            }
+
+            // 5. Update UI & Persist
+            updateOverallProgress();
+            renderSyllabusSidebar();
+
+            if (window.auth.currentUser && currentCourse) {
+                await DB.saveCourseProgress(window.auth.currentUser.uid, currentCourse.id, {
+                    completedItems: newCompletedList,
+                    examAttempts: examAttempts,
+                    lastItemId: milestoneIdx >= 0 ? syllabus[milestoneIdx].id : null
+                });
+            }
+
+            // Select the milestone item to show where they are
+            if (milestoneIdx >= 0) {
+                selectSyllabusItem(syllabus[milestoneIdx].id);
+            } else if (syllabus.length > 0) {
+                selectSyllabusItem(syllabus[0].id);
+            }
+        };
+
+        window.closeCoursePlayer = async () => {
+            if (player) player.stopVideo();
+            if (progressInterval) clearInterval(progressInterval);
+            await syncWatchTime();
+            document.getElementById('course-player-modal').style.display = 'none';
+        };
+
+        // Reuse existing control functions
+        window.togglePlay = () => {
+            if (!player) return;
+            const state = player.getPlayerState();
+            if (state === YT.PlayerState.PLAYING) player.pauseVideo();
+            else player.playVideo();
+        };
+
+        window.seekVideo = (percent) => {
+            if (!player) return;
+            player.seekTo(player.getDuration() * (percent / 100), true);
+        };
+
+        window.restartVideo = () => { if (player) player.seekTo(0, true); };
+        window.rewindVideo = () => { if (player) player.seekTo(Math.max(0, player.getCurrentTime() - 10), true); };
+
+        function updateTimeDisplay(cur, total) {
+            const format = (s) => Math.floor(s / 60) + ":" + (Math.floor(s % 60)).toString().padStart(2, '0');
+            document.getElementById('time-display').innerText = format(cur) + " / " + format(total);
+        }
+
+        function startTracking() {
+            if (progressInterval) clearInterval(progressInterval);
+            sessionWatchTime = 0;
+            progressInterval = setInterval(() => {
+                if (!player || typeof player.getCurrentTime !== 'function') return;
+
+                if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                    sessionWatchTime += 1;
+                    if (sessionWatchTime % 30 === 0) {
+                        syncWatchTime();
+                    }
+                }
+
+                const cur = player.getCurrentTime();
+                const total = player.getDuration();
+                if (total > 0) {
+                    const p = (cur / total) * 100;
+                    document.getElementById('video-seeker').value = p;
+                    updateTimeDisplay(cur, total);
+
+                    const displayP = Math.min(100, Math.round(p));
+                    document.getElementById('course-status-badge').innerText = displayP + "%";
+
+                    // AUTO COMPLETE AT 98%
+                    if (p >= 98) {
+                        markItemCompleted();
+                    }
+                }
+            }, 1000);
+        }
+
+        async function syncWatchTime() {
+            if (!window.auth.currentUser || !currentCourse || sessionWatchTime <= 0) return;
+            const watchToSync = sessionWatchTime;
+            sessionWatchTime = 0;
+            try {
+                const docId = `${window.auth.currentUser.uid}_${currentCourse.id}`;
+                await window.db.collection('course_progress').doc(docId).set({
+                    uid: window.auth.currentUser.uid,
+                    courseId: currentCourse.id,
+                    watchTime: firebase.firestore.FieldValue.increment(watchToSync),
+                    lastUpdated: new Date()
+                }, { merge: true });
+                loadWatchTime(window.auth.currentUser.uid);
+            } catch (e) {
+                console.error("Sync Watch Time Error:", e);
+                sessionWatchTime += watchToSync;
+            }
+        }
+
+        function onPlayerStateChange(e) {
+            const btn = document.getElementById('custom-play-btn');
+            if (e.data === YT.PlayerState.PLAYING) {
+                btn.innerHTML = '<i class="fas fa-pause"></i> Pause';
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i> Play';
+            }
+
+            // SNAP TO 100% ON END
+            if (e.data === YT.PlayerState.ENDED) {
+                document.getElementById('video-seeker').value = 100;
+                document.getElementById('course-status-badge').innerText = "100%";
+                markItemCompleted();
+            }
+        }
+
+        // Change Password Handler
+        document.getElementById('change-pass-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currPass = document.getElementById('current-pass').value;
+            const p1 = document.getElementById('new-pass').value;
+            const p2 = document.getElementById('confirm-pass').value;
+
+            if (p1 !== p2) {
+                Auth.showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            const res = await Auth.changePassword(currPass, p1);
+            if (res.success) {
+                Auth.showToast('Password Updated Successfully', 'success');
+                document.getElementById('change-pass-modal').style.display = 'none';
+                document.getElementById('change-pass-form').reset();
+            } else {
+                Auth.showToast(res.message, 'error');
+            }
+        });
+    </script>
+    <!-- Live Player Modal (Split View) -->
+    <div id="live-player-modal" class="modal"
+        style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background-color: rgba(0,0,0,0.95);">
+
+        <div
+            style="position: relative; width: 95%; height: 95%; margin: 2.5vh auto; display: flex; flex-direction: column;">
+
+            <!-- Header -->
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; color: white;">
+                <h3 id="live-player-title" style="margin: 0; font-size: 1.2rem;">Live Stream</h3>
+                <span class="close-btn" style="color: white; font-size: 2rem; cursor: pointer;"
+                    onclick="closeLivePlayer()">&times;</span>
+            </div>
+
+            <!-- Body (Grid: Video + Chat) -->
+            <div
+                style="flex-grow: 1; display: grid; grid-template-columns: 1fr 350px; gap: 1rem; overflow: hidden; padding-bottom: 1rem;">
+
+                <!-- Video Col (16:9ish) -->
+                <!-- Video Col (Left Side) -->
+                <div
+                    style="display: flex; flex-direction: column; background: black; border-radius: 8px; overflow: hidden; justify-content: space-between;">
+
+                    <!-- Video Frame -->
+                    <div id="live-player-container"
+                        style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; pointer-events: none;">
+                        <div id="live-player-frame"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto;">
+                        </div>
+                        <div
+                            style="position: absolute; top:0; left:0; width:100%; height:100%; background:transparent; pointer-events:auto;">
+                        </div>
+                    </div>
+
+                    <!-- Small Controls Bar (Bottom of Video Col) -->
+                    <div
+                        style="display: flex; gap: 0.5rem; padding: 0.5rem; background: #111827; justify-content: center; align-items: center;">
+                        <button class="btn btn-sm btn-secondary" onclick="controlLivePlayer('playPause')"
+                            style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            <i class="fas fa-play"></i> / <i class="fas fa-pause"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="controlLivePlayer('rewind')"
+                            style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            <i class="fas fa-undo"></i> -10s
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="controlLivePlayer('forward')"
+                            style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            <i class="fas fa-redo"></i> +10s
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="controlLivePlayer('mute')"
+                            style="padding: 0.25rem 0.5rem; font-size: 0.8rem;">
+                            <i class="fas fa-volume-mute"></i> / <i class="fas fa-volume-up"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Col (Right Side) -->
+                <div
+                    style="display: flex; flex-direction: column; background: #1f2937; border-radius: 8px; overflow: hidden;">
+                    <div style="padding: 1rem; border-bottom: 1px solid #374151; color: white; font-weight: bold;">
+                        Live Chat
+                    </div>
+
+                    <div id="live-chat-messages"
+                        style="flex-grow: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; scroll-behavior: smooth;">
+                        <div style="color: #6b7280; text-align: center; margin-top: 2rem;">Connecting to chat...</div>
+                    </div>
+
+                    <form id="live-chat-form"
+                        style="display: flex; padding: 0.5rem; border-top: 1px solid #374151; gap: 0.5rem;">
+                        <input type="text" id="live-chat-input" placeholder="Say something..." autocomplete="off"
+                            style="flex-grow: 1; padding: 0.5rem; border-radius: 4px; border: 1px solid #374151; background: #111827; color: white;">
+                        <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1rem;">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Mobile Responsive Style Overrides Inline -->
+                <style>
+                    @media (max-width: 900px) {
+                        #live-player-modal>div>div:nth-child(2) {
+                            grid-template-columns: 1fr;
+                            grid-template-rows: auto 1fr;
+                        }
+
+                        /* Make chat collapsible or smaller on mobile? For now just stacked */
+                    }
+                </style>
+            </div>
+        </div>
+</body>
+
+</html>

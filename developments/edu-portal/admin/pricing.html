@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Pricing - EduPortal Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <style>
+        .pricing-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #8B5CF6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pricing-card:hover::before {
+            opacity: 1;
+        }
+
+        .premium-tag {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+
+        .price-display {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #4F46E5 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .no-price {
+            color: #EF4444;
+            background: #FEE2E2;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-style: normal;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body style="background-color: #f3f4f6;">
+
+    <header style="background: #1F2937; color: white;">
+        <div class="container navbar">
+            <div class="logo" style="color: white; cursor: pointer;" onclick="window.location.href='index.html'">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </div>
+            <div class="nav-cta" style="display: flex; gap: 1rem; align-items: center;">
+                <span id="admin-name">loading...</span>
+                <button id="logout-btn" class="btn btn-sm btn-secondary"
+                    style="background: transparent; color: white; border-color: rgba(255,255,255,0.3);">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container" style="padding: var(--spacing-lg) var(--spacing-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="margin: 0; font-size: 1.8rem;">Course Pricing Management</h1>
+                <p style="color: var(--text-muted);">Set and manage course prices for students.</p>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" id="pricing-search" class="form-control" placeholder="Search courses..."
+                    style="width: 250px;">
+            </div>
+        </div>
+
+        <div id="pricing-grid" class="card-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+            <!-- Pricing cards will be injected here -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading course data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Price Modal -->
+    <div id="price-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 1000;">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 2rem;">
+            <h2 id="modal-title" style="margin-bottom: 1rem;">Edit Price</h2>
+            <form id="price-form">
+                <input type="hidden" id="price-course-id">
+                <div class="form-group">
+                    <label class="form-label">Course Title</label>
+                    <p id="modal-course-title" style="font-weight: 600; margin-bottom: 1rem;"></p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Price (in USD/Credits/INR)</label>
+                    <input type="number" id="course-price-input" class="form-control" placeholder="Enter amount" min="0"
+                        step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Quick Actions</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="setQuickPrice(0)">Set as
+                            Free</button>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="setQuickPrice(499)">499</button>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="setQuickPrice(999)">999</button>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('price-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Price</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.85rem; margin-top: auto;">
+        powered by <a href="https://www.gridify.in" target="_blank"
+            style="color: inherit; text-decoration: underline;">Gridify</a>
+    </footer>
+
+    <script type="module" src="../scripts/firebase-config.js"></script>
+    <script src="../scripts/auth.js"></script>
+    <script src="../scripts/db.js"></script>
+
+    <script>
+        let allCourses = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Restriction: Only admin, super_admin, head_admin. NOT staff.
+            const isAuth = await Auth.checkProtection('admin');
+            if (!isAuth) return;
+
+            // Check if user is staff - staff should not be here
+            if (Auth.userProfile && Auth.userProfile.role === 'staff') {
+                alert('Access Denied: Pricing management is restricted to administrators.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            document.getElementById('admin-name').innerText = Auth.userProfile.name || 'Admin';
+
+            loadCourses();
+
+            document.getElementById('pricing-search').addEventListener('input', renderPricingGrid);
+        });
+
+        async function loadCourses() {
+            DB.listenToCourses((courses) => {
+                allCourses = courses;
+                renderPricingGrid();
+            });
+        }
+
+        function renderPricingGrid() {
+            const search = document.getElementById('pricing-search').value.toLowerCase();
+            const grid = document.getElementById('pricing-grid');
+            grid.innerHTML = '';
+
+            const filtered = allCourses.filter(c => c.title.toLowerCase().includes(search));
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #666;">No courses found.</div>';
+                return;
+            }
+
+            filtered.sort((a, b) => (b.isPremium ? 1 : 0) - (a.isPremium ? 1 : 0)).forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'card pricing-card';
+                card.style.padding = '1.5rem';
+                card.style.display = 'flex';
+                card.style.flexDirection = 'column';
+                card.style.justifyContent = 'space-between';
+
+                const hasPrice = c.price !== undefined && c.price !== null;
+                const priceText = hasPrice ? (c.price === 0 ? 'FREE' : '₹' + c.price) : '<span class="no-price">Price Not Set</span>';
+
+                const premiumBadge = c.isPremium ? '<span class="premium-tag">PREMIUM</span>' : '<span class="badge badge-success">FREE COURSE</span>';
+
+                card.innerHTML = `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                            <span class="badge badge-secondary">${c.category || 'General'}</span>
+                            ${premiumBadge}
+                        </div>
+                        <h3 style="margin: 0.5rem 0; font-size: 1.1rem;">${c.title}</h3>
+                        <p style="font-size: 0.85rem; color: #666; margin-bottom: 1rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${c.description}</p>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                            <span style="font-size: 0.85rem; color: #666;">Current Price:</span>
+                            <span class="price-display">${priceText}</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="openPriceModal('${c.id}', '${c.title.replace(/'/g, "\\'")}', ${c.price || 0})">
+                            <i class="fas fa-tag"></i> Edit Price
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.openPriceModal = (id, title, currentPrice) => {
+            document.getElementById('price-course-id').value = id;
+            document.getElementById('modal-course-title').innerText = title;
+            document.getElementById('course-price-input').value = currentPrice || '';
+            document.getElementById('price-modal').style.display = 'flex';
+        };
+
+        window.closeModal = (id) => {
+            document.getElementById(id).style.display = 'none';
+        };
+
+        window.setQuickPrice = (val) => {
+            document.getElementById('course-price-input').value = val;
+        };
+
+        document.getElementById('price-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('price-course-id').value;
+            const price = parseFloat(document.getElementById('course-price-input').value);
+
+            if (isNaN(price)) {
+                alert('Please enter a valid price.');
+                return;
+            }
+
+            try {
+                await DB.updateCoursePrice(id, price);
+                Auth.showToast('Price updated successfully!', 'success');
+                closeModal('price-modal');
+            } catch (error) {
+                Auth.showToast('Error updating price: ' + error.message, 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

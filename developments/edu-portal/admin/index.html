@@ -1,0 +1,2204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EduPortal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+
+</head>
+
+<body class="admin-dashboard">
+
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo">
+                <i class="fas fa-user-shield"></i>
+                <span class="dashboard-hide-mobile">EduPortal Admin</span>
+                <span class="dashboard-show-mobile">Admin</span>
+            </a>
+            <div class="nav-controls">
+                <span id="admin-name" class="dashboard-hide-mobile"
+                    style="margin-right: 0.5rem; opacity: 0.9; font-size: 0.9rem;">Admin</span>
+
+                <div class="hanging-controls">
+                    <button onclick="openModal('change-pass-modal')" class="btn btn-secondary" title="Change Password">
+                        <i class="fas fa-key"></i>
+                        <span class="btn-text-mobile">Password</span>
+                    </button>
+
+                    <button id="logout-btn" class="btn btn-secondary" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="btn-text-mobile">Log Out</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ... Content ... -->
+
+    <!-- Change Password Modal -->
+    <div id="change-pass-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10001;">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Change Password</h3>
+            <form id="change-pass-form">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="current-pass" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="new-pass" class="form-control" required minlength="4"
+                        placeholder="Min 6 characters">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" id="confirm-pass" class="form-control" required minlength="4">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('change-pass-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="container"
+        style="padding: calc(var(--admin-spacing-unit) * 4) calc(var(--admin-spacing-unit) * 2); max-width: 1400px;">
+
+        <!-- 1. HERO SUMMARY STRIP -->
+        <div class="hero-summary">
+            <div class="hero-summary-grid">
+                <div class="hero-metric status" id="hero-status-metric">
+                    <div class="hero-metric-value" id="hero-status-value">Online</div>
+                    <div class="hero-metric-label">System Status</div>
+                    <div id="sys-toggle-container" style="margin-top: 12px;"></div>
+                </div>
+                <div class="hero-metric" onclick="window.location.href='users.html'" style="cursor: pointer;">
+                    <div class="hero-metric-value" id="stat-users">-</div>
+                    <div class="hero-metric-label">Total Users</div>
+                </div>
+                <div class="hero-metric" onclick="window.location.href='courses.html'" style="cursor: pointer;">
+                    <div class="hero-metric-value" id="stat-courses">-</div>
+                    <div class="hero-metric-label">Total Courses</div>
+                </div>
+                <div class="hero-metric" onclick="window.location.href='payments.html'" style="cursor: pointer;">
+                    <div class="hero-metric-value" id="stat-payments" style="color: #F59E0B;">-</div>
+                    <div class="hero-metric-label">Pending Payments</div>
+                </div>
+                <div class="hero-metric" onclick="window.location.href='reviews.html'" style="cursor: pointer;">
+                    <div class="hero-metric-value" id="stat-reviews" style="color: #8B5CF6;">-</div>
+                    <div class="hero-metric-label">Exam Valuation</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. CORE CONTROLS SECTION -->
+        <div class="core-controls-grid">
+            <!-- Left: Primary Actions -->
+            <div class="primary-actions">
+                <div class="action-card primary" onclick="openModal('live-modal')">
+                    <div class="action-card-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="action-card-content">
+                        <div class="action-card-title">Start Live Class</div>
+                        <div class="action-card-subtitle">Begin a live streaming session</div>
+                    </div>
+                </div>
+
+                <div class="action-card" onclick="openModal('course-modal')">
+                    <div class="action-card-icon" style="background: #EEF2FF; color: #4F46E5;">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="action-card-content">
+                        <div class="action-card-title">Add New Course</div>
+                        <div class="action-card-subtitle">Create a new course offering</div>
+                    </div>
+                </div>
+
+                <div class="action-card" onclick="window.location.href='pricing.html'" id="pricing-action-card"
+                    style="display: none;">
+                    <div class="action-card-icon" style="background: #FEF3C7; color: #F59E0B;">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div class="action-card-content">
+                        <div class="action-card-title">Course Pricing</div>
+                        <div class="action-card-subtitle">Manage course prices and offers</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: System Controls -->
+            <div class="system-controls">
+                <div class="system-control-card" onclick="promptFirebaseAccess()" id="firebase-control-card"
+                    style="display: none;">
+                    <div class="system-control-icon" style="background: #FEF3C7; color: #F59E0B;">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                    <div class="system-control-label">Firebase Config</div>
+                </div>
+
+                <div class="system-control-card" onclick="openSettingsModal()" id="settings-control-card"
+                    style="display: none;">
+                    <div class="system-control-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="system-control-label">Site Settings</div>
+                </div>
+
+                <div class="system-control-card" onclick="openModal('sub-status-modal')">
+                    <div class="system-control-icon" style="background: #EEF2FF; color: #6366F1;">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="system-control-label">Subscription Status</div>
+                </div>
+
+                <div class="system-control-card" onclick="openLegalPagesModal()" id="legal-control-card"
+                    style="display: none;">
+                    <div class="system-control-icon" style="background: #EEF2FF; color: #6366F1;">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <div class="system-control-label">Legal Pages</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. MANAGEMENT MODULES -->
+        <div class="management-modules">
+            <div class="management-modules-header">Management Tools</div>
+            <div class="management-grid">
+                <div class="module-card" onclick="openModal('verify-cert-modal')">
+                    <div class="module-icon" style="background: #FCE7F3; color: #EC4899;">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="module-title">Verify Certificate</div>
+                </div>
+
+                <div class="module-card" onclick="window.location.href='payment_report.html'" id="report-module-card"
+                    style="display: none;">
+                    <div class="module-icon" style="background: #D1FAE5; color: #10B981;">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="module-title">Payment Report</div>
+                </div>
+
+                <div class="module-card" onclick="window.location.href='reviews.html'">
+                    <div class="module-icon" style="background: #EDE9FE; color: #8B5CF6;">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <div class="module-title">Exam Reviews</div>
+                </div>
+
+                <div class="module-card" onclick="openCategoriesModal()" id="department-module-card"
+                    style="display: none;">
+                    <div class="module-icon" style="background: #FEF3C7; color: #F59E0B;">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="module-title">Department</div>
+                </div>
+
+                <div class="module-card" onclick="openGridifyPortalModal()">
+                    <div class="module-icon" style="background: #E0F2FE; color: #0EA5E9;">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="module-title">Gridify Portal</div>
+                </div>
+
+                <div class="module-card" onclick="openModal('contacts-modal')">
+                    <div class="module-icon" style="background: #D1FAE5; color: #10B981;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="module-title">Contact Messages</div>
+                    <div style="font-size: 0.75rem; color: var(--admin-text-tertiary); margin-top: 4px;">
+                        <span id="stat-contacts">-</span> unread
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="openProvidedCertsModal()">
+                    <div class="module-icon" style="background: #EEF2FF; color: #6366F1;">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="module-title">Certificates</div>
+                    <div style="font-size: 0.75rem; color: var(--admin-text-tertiary); margin-top: 4px;">
+                        <span id="stat-certificates">-</span> issued
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. ACTIVITY & ACTION ZONE -->
+        <div class="activity-zone">
+            <!-- Left: Recent Activity Timeline -->
+            <div class="activity-panel">
+                <div class="activity-header">
+                    <div class="activity-title">Recent Activity</div>
+                    <button class="admin-btn admin-btn-secondary admin-btn-sm" onclick="loadActivities()">
+                        <i class="fas fa-sync"></i> Refresh
+                    </button>
+                </div>
+                <div class="activity-timeline" id="activity-feed">
+                    <div style="text-align: center; padding: 2rem; color: var(--admin-text-tertiary);">
+                        <i class="fas fa-spinner fa-spin fa-2x"></i>
+                        <p style="margin-top: 1rem;">Loading activities...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Quick Actions -->
+            <div class="quick-actions-panel">
+                <div class="activity-header">
+                    <div class="activity-title">Quick Actions</div>
+                </div>
+                <div>
+                    <div class="quick-action-item highlighted" onclick="openModal('live-modal')">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="quick-action-label">Start Live</div>
+                    </div>
+                    <div class="quick-action-item" onclick="openModal('user-modal')">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="quick-action-label">Add User</div>
+                    </div>
+                    <div class="quick-action-item" onclick="window.location.href='users.html'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="quick-action-label">Manage Users</div>
+                    </div>
+                    <div class="quick-action-item" onclick="window.location.href='courses.html'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="quick-action-label">Manage Courses</div>
+                    </div>
+                    <div class="quick-action-item" onclick="openDuplicatesModal()" id="duplicates-quick-action">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="quick-action-label">
+                            Duplicates (<span id="stat-duplicates">0</span>)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden stat cards for backwards compatibility -->
+        <div style="display: none;">
+            <div id="stat-cats-card"></div>
+            <div id="stat-gridify-card"></div>
+            <div id="stat-pricing-card"></div>
+            <div id="stat-reports-card"></div>
+            <div id="stat-duplicates-card"></div>
+            <div id="stat-live-card"></div>
+            <div id="stat-legal-card"></div>
+            <div id="stat-firebase-card"></div>
+            <div id="stat-settings-card"></div>
+            <div id="dup-alert"></div>
+            <div id="side-report-btn"></div>
+        </div>
+    </div>
+
+    <!-- Live Class Modal -->
+    <div id="live-modal" class="live-session-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 10011;">
+        <div class="live-session-card"
+            style="width: 90%; max-width: 540px; background: white; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); overflow: hidden;">
+            <!-- Header -->
+            <div class="live-session-header"
+                style="padding: 1.5rem 2rem; border-bottom: 1px solid #F0F2F5; background: linear-gradient(135deg, #FAFBFC 0%, #FFFFFF 100%);">
+                <h2
+                    style="margin: 0; font-size: 1.5rem; font-weight: 700; color: #0F172A; display: flex; align-items: center; gap: 0.75rem;">
+                    <div
+                        style="width: 40px; height: 40px; background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.3);">
+                        <i class="fas fa-video" style="color: white; font-size: 1.125rem;"></i>
+                    </div>
+                    Start Live Session
+                </h2>
+                <p style="margin: 0.5rem 0 0 0; color: #64748B; font-size: 0.875rem;">Configure your live streaming
+                    session details</p>
+            </div>
+
+            <!-- Form Body -->
+            <form id="live-class-form" style="padding: 2rem;">
+                <!-- Session Title -->
+                <div class="live-form-group" style="margin-bottom: 1.5rem;">
+                    <label class="live-form-label"
+                        style="display: block; font-size: 0.875rem; font-weight: 600; color: #0F172A; margin-bottom: 0.5rem;">
+                        Session Title
+                    </label>
+                    <input type="text" id="live-title" class="live-form-input"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #E4E7EB; border-radius: 10px; font-size: 0.9375rem; transition: all 0.2s ease; outline: none;"
+                        placeholder="e.g. Advanced Physics Workshop" required
+                        onfocus="this.style.borderColor='#4F46E5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)'"
+                        onblur="this.style.borderColor='#E4E7EB'; this.style.boxShadow='none'">
+                </div>
+
+                <!-- Description -->
+                <div class="live-form-group" style="margin-bottom: 1.5rem;">
+                    <label class="live-form-label"
+                        style="display: block; font-size: 0.875rem; font-weight: 600; color: #0F172A; margin-bottom: 0.5rem;">
+                        Description
+                    </label>
+                    <textarea id="live-desc" class="live-form-input" rows="3"
+                        style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #E4E7EB; border-radius: 10px; font-size: 0.9375rem; transition: all 0.2s ease; outline: none; resize: vertical; font-family: inherit;"
+                        placeholder="Brief description of the session..." required
+                        onfocus="this.style.borderColor='#4F46E5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)'"
+                        onblur="this.style.borderColor='#E4E7EB'; this.style.boxShadow='none'"></textarea>
+                </div>
+
+                <!-- Category & Course Row -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="live-form-group">
+                        <label class="live-form-label"
+                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #0F172A; margin-bottom: 0.5rem;">
+                            Category
+                        </label>
+                        <select id="live-category" class="live-form-input"
+                            style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #E4E7EB; border-radius: 10px; font-size: 0.9375rem; transition: all 0.2s ease; outline: none; background: white; cursor: pointer;"
+                            onfocus="this.style.borderColor='#4F46E5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)'"
+                            onblur="this.style.borderColor='#E4E7EB'; this.style.boxShadow='none'">
+                            <option value="General">General</option>
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+
+                    <div class="live-form-group">
+                        <label class="live-form-label"
+                            style="display: block; font-size: 0.875rem; font-weight: 600; color: #0F172A; margin-bottom: 0.5rem;">
+                            Related Course
+                        </label>
+                        <select id="live-course" class="live-form-input"
+                            style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #E4E7EB; border-radius: 10px; font-size: 0.9375rem; transition: all 0.2s ease; outline: none; background: white; cursor: pointer;"
+                            onfocus="this.style.borderColor='#4F46E5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)'"
+                            onblur="this.style.borderColor='#E4E7EB'; this.style.boxShadow='none'">
+                            <option value="">None (Category Wide)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div
+                    style="background: #F8FAFC; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1.5rem; border-left: 3px solid #94A3B8;">
+                    <p style="margin: 0; font-size: 0.8125rem; color: #64748B; line-height: 1.5;">
+                        <i class="fas fa-info-circle" style="margin-right: 0.5rem; color: #94A3B8;"></i>
+                        If a course is selected, only enrolled students will see this live session.
+                    </p>
+                </div>
+
+                <!-- YouTube Link -->
+                <div class="live-form-group" style="margin-bottom: 1.5rem;">
+                    <label class="live-form-label"
+                        style="display: block; font-size: 0.875rem; font-weight: 600; color: #0F172A; margin-bottom: 0.5rem;">
+                        YouTube Live Link
+                    </label>
+                    <div style="position: relative;">
+                        <div
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); pointer-events: none;">
+                            <i class="fab fa-youtube" style="color: #FF0000; font-size: 1.25rem;"></i>
+                        </div>
+                        <input type="url" id="live-link" class="live-form-input"
+                            style="width: 100%; padding: 0.75rem 1rem 0.75rem 3rem; border: 1.5px solid #E4E7EB; border-radius: 10px; font-size: 0.9375rem; transition: all 0.2s ease; outline: none;"
+                            placeholder="https://youtube.com/live/..." required
+                            onfocus="this.style.borderColor='#4F46E5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)'"
+                            onblur="this.style.borderColor='#E4E7EB'; this.style.boxShadow='none'">
+                    </div>
+                    <small style="display: block; margin-top: 0.5rem; color: #94A3B8; font-size: 0.8125rem;">
+                        Paste your YouTube live stream URL here
+                    </small>
+                </div>
+
+                <!-- Action Buttons -->
+                <div
+                    style="display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #F0F2F5;">
+                    <button type="button" id="end-live-btn"
+                        style="display: none; padding: 0.625rem 1.25rem; background: #FEE2E2; color: #DC2626; border: 1.5px solid #FECACA; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
+                        onclick="endLiveSession()"
+                        onmouseover="this.style.background='#FEF2F2'; this.style.borderColor='#FCA5A5'"
+                        onmouseout="this.style.background='#FEE2E2'; this.style.borderColor='#FECACA'">
+                        <i class="fas fa-stop-circle" style="margin-right: 0.5rem;"></i>End Current Session
+                    </button>
+                    <div style="display: flex; gap: 0.75rem; margin-left: auto;">
+                        <button type="button" class="live-btn-secondary"
+                            style="padding: 0.75rem 1.5rem; background: white; color: #64748B; border: 1.5px solid #E4E7EB; border-radius: 10px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;"
+                            onclick="closeModal('live-modal')"
+                            onmouseover="this.style.background='#F8FAFC'; this.style.borderColor='#CBD5E1'"
+                            onmouseout="this.style.background='white'; this.style.borderColor='#E4E7EB'">
+                            Cancel
+                        </button>
+                        <button type="submit" class="live-btn-primary"
+                            style="padding: 0.75rem 1.75rem; background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%); color: white; border: none; border-radius: 10px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);"
+                            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 10px 15px -3px rgba(79, 70, 229, 0.4)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(79, 70, 229, 0.3)'">
+                            <i class="fas fa-broadcast-tower" style="margin-right: 0.5rem;"></i>Go Live
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="course-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div class="card" style="width: 90%; max-width: 500px; padding: 2rem;">
+            <h2 style="margin-bottom: 1rem;">Add New Course</h2>
+            <form id="add-course-form">
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" id="c-title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea id="c-desc" class="form-control" require></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="c-cat" class="form-control">
+                        <option value="">Loading categories...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="c-premium"> Is Premium?
+                    </label>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('course-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Course</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="user-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div class="card" style="width: 90%; max-width: 500px; padding: 2rem;">
+            <h2 style="margin-bottom: 1rem;">Add New User</h2>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="u-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="u-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="u-pass" class="form-control" required minlength="4">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select id="u-role" class="form-control">
+                        <option value="student">Student</option>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                        <option value="head_admin">Head Admin</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('user-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- System Offline Reason Modal -->
+    <div id="offline-reason-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 9999;">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Set System Offline</h3>
+            <p style="margin-bottom: 1rem; color: #666;">Please select a reason for taking the system offline:</p>
+
+            <div style="margin-bottom: 1rem;">
+                <div style="margin-bottom: 0.5rem;">
+                    <input type="radio" name="offline-reason" id="reason-dev" value="Under Maintenance" checked
+                        onchange="toggleCustomReason(false)">
+                    <label for="reason-dev">Under Maintenance</label>
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <input type="radio" name="offline-reason" id="reason-sub" value="Platform Subscription Expired"
+                        onchange="toggleCustomReason(false)">
+                    <label for="reason-sub">Platform Subscription Expired</label>
+                </div>
+                <div style="margin-bottom: 0.5rem;">
+                    <input type="radio" name="offline-reason" id="reason-custom" value="custom"
+                        onchange="toggleCustomReason(true)">
+                    <label for="reason-custom">Custom Input</label>
+                </div>
+                <div id="custom-reason-input" style="display: none; margin-top: 0.5rem;">
+                    <input type="text" id="reason-text" class="form-control" placeholder="Enter reason here...">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="closeModal('offline-reason-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmOffline()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Messages Modal -->
+    <div id="contacts-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10007;">
+        <div class="card"
+            style="width: 95%; max-width: 900px; padding: 2rem; max-height: 90vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Contact Messages</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('contacts-modal')">&times;</button>
+            </div>
+
+            <div style="overflow-y: auto; flex: 1;" class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid #eee;">
+                            <th style="padding: 1rem;">From</th>
+                            <th style="padding: 1rem;">WhatsApp</th>
+                            <th style="padding: 1rem;">Message</th>
+                            <th style="padding: 1rem;">Date</th>
+                            <th style="padding: 1rem;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contacts-list">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verify Certificate Modal -->
+    <div id="verify-cert-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10003;">
+        <div class="card" style="width: 90%; max-width: 500px; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Verify Certificate</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('verify-cert-modal')">&times;</button>
+            </div>
+
+            <form id="verify-cert-form" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                <input type="text" id="verify-cert-id" class="form-control"
+                    placeholder="Enter Certificate ID (e.g. GRD-CERT-...)" required>
+                <button type="submit" class="btn btn-primary">Check</button>
+            </form>
+
+            <div id="verify-result"
+                style="display: none; padding: 1rem; border-radius: 8px; border: 1px solid #eee; background: #f9fafb;">
+                <!-- Results injected here -->
+            </div>
+        </div>
+    </div>
+    <!-- Provided Certificates Modal -->
+    <div id="provided-certs-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10004;">
+        <div class="card" style="width: 95%; max-width: 800px; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Provided Certificates</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('provided-certs-modal')">&times;</button>
+            </div>
+
+            <div style="margin-bottom: 1rem;">
+                <input type="text" id="cert-search-input" class="form-control"
+                    placeholder="Search by student name, course or cert ID..." onkeyup="filterProvidedCerts()">
+            </div>
+
+            <div class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid #eee;">
+                            <th style="padding: 1rem;">Student</th>
+                            <th style="padding: 1rem;">Course</th>
+                            <th style="padding: 1rem;">ID</th>
+                            <th style="padding: 1rem;">Date</th>
+                            <th style="padding: 1rem;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="provided-certs-list">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="categories-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10002;">
+        <div class="card" style="width: 90%; max-width: 450px; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Manage Categories</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('categories-modal')">&times;</button>
+            </div>
+
+            <form id="add-category-form" style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                <input type="text" id="new-cat-name" class="form-control" placeholder="New category name..." required>
+                <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+
+            <div id="categories-list"
+                style="max-height: 350px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Categories will be loaded here -->
+            </div>
+        </div>
+    </div>
+    <!-- Duplicate Certificates Modal -->
+    <div id="duplicates-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10005;">
+        <div class="card"
+            style="width: 95%; max-width: 900px; padding: 2rem; max-height: 90vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Duplicate Certificates Detected</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('duplicates-modal')">&times;</button>
+            </div>
+
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">Users listed below have multiple certificates for
+                the same course. Please review and revoke unnecessary ones.</p>
+
+            <div style="overflow-y: auto; flex: 1;" id="duplicates-list-container" class="table-responsive">
+                <table class="table" style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid #eee;">
+                            <th style="padding: 1rem;">Student & Course</th>
+                            <th style="padding: 1rem;">Certificate History (Select to Revoke)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="duplicates-list">
+                        <!-- Loaded dynamically -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Subscription Status Modal (Popup) -->
+    <div id="sub-status-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10006;">
+        <div class="card"
+            style="width: 95%; height: 90vh; max-width: 1200px; padding: 0; overflow: hidden; display: flex; flex-direction: column; position: relative;">
+            <div
+                style="padding: 1rem 1.5rem; background: #fff; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-size: 1.25rem;"><i class="fas fa-crown" style="color: #4F46E5;"></i> Platform
+                    Subscription</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('sub-status-modal')"
+                    style="border-radius: 50%; width: 32px; height: 32px; padding: 0;">&times;</button>
+            </div>
+            <iframe src="https://gridify.in/sub/check" style="flex: 1; width: 100%; border: none;"></iframe>
+        </div>
+    </div>
+
+    <!-- Firebase Config Modal -->
+    <div id="firebase-config-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10008;">
+        <div class="card" style="width: 95%; max-width: 600px; padding: 2rem; max-height: 90vh; overflow-y:auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Firebase Configuration</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('firebase-config-modal')">&times;</button>
+            </div>
+            <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">
+                Update your Firebase connection settings. Changes will be saved to your browser session.
+            </p>
+            <form id="firebase-config-form">
+                <div class="form-group">
+                    <label class="form-label">API Key</label>
+                    <input type="text" id="fb-apiKey" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Auth Domain</label>
+                    <input type="text" id="fb-authDomain" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Project ID</label>
+                    <input type="text" id="fb-projectId" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Storage Bucket</label>
+                    <input type="text" id="fb-storageBucket" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Messaging Sender ID</label>
+                    <input type="text" id="fb-messagingSenderId" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">App ID</label>
+                    <input type="text" id="fb-appId" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Measurement ID</label>
+                    <input type="text" id="fb-measurementId" class="form-control">
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="downloadConfigFile()"
+                        title="Download as firebase-config.js">
+                        <i class="fas fa-download"></i> Download File
+                    </button>
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('firebase-config-modal')">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Re-Auth Modal -->
+    <div id="firebase-reauth-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10009;">
+        <div class="card" style="width: 90%; max-width: 400px; padding: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Security Check</h3>
+            <p style="margin-bottom: 1rem; color: #666;">Please confirm your password to access sensitive configuration.
+            </p>
+            <form id="firebase-reauth-form">
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="reauth-pass" class="form-control" required
+                        autocomplet="current-password">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('firebase-reauth-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Verify</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.85rem; margin-top: auto;">
+        powered by <a href="https://www.gridify.in" target="_blank"
+            style="color: inherit; text-decoration: underline;">Gridify</a>
+    </footer>
+
+    <!-- Gridify Portal Modal -->
+    <div id="gridify-portal-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10010;">
+        <div class="card"
+            style="width: 90%; max-width: 800px; padding: 2rem; max-height: 90vh; display: flex; flex-direction: column;">
+            <h2 style="margin-bottom: 1rem;">Gridify Portal - Details</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Centralized details and credentials.
+            </p>
+            <textarea id="gridify-portal-content" class="form-control"
+                style="flex: 1; min-height: 400px; font-family: monospace; line-height: 1.5; resize: none; white-space: pre-wrap;"
+                placeholder="Loading details..."></textarea>
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                <button type="button" class="btn btn-secondary"
+                    onclick="closeModal('gridify-portal-modal')">Close</button>
+                <button type="button" id="gridify-save-btn" class="btn btn-primary" onclick="saveGridifyPortal()"
+                    style="display: none;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Site Settings Modal -->
+    <div id="settings-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10009;">
+        <div class="card" style="width: 90%; max-width: 500px; padding: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">Edit Site Settings</h2>
+
+            <div id="settings-loading" style="text-align: center; padding: 2rem;">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+            </div>
+
+            <form id="settings-form" onsubmit="saveSettings(event)" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Site Name</label>
+                    <input type="text" id="set-name" class="form-control" placeholder="e.g. EduPortal">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Logo URL</label>
+                    <input type="text" id="set-logo" class="form-control" placeholder="https://example.com/logo.png">
+                    <small style="color: #666;">Leave empty to use default icon.</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Logo Size (Height)</label>
+                    <input type="text" id="set-logo-size" class="form-control" placeholder="e.g. 30px or 2rem">
+                    <small style="color: #666;">Default is 30px.</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Primary Color Theme</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="color" id="set-color" class="form-control"
+                            style="width: 60px; padding: 2px; height: 40px;" value="#4F46E5">
+                        <span style="font-size: 0.9rem; color: #666;">Choose the main brand color.</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                    <button type="button" class="btn btn-secondary"
+                        onclick="closeModal('settings-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Legal Pages Modal -->
+    <div id="legal-pages-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 10012;">
+        <div class="card"
+            style="width: 90%; max-width: 900px; padding: 2rem; max-height: 90vh; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Manage Legal Pages</h2>
+                <button class="btn btn-sm btn-secondary" onclick="closeModal('legal-pages-modal')">&times;</button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 2px solid #eee;">
+                <button id="tab-privacy" class="legal-tab active"
+                    style="padding: 0.75rem 1.5rem; background: none; border: none; border-bottom: 3px solid var(--primary-color); color: var(--primary-color); font-weight: 600; cursor: pointer;"
+                    onclick="switchLegalTab('privacy')">
+                    <i class="fas fa-shield-alt"></i> Privacy Policy
+                </button>
+                <button id="tab-terms" class="legal-tab"
+                    style="padding: 0.75rem 1.5rem; background: none; border: none; border-bottom: 3px solid transparent; color: var(--text-muted); font-weight: 600; cursor: pointer;"
+                    onclick="switchLegalTab('terms')">
+                    <i class="fas fa-file-contract"></i> Terms of Service
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div id="legal-content-area" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div id="privacy-content" class="legal-content-panel">
+                    <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Edit your Privacy Policy content. HTML is supported.
+                    </p>
+                    <textarea id="privacy-textarea" class="form-control"
+                        style="flex: 1; min-height: 400px; font-family: monospace; line-height: 1.6; resize: vertical;"
+                        placeholder="Enter Privacy Policy content here..."></textarea>
+                </div>
+
+                <div id="terms-content" class="legal-content-panel" style="display: none;">
+                    <p style="color: var(--text-muted); margin-bottom: 1rem; font-size: 0.9rem;">
+                        <i class="fas fa-info-circle"></i> Edit your Terms of Service content. HTML is supported.
+                    </p>
+                    <textarea id="terms-textarea" class="form-control"
+                        style="flex: 1; min-height: 400px; font-family: monospace; line-height: 1.6; resize: vertical;"
+                        placeholder="Enter Terms of Service content here..."></textarea>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('legal-pages-modal')">Close</button>
+                <button type="button" class="btn btn-primary" onclick="saveLegalPages()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../scripts/firebase-config.js"></script>
+    <script src="../scripts/auth.js"></script>
+    <script src="../scripts/db.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isAuth = await Auth.checkProtection('admin');
+            if (!isAuth) return;
+
+            // Show Site Settings for Super Admin and Head Admin
+            if (Auth.userProfile.role === 'super_admin' || Auth.userProfile.role === 'head_admin') {
+                const settingsCard = document.getElementById('settings-control-card');
+                if (settingsCard) settingsCard.style.display = 'flex';
+            }
+
+            // Set up real-time listener for stats
+            const statsUnsubscribe = DB.listenToStats((stats) => {
+                document.getElementById('stat-users').innerText = stats.users;
+                document.getElementById('stat-courses').innerText = stats.courses;
+                document.getElementById('stat-payments').innerText = stats.pendingPayments;
+                document.getElementById('stat-reviews').innerText = stats.pendingReviews;
+                document.getElementById('stat-certificates').innerText = stats.certificates;
+                document.getElementById('stat-contacts').innerText = stats.contacts;
+
+
+            });
+
+            // Clean up listener when page unloads
+            window.addEventListener('beforeunload', () => {
+                if (statsUnsubscribe) {
+                    statsUnsubscribe();
+                }
+            });
+
+            // Load Categories for Course Modal
+            loadCategoryOptions();
+
+            // Role based UI
+            if (Auth.userProfile && Auth.userProfile.role !== 'staff') {
+                const pricingCard = document.getElementById('pricing-action-card');
+                if (pricingCard) pricingCard.style.display = 'flex';
+                const reportCard = document.getElementById('report-module-card');
+                if (reportCard) reportCard.style.display = 'block';
+                const legalCard = document.getElementById('legal-control-card');
+                if (legalCard) legalCard.style.display = 'flex';
+                const departmentCard = document.getElementById('department-module-card');
+                if (departmentCard) departmentCard.style.display = 'block';
+            }
+
+            // System Status Logic
+            const sysStatus = await DB.getSystemStatus();
+            const heroStatusValue = document.getElementById('hero-status-value');
+            const heroStatusMetric = document.getElementById('hero-status-metric');
+
+            if (sysStatus === 'offline') {
+                heroStatusValue.innerText = 'Offline';
+                heroStatusMetric.classList.add('offline');
+                heroStatusMetric.classList.remove('status');
+            } else {
+                heroStatusValue.innerText = 'Online';
+                heroStatusMetric.classList.remove('offline');
+            }
+
+            // Super Admin Controls
+            if (Auth.userProfile && Auth.userProfile.role === 'super_admin') {
+                // Show Firebase Config Card
+                document.getElementById('firebase-control-card').style.display = 'flex';
+
+                const container = document.getElementById('sys-toggle-container');
+                const btn = document.createElement('button');
+                btn.className = sysStatus === 'offline' ? 'admin-btn admin-btn-sm' : 'admin-btn admin-btn-sm';
+                btn.style.background = sysStatus === 'offline' ? 'var(--admin-success)' : 'var(--admin-danger)';
+                btn.style.color = 'white';
+                btn.style.border = 'none';
+                btn.innerHTML = sysStatus === 'offline' ? '<i class="fas fa-power-off"></i> Go Online' : '<i class="fas fa-power-off"></i> Go Offline';
+
+                btn.onclick = async () => {
+                    const newStatus = sysStatus === 'offline' ? 'online' : 'offline';
+
+                    if (newStatus === 'offline') {
+                        // Open Logic Modal
+                        document.getElementById('offline-reason-modal').style.display = 'flex';
+                    } else {
+                        // Go Online
+                        if (confirm(`Are you sure you want to take the system ONLINE?`)) {
+                            await DB.setSystemStatus('online');
+                            window.location.reload();
+                        }
+                    }
+                };
+                container.appendChild(btn);
+
+                // Add Global Logic for Offline Modal
+                window.toggleCustomReason = (show) => {
+                    document.getElementById('custom-reason-input').style.display = show ? 'block' : 'none';
+                };
+
+                window.confirmOffline = async () => {
+                    let reason = document.querySelector('input[name="offline-reason"]:checked').value;
+                    if (reason === 'custom') {
+                        reason = document.getElementById('reason-text').value;
+                        if (!reason.trim()) { alert('Please enter a reason.'); return; }
+                    }
+
+                    await DB.setSystemStatus('offline', reason);
+                    window.location.reload();
+                };
+
+                // Firebase Config Logic
+                window.openFirebaseConfigModal = () => {
+                    const currentConfig = window.firebaseConfig;
+                    if (currentConfig) {
+                        document.getElementById('fb-apiKey').value = currentConfig.apiKey || '';
+                        document.getElementById('fb-authDomain').value = currentConfig.authDomain || '';
+                        document.getElementById('fb-projectId').value = currentConfig.projectId || '';
+                        document.getElementById('fb-storageBucket').value = currentConfig.storageBucket || '';
+                        document.getElementById('fb-messagingSenderId').value = currentConfig.messagingSenderId || '';
+                        document.getElementById('fb-appId').value = currentConfig.appId || '';
+                        document.getElementById('fb-measurementId').value = currentConfig.measurementId || '';
+                    }
+                    openModal('firebase-config-modal');
+                };
+
+                window.promptFirebaseAccess = () => {
+                    document.getElementById('reauth-pass').value = '';
+                    openModal('firebase-reauth-modal');
+                };
+
+                document.getElementById('firebase-reauth-form').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    let password = document.getElementById('reauth-pass').value;
+                    if (!password) return;
+
+                    // Apply same padding logic as Auth.login/signup
+                    if (password.length >= 4 && password.length < 6) {
+                        password = password.padEnd(6, '0');
+                    }
+
+                    try {
+                        const user = window.auth.currentUser;
+                        const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+                        await user.reauthenticateWithCredential(credential);
+
+                        // Verification Success
+                        closeModal('firebase-reauth-modal');
+                        openFirebaseConfigModal();
+                        Auth.showToast('Verified Access Granted', 'success');
+                    } catch (error) {
+                        console.error(error);
+                        Auth.showToast('Incorrect Password', 'error');
+                    }
+                });
+
+                window.downloadConfigFile = () => {
+                    const newConfig = {
+                        apiKey: document.getElementById('fb-apiKey').value.trim(),
+                        authDomain: document.getElementById('fb-authDomain').value.trim(),
+                        projectId: document.getElementById('fb-projectId').value.trim(),
+                        storageBucket: document.getElementById('fb-storageBucket').value.trim(),
+                        messagingSenderId: document.getElementById('fb-messagingSenderId').value.trim(),
+                        appId: document.getElementById('fb-appId').value.trim(),
+                        measurementId: document.getElementById('fb-measurementId').value.trim()
+                    };
+
+                    const blob = new Blob([`const firebaseConfig = ${JSON.stringify(newConfig, null, 4)};\nexport default firebaseConfig;`], { type: 'text/javascript' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'firebase-config.js';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                };
+            }
+
+            // Live Class Logic
+            const liveForm = document.getElementById('live-class-form');
+            if (liveForm) {
+                // Pre-fetch active session for THIS USER to show 'End' button
+                // We use getUserActiveLiveClass instead of global getActiveLiveClass
+                // ensuring concurrent live classes don't block each other's UI
+                const activeSession = await DB.getUserActiveLiveClass(Auth.currentUser.uid);
+
+                if (activeSession) {
+                    const endBtn = document.getElementById('end-live-btn');
+                    endBtn.style.display = 'block';
+                    endBtn.onclick = () => endLiveSession(activeSession.id); // Ensure ID is passed
+
+                    // Add Manage Button Next to it
+                    let manageBtn = document.getElementById('manage-live-btn');
+                    if (!manageBtn) {
+                        manageBtn = document.createElement('button');
+                        manageBtn.type = 'button'; // Prevent form submission
+                        manageBtn.id = 'manage-live-btn';
+                        manageBtn.style.cssText = 'padding: 0.625rem 1.25rem; background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; border-radius: 10px; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3); margin-left: 0.75rem;';
+                        manageBtn.innerHTML = '<i class="fas fa-comments" style="margin-right: 0.5rem;"></i>Manage / Chat';
+                        manageBtn.onmouseover = () => {
+                            manageBtn.style.transform = 'translateY(-1px)';
+                            manageBtn.style.boxShadow = '0 10px 15px -3px rgba(16, 185, 129, 0.4)';
+                        };
+                        manageBtn.onmouseout = () => {
+                            manageBtn.style.transform = 'translateY(0)';
+                            manageBtn.style.boxShadow = '0 4px 6px -1px rgba(16, 185, 129, 0.3)';
+                        };
+                        manageBtn.onclick = () => {
+                            closeModal('live-modal');
+                            openLiveManager(activeSession.id, activeSession.youtubeLink);
+                        };
+                        endBtn.parentNode.insertBefore(manageBtn, endBtn.nextSibling);
+                    }
+
+                    document.getElementById('live-title').value = activeSession.title;
+                    document.getElementById('live-desc').value = activeSession.description;
+                    document.getElementById('live-link').value = activeSession.youtubeLink;
+                }
+
+                // Load courses and categories
+                const categories = await DB.getCategories();
+                const allCourses = await DB.getCourses();
+                const catSelect = document.getElementById('live-category');
+                const courseSelect = document.getElementById('live-course');
+
+                // Populate Categories
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.name;
+                    opt.innerText = cat.name;
+                    catSelect.appendChild(opt);
+                });
+
+                // Function to filter courses based on category
+                function filterCourses() {
+                    const selectedCat = catSelect.value;
+                    courseSelect.innerHTML = '<option value="">-- None (Category Wide) --</option>';
+
+                    const filtered = allCourses.filter(c => c.status !== 'inactive' && (!selectedCat || c.category === selectedCat));
+
+                    filtered.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.innerText = c.title; // Using title as we might need it
+                        opt.dataset.title = c.title;
+                        courseSelect.appendChild(opt);
+                    });
+                }
+
+                // Initial load
+                filterCourses();
+                catSelect.addEventListener('change', filterCourses);
+
+                liveForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const title = document.getElementById('live-title').value;
+                    const desc = document.getElementById('live-desc').value;
+                    const category = document.getElementById('live-category').value;
+                    const link = document.getElementById('live-link').value;
+
+                    const courseId = courseSelect.value;
+                    let courseTitle = null;
+                    if (courseId) {
+                        const selectedOpt = courseSelect.querySelector(`option[value="${courseId}"]`);
+                        if (selectedOpt) courseTitle = selectedOpt.dataset.title;
+                    }
+
+                    try {
+                        await DB.startLiveClass({
+                            title,
+                            description: desc,
+                            category,
+                            youtubeLink: link,
+                            startedBy: Auth.currentUser.uid,
+                            courseId: courseId || null,
+                            courseTitle: courseTitle || null
+                        });
+                        Auth.showToast('Live Session Started!', 'success');
+                        closeModal('live-modal');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } catch (error) {
+                        console.error(error);
+                        Auth.showToast('Failed to start session', 'error');
+                    }
+                });
+            }
+
+            window.endLiveSession = async () => {
+                if (confirm('Are you sure you want to end your current live session?')) {
+                    try {
+                        await DB.endLiveClass(Auth.currentUser.uid);
+                        Auth.showToast('Session Ended', 'success');
+                        closeModal('live-modal');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } catch (e) {
+                        Auth.showToast('Error ending session', 'error');
+                    }
+                }
+            };
+
+
+            window.openGridifyPortalModal = async () => {
+                openModal('gridify-portal-modal');
+                const textarea = document.getElementById('gridify-portal-content');
+                const saveBtn = document.getElementById('gridify-save-btn');
+
+                textarea.value = 'Loading...';
+
+                try {
+                    const content = await DB.getGridifyPortalDetails();
+                    textarea.value = content || '';
+                } catch (e) {
+                    textarea.value = 'Error loading details.';
+                }
+
+                // Role Check
+                if (Auth.userProfile && Auth.userProfile.role === 'super_admin') {
+                    textarea.removeAttribute('readonly');
+                    saveBtn.style.display = 'block';
+                } else {
+                    textarea.setAttribute('readonly', 'true');
+                    saveBtn.style.display = 'none';
+                }
+            };
+
+            window.saveGridifyPortal = async () => {
+                const content = document.getElementById('gridify-portal-content').value;
+                const saveBtn = document.getElementById('gridify-save-btn');
+
+                if (Auth.userProfile.role !== 'super_admin') return;
+
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+                try {
+                    await DB.saveGridifyPortalDetails(content);
+                    Auth.showToast('Details saved successfully', 'success');
+                    closeModal('gridify-portal-modal');
+                } catch (e) {
+                    Auth.showToast('Failed to save details', 'error');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.innerText = 'Save Changes';
+                }
+            };
+
+            initActivityListeners();
+            checkDuplicateCertificates();
+        });
+
+        // --- Live Manager (Admin) ---
+        let adminChatUnsub = null;
+        window.openLiveManager = (liveId, link) => {
+            const modal = document.getElementById('live-manager-modal');
+            const iframe = document.getElementById('live-manager-frame');
+
+            // Extract ID
+            let videoId = '';
+            try {
+                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|live\/)([^#\&\?]*).*/;
+                const match = link.match(regExp);
+                if (match && match[2].length === 11) videoId = match[2];
+            } catch (e) { }
+
+            if (videoId) {
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0`; // Muted for admin
+            }
+
+            modal.style.display = 'block';
+
+            // Setup Chat
+            const msgContainer = document.getElementById('admin-chat-messages');
+            const form = document.getElementById('admin-chat-form');
+
+            // Clear previous
+            msgContainer.innerHTML = '';
+            if (adminChatUnsub) adminChatUnsub();
+
+            // Listen
+            adminChatUnsub = DB.onLiveChatUpdates(liveId, (messages) => {
+                msgContainer.innerHTML = '';
+
+                if (messages.length === 0) {
+                    msgContainer.innerHTML = `
+                        <div style="text-align: center; padding: 3rem 1rem; color: #94A3B8;">
+                            <i class="fas fa-comments" style="font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.3;"></i>
+                            <p style="margin: 0; font-size: 0.875rem;">No messages yet</p>
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem;">Be the first to start the conversation!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                messages.forEach(msg => {
+                    const el = document.createElement('div');
+                    const isAdmin = msg.role === 'admin' || msg.role === 'head_admin' || msg.role === 'super_admin';
+                    const time = msg.timestamp ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                    // Modern message card design
+                    el.style.cssText = `
+                        padding: 0.75rem 1rem;
+                        border-radius: 10px;
+                        background: ${isAdmin ? 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)' : 'white'};
+                        border: 1.5px solid ${isAdmin ? '#FECACA' : '#E4E7EB'};
+                        margin-bottom: 0.5rem;
+                        transition: all 0.2s ease;
+                    `;
+
+                    el.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.375rem;">
+                            ${isAdmin ? '<i class="fas fa-shield-alt" style="color: #DC2626; font-size: 0.75rem;"></i>' : '<i class="fas fa-user-circle" style="color: #94A3B8; font-size: 0.75rem;"></i>'}
+                            <span style="font-weight: 700; font-size: 0.8125rem; color: ${isAdmin ? '#DC2626' : '#0F172A'};">${msg.userName}</span>
+                            ${isAdmin ? '<span style="background: #DC2626; color: white; padding: 0.125rem 0.5rem; border-radius: 6px; font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em;">Admin</span>' : ''}
+                            <span style="margin-left: auto; font-size: 0.6875rem; color: #94A3B8;">${time}</span>
+                        </div>
+                        <div style="font-size: 0.875rem; color: #0F172A; line-height: 1.5; word-wrap: break-word;">${msg.text}</div>
+                    `;
+
+                    msgContainer.appendChild(el);
+                });
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+            });
+
+            // Send
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                const input = document.getElementById('admin-chat-input');
+                const text = input.value.trim();
+                if (!text) return;
+
+                const user = Auth.userProfile;
+                await DB.sendLiveMessage(liveId, {
+                    userId: Auth.currentUser.uid,
+                    userName: user ? user.name : 'Instructor',
+                    role: user ? user.role : 'admin',
+                    text: text
+                });
+                input.value = '';
+            };
+        };
+
+        window.closeLiveManager = () => {
+            const modal = document.getElementById('live-manager-modal');
+            const iframe = document.getElementById('live-manager-frame');
+            modal.style.display = 'none';
+            iframe.src = '';
+            if (adminChatUnsub) adminChatUnsub();
+        };
+
+        async function checkDuplicateCertificates() {
+            try {
+                const dups = await DB.getDuplicateCertificates();
+                const statEl = document.getElementById('stat-duplicates');
+                const alertEl = document.getElementById('dup-alert');
+
+                if (dups.length > 0) {
+                    statEl.innerText = dups.length;
+                    alertEl.style.display = 'block';
+                } else {
+                    statEl.innerText = '0';
+                    alertEl.style.display = 'none';
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function openDuplicatesModal() {
+            openModal('duplicates-modal');
+            const list = document.getElementById('duplicates-list');
+            list.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Finding duplicates...</td></tr>';
+
+            try {
+                const dups = await DB.getDuplicateCertificates();
+                if (dups.length === 0) {
+                    list.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 2rem;">No duplicates found!</td></tr>';
+                    return;
+                }
+
+                list.innerHTML = dups.map(group => `
+                    <tr style="border-bottom: 1px solid #f3f4f6;">
+                        <td style="padding: 1rem; vertical-align: top;">
+                            <div style="font-weight: 700;">${group.userName}</div>
+                            <div style="color: var(--primary-color); font-size: 0.9rem;">${group.courseTitle}</div>
+                            <small style="color: #666;">UID: ${group.uid.substring(0, 8)}...</small>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                ${group.certs.map((c, index) => `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; background: #f9fafb; padding: 0.75rem; border-radius: 6px; border: 1px solid #eee;">
+                                        <div>
+                                            <div style="font-size: 0.85rem; font-weight: 600;">ID: ${c.certificateId} ${index === 0 ? '<span style="color: #10B981; margin-left:5px;">(Latest)</span>' : ''}</div>
+                                            <div style="font-size: 0.75rem; color: #666;">Issued: ${new Date(c.issuedAt.seconds * 1000).toLocaleString()}</div>
+                                            <div style="font-size: 0.75rem; color: #666;">Score: ${c.score}/${c.totalPossible}</div>
+                                        </div>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <a href="../certificate.html?id=${c.id}" target="_blank" class="btn btn-sm btn-secondary" title="View"><i class="fas fa-eye"></i></a>
+                                            <button class="btn btn-sm btn-danger" style="background: #EF4444; border-color: #EF4444;" 
+                                                onclick="revokeCert('${c.id}', '${group.uid}', '${group.courseTitle.replace(/'/g, "\\'")}')" title="Revoke & Delete">
+                                                <i class="fas fa-trash-alt"></i> Revoke
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = '<tr><td colspan="2" style="text-align:center; color: red;">Error loading duplicates.</td></tr>';
+            }
+        }
+
+        window.revokeCert = async (certId, uid, courseTitle) => {
+            if (!confirm(`Are you sure you want to REVOKE and DELETE certificate ${certId}?\nThis action cannot be undone and the student will be notified.`)) return;
+
+            try {
+                await DB.revokeCertificate(certId, uid, courseTitle);
+                Auth.showToast('Certificate Revoked Successfully!', 'success');
+                // Refresh list
+                openDuplicatesModal();
+                checkDuplicateCertificates();
+            } catch (e) {
+                Auth.showToast('Error revoking: ' + e.message, 'error');
+            }
+        }
+
+        let recentUsers = [];
+        let pendingSubs = [];
+        let recentPayments = [];
+        let recentCertificates = [];
+
+        function initActivityListeners() {
+            DB.listenToRecentUsers(users => {
+                recentUsers = users;
+                renderActivityFeed();
+            });
+            DB.listenToPendingSubmissions(subs => {
+                pendingSubs = subs;
+                renderActivityFeed();
+            });
+            DB.listenToRecentPayments(payments => {
+                recentPayments = payments;
+                renderActivityFeed();
+            });
+            DB.listenToRecentCertificates(certs => {
+                recentCertificates = certs;
+                renderActivityFeed();
+            });
+            DB.listenToRecentContacts(contacts => {
+                recentContacts = contacts;
+                renderActivityFeed();
+            });
+        }
+
+        let recentContacts = [];
+
+        function renderActivityFeed() {
+            const feed = document.getElementById('activity-feed');
+            let activities = [];
+
+            // Add Reviews
+            pendingSubs.forEach(r => {
+                activities.push({
+                    type: 'exam',
+                    title: `New Exam Submission: ${r.itemTitle || 'Exam'}`,
+                    desc: `Submitted by ${r.userName} for ${r.courseTitle}`,
+                    time: r.submittedAt,
+                    icon: 'fa-file-signature',
+                    color: '#8B5CF6'
+                });
+            });
+
+            // Add Payments
+            recentPayments.forEach(p => {
+                const isApproved = p.status === 'approved';
+                activities.push({
+                    type: 'payment',
+                    title: isApproved ? 'Payment Approved' : 'New Payment Request',
+                    desc: `${p.userName}: ₹${p.finalPrice || p.price} for ${p.courseTitle}`,
+                    time: isApproved ? p.approvedAt : p.createdAt,
+                    icon: isApproved ? 'fa-check-double' : 'fa-wallet',
+                    color: isApproved ? '#10B981' : '#F59E0B'
+                });
+            });
+
+            // Add Certificates
+            recentCertificates.forEach(c => {
+                activities.push({
+                    type: 'cert',
+                    title: 'Certificate Issued',
+                    desc: `${c.userName} completed ${c.courseTitle}`,
+                    time: c.issuedAt,
+                    icon: 'fa-certificate',
+                    color: '#6366F1'
+                });
+            });
+
+            // Add User Registrations
+            recentUsers.forEach(u => {
+                activities.push({
+                    type: 'user',
+                    title: `New Student Joined`,
+                    desc: `${u.name} (${u.email})`,
+                    time: u.createdAt,
+                    icon: 'fa-user-plus',
+                    color: '#10B981'
+                });
+            });
+
+            // Add Contact Messages
+            recentContacts.forEach(c => {
+                activities.push({
+                    type: 'contact',
+                    title: `Message from ${c.name}`,
+                    desc: c.message.length > 60 ? c.message.substring(0, 60) + '...' : c.message,
+                    time: c.createdAt,
+                    icon: 'fa-envelope',
+                    color: '#10B981'
+                });
+            });
+
+            // Sort by time
+            activities.sort((a, b) => (b.time?.seconds || 0) - (a.time?.seconds || 0));
+
+            if (activities.length === 0) {
+                feed.innerHTML = '<p style="text-align:center; padding: 2rem; color: var(--admin-text-tertiary);">No recent activity.</p>';
+                return;
+            }
+
+            feed.innerHTML = activities.slice(0, 12).map(act => `
+                <div class="activity-item">
+                    <div class="activity-dot" style="border-color: ${act.color};"></div>
+                    <div class="activity-content">${act.title}</div>
+                    <div style="font-size: 0.875rem; color: var(--admin-text-secondary); margin-bottom: 4px;">${act.desc}</div>
+                    <div class="activity-time">${act.time ? new Date(act.time.seconds * 1000).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recent'}</div>
+                </div>
+            `).join('');
+        }
+
+        // Keep for manual refresh button
+        async function loadActivities() {
+            // Re-initialize or simply the listeners will handle it
+            renderActivityFeed();
+        }
+
+        // Add Course Handler
+        document.getElementById('add-course-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('c-title').value;
+            const desc = document.getElementById('c-desc').value;
+            const cat = document.getElementById('c-cat').value;
+            const isPremium = document.getElementById('c-premium').checked;
+
+            try {
+                await DB.createCourse({
+                    title,
+                    description: desc,
+                    category: cat,
+                    isPremium,
+                    createdAt: new Date()
+                });
+                Auth.showToast('Course Created!', 'success');
+                closeModal('course-modal');
+                // Reload or re-fetch recommended
+                setTimeout(() => window.location.reload(), 1000);
+            } catch (e) { Auth.showToast(e.message, 'error'); }
+        });
+
+        // Add User Handler
+        document.getElementById('add-user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('u-name').value;
+            const email = document.getElementById('u-email').value;
+            const password = document.getElementById('u-pass').value;
+            const role = document.getElementById('u-role').value;
+
+            // Validation for Staff
+            if (Auth.userProfile.role === 'staff' && role !== 'student') {
+                Auth.showToast('Staff members can only create Student accounts.', 'error');
+                return;
+            }
+
+            try {
+                const res = await Auth.createStaffUser(email, password, name, role);
+                if (res.success) {
+                    Auth.showToast('User Created Successfully!', 'success');
+                    closeModal('user-modal');
+                    window.location.reload();
+                } else {
+                    Auth.showToast('Error: ' + res.message, 'error');
+                }
+            } catch (e) {
+                Auth.showToast('Error: ' + e.message, 'error');
+            }
+        });
+
+        // Change Password Handler
+        document.getElementById('change-pass-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currPass = document.getElementById('current-pass').value;
+            const p1 = document.getElementById('new-pass').value;
+            const p2 = document.getElementById('confirm-pass').value;
+
+            if (p1 !== p2) {
+                Auth.showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            const res = await Auth.changePassword(currPass, p1);
+            if (res.success) {
+                Auth.showToast('Password Updated Successfully', 'success');
+                closeModal('change-pass-modal');
+                document.getElementById('change-pass-form').reset();
+            } else {
+                Auth.showToast(res.message, 'error');
+            }
+        });
+
+
+
+        async function loadContacts() {
+            const list = document.getElementById('contacts-list');
+            list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;"><i class="fas fa-spinner fa-spin"></i> Loading messages...</td></tr>';
+
+            try {
+                const contacts = await DB.getContacts();
+                if (contacts.length === 0) {
+                    list.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 2rem;">No messages found.</td></tr>';
+                    return;
+                }
+
+                list.innerHTML = contacts.map(c => `
+                    <tr style="border-bottom: 1px solid #f3f4f6; ${c.status === 'unread' ? 'background: #fffbeb;' : ''}">
+                        <td style="padding: 1rem;">
+                            <div style="font-weight: 700;">${c.name}</div>
+                            <div style="font-size: 0.85rem; color: #666;">${c.email}</div>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <div style="font-size: 0.9rem; color: #10B981; font-weight: 600;"><i class="fab fa-whatsapp"></i> ${c.whatsapp || 'N/A'}</div>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <div style="max-width: 400px; white-space: pre-wrap; font-size: 0.9rem;">${c.message}</div>
+                        </td>
+                        <td style="padding: 1rem; font-size: 0.85rem; color: #666;">
+                            ${new Date(c.createdAt.seconds * 1000).toLocaleString()}
+                        </td>
+                        <td style="padding: 1rem;">
+                            <div style="display: flex; gap: 0.5rem;">
+                                ${c.status === 'unread' ? `
+                                    <button class="btn btn-sm btn-primary" onclick="markMessageRead('${c.id}')">
+                                        <i class="fas fa-check"></i> Read
+                                    </button>
+                                ` : ''}
+                                <button class="btn btn-sm btn-danger" onclick="deleteMessage('${c.id}')" style="background: #EF4444; border-color: #EF4444;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                list.innerHTML = '<tr><td colspan="4" style="text-align:center; color: red;">Error loading messages.</td></tr>';
+            }
+        }
+
+        window.markMessageRead = async (id) => {
+            await DB.markContactAsRead(id);
+            loadContacts();
+            // Stats will update automatically via real-time listener
+        };
+
+        window.deleteMessage = async (id) => {
+            if (!confirm('Are you sure you want to delete this message?')) return;
+            await DB.deleteContact(id);
+            loadContacts();
+            // Stats will update automatically via real-time listener
+        };
+
+        async function loadCategoryOptions() {
+            const select = document.getElementById('c-cat');
+            try {
+                const cats = await DB.getCategories();
+                // Filter only active categories for new courses
+                const activeCats = cats.filter(c => c.status !== 'paused');
+                if (activeCats.length === 0) {
+                    select.innerHTML = '<option value="">No active categories</option>';
+                    return;
+                }
+                select.innerHTML = activeCats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+            } catch (e) {
+                select.innerHTML = '<option value="">Error loading</option>';
+            }
+        }
+
+        async function openCategoriesModal() {
+            openModal('categories-modal');
+            loadCategoriesList();
+        }
+
+        async function loadCategoriesList() {
+            const list = document.getElementById('categories-list');
+            list.innerHTML = '<div style="text-align:center; padding: 1rem;"><i class="fas fa-spinner fa-spin"></i></div>';
+            try {
+                const cats = await DB.getCategories();
+                if (cats.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color: #666; padding: 1rem;">No categories yet.</p>';
+                    return;
+                }
+                list.innerHTML = cats.map(c => {
+                    const isPaused = c.status === 'paused';
+                    return `
+                    <div style="padding: 1rem; background: #f9fafb; border-radius: 8px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="${isPaused ? 'text-decoration: line-through; color: #999;' : ''}">${c.name}</strong>
+                            <div style="display: flex; gap: 0.25rem;">
+                                <button class="btn btn-sm btn-secondary" onclick="editCategoryName('${c.id}', '${c.name}')" title="Edit Name">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm ${isPaused ? 'btn-success' : 'btn-secondary'}" onclick="toggleCategoryStatus('${c.id}', '${c.status || 'active'}')" title="${isPaused ? 'Resume' : 'Pause'}">
+                                    <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i>
+                                </button>
+                                <button class="btn btn-sm btn-secondary" onclick="deleteCategory('${c.id}')" style="color: var(--danger-color);" title="Delete">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${isPaused ? '<small style="color: var(--danger-color); font-weight: 600;">Currently Paused</small>' : ''}
+                    </div>
+                `;
+                }).join('');
+            } catch (e) {
+                list.innerHTML = '<p style="text-align:center; color: var(--danger-color);">Error loading categories.</p>';
+            }
+        }
+
+        window.editCategoryName = async (id, oldName) => {
+            const newName = prompt('Enter new name for category:', oldName);
+            if (newName && newName.trim() !== oldName) {
+                try {
+                    await DB.updateCategory(id, { name: newName.trim(), updatedAt: new Date() });
+                    Auth.showToast('Category name updated', 'success');
+                    loadCategoriesList();
+                    loadCategoryOptions();
+                } catch (e) {
+                    Auth.showToast(e.message, 'error');
+                }
+            }
+        };
+
+        window.toggleCategoryStatus = async (id, currentStatus) => {
+            const newStatus = currentStatus === 'paused' ? 'active' : 'paused';
+            try {
+                await DB.updateCategory(id, { status: newStatus, updatedAt: new Date() });
+                Auth.showToast(`Category ${newStatus === 'active' ? 'Resumed' : 'Paused'}`, 'success');
+                loadCategoriesList();
+                loadCategoryOptions();
+            } catch (e) {
+                Auth.showToast(e.message, 'error');
+            }
+        };
+
+        document.getElementById('add-category-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('new-cat-name').value.trim();
+            if (!name) return;
+            try {
+                await DB.createCategory(name);
+                document.getElementById('new-cat-name').value = '';
+                Auth.showToast('Category Added', 'success');
+                loadCategoriesList();
+                loadCategoryOptions(); // Sync course modal
+            } catch (e) {
+                Auth.showToast(e.message, 'error');
+            }
+        });
+
+        window.deleteCategory = async (id) => {
+            if (!confirm('Are you sure? This won\'t delete courses in this category but will remove the option.')) return;
+            try {
+                await DB.deleteCategory(id);
+                Auth.showToast('Category Deleted', 'success');
+                loadCategoriesList();
+                loadCategoryOptions();
+            } catch (e) {
+                Auth.showToast(e.message, 'error');
+            }
+        };
+
+        async function openProvidedCertsModal() {
+            openModal('provided-certs-modal');
+            loadProvidedCerts();
+        }
+
+        let allCertificates = [];
+
+        async function loadProvidedCerts() {
+            const list = document.getElementById('provided-certs-list');
+            list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+            try {
+                allCertificates = await DB.getAllCertificates();
+                renderCertificateTable(allCertificates);
+            } catch (e) {
+                list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:red;">Error loading certificates.</td></tr>';
+            }
+        }
+
+        function renderCertificateTable(certs) {
+            const list = document.getElementById('provided-certs-list');
+            if (certs.length === 0) {
+                list.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem; color:#666;">No certificates matching search.</td></tr>';
+                return;
+            }
+            list.innerHTML = certs.map(c => `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 1rem;">
+                        <div style="font-weight:600;">${c.userName}</div>
+                        <small style="color:#666;">UID: ${c.uid.substring(0, 8)}...</small>
+                    </td>
+                    <td style="padding: 1rem;">${c.courseTitle}</td>
+                    <td style="padding: 1rem;"><small>${c.certificateId}</small></td>
+                    <td style="padding: 1rem;">${new Date(c.issuedAt.seconds * 1000).toLocaleDateString()}</td>
+                    <td style="padding: 1rem;">
+                        <a href="../certificate.html?id=${c.id}" target="_blank" class="btn btn-sm btn-secondary">View</a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterProvidedCerts() {
+            const query = document.getElementById('cert-search-input').value.toLowerCase();
+            const filtered = allCertificates.filter(c =>
+                c.userName.toLowerCase().includes(query) ||
+                c.courseTitle.toLowerCase().includes(query) ||
+                c.certificateId.toLowerCase().includes(query)
+            );
+            renderCertificateTable(filtered);
+        }
+        document.getElementById('verify-cert-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const certId = document.getElementById('verify-cert-id').value.trim();
+            const resultDiv = document.getElementById('verify-result');
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Verifying...</div>';
+
+            try {
+                const cert = await DB.getCertificateById(certId);
+                if (cert) {
+                    resultDiv.innerHTML = `
+                        <div style="color: var(--success-color); font-weight: 700; margin-bottom: 0.5rem;">
+                            <i class="fas fa-check-circle"></i> Valid Certificate
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--text-main);">
+                            <p><strong>Student:</strong> ${cert.userName}</p>
+                            <p><strong>Course:</strong> ${cert.courseTitle}</p>
+                            <p><strong>Issued On:</strong> ${new Date(cert.issuedAt.seconds * 1000).toLocaleDateString()}</p>
+                            <p><strong>Score:</strong> ${cert.score}/${cert.totalPossible}</p>
+                        </div>
+                        <a href="../certificate.html?id=${cert.id}" target="_blank" class="btn btn-sm btn-primary" style="width: 100%; margin-top: 1rem;">View Certificate</a>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="color: var(--danger-color); font-weight: 700; text-align: center;">
+                            <i class="fas fa-times-circle"></i> Invalid Certificate ID
+                        </div>
+                    `;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = '<p style="color: var(--danger-color);">Error verifying certificate.</p>';
+            }
+        });
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+            // Logic to disable admin/staff options if current user is staff
+            if (id === 'user-modal' && Auth.userProfile && Auth.userProfile.role === 'staff') {
+                const select = document.getElementById('u-role');
+                Array.from(select.options).forEach(opt => {
+                    if (opt.value !== 'student') opt.disabled = true;
+                });
+                select.value = 'student';
+            }
+            if (id === 'contacts-modal') loadContacts();
+        }
+        window.openSettingsModal = async () => {
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = 'flex';
+            document.getElementById('settings-loading').style.display = 'block';
+            document.getElementById('settings-form').style.display = 'none';
+
+            // Load values
+            const settings = await DB.getSiteSettings() || {};
+            document.getElementById('set-name').value = settings.siteName || '';
+            document.getElementById('set-logo').value = settings.logoUrl || '';
+            document.getElementById('set-logo-size').value = settings.logoSize || '30px';
+            document.getElementById('set-color').value = settings.primaryColor || '#4F46E5';
+
+            document.getElementById('settings-loading').style.display = 'none';
+            document.getElementById('settings-form').style.display = 'block';
+        };
+
+        window.saveSettings = async (e) => {
+            e.preventDefault();
+            const settings = {
+                siteName: document.getElementById('set-name').value,
+                logoUrl: document.getElementById('set-logo').value,
+                logoSize: document.getElementById('set-logo-size').value || '30px',
+                primaryColor: document.getElementById('set-color').value
+            };
+
+            try {
+                await DB.saveSiteSettings(settings);
+                Auth.showToast('Settings saved!', 'success');
+                // Apply immediately
+                if (window.applySettingsToDOM) window.applySettingsToDOM(settings);
+                else {
+                    document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
+                }
+                setTimeout(() => window.location.reload(), 1000);
+            } catch (err) {
+                Auth.showToast('Error saving settings', 'error');
+            }
+        };
+
+        // Auto-apply settings on load (Admin specific implementation)
+        async function loadAndApplyAdminSettings() {
+            // 1. Try Local Storage
+            const cached = localStorage.getItem('siteSettings');
+            if (cached) {
+                applyAdminSettings(JSON.parse(cached));
+            }
+
+            // 2. DB Sync
+            try {
+                const settings = await DB.getSiteSettings();
+                if (settings) {
+                    localStorage.setItem('siteSettings', JSON.stringify(settings));
+                    applyAdminSettings(settings);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function applyAdminSettings(settings) {
+            if (!settings) return;
+            if (settings.siteName) {
+                if (!document.title.includes(' - ')) {
+                    const parts = document.title.split(' - ');
+                    if (parts.length > 0) document.title = `${parts[0]} - ${settings.siteName}`;
+                } else {
+                    const parts = document.title.split(' - ');
+                    document.title = `${parts[0]} - ${settings.siteName}`;
+                }
+            }
+            if (settings.primaryColor) {
+                document.documentElement.style.setProperty('--primary-color', settings.primaryColor);
+            }
+
+            // Favicon
+            if (settings.logoUrl) {
+                let link = document.querySelector("link[rel~='icon']");
+                if (!link) {
+                    link = document.createElement('link');
+                    link.rel = 'icon';
+                    document.head.appendChild(link);
+                }
+                link.href = settings.logoUrl;
+            }
+            // Logic for Admin Logo (if structurally different or just class .logo)
+            const logoEls = document.querySelectorAll('.logo');
+            logoEls.forEach(el => {
+                if (settings.logoUrl) {
+                    const size = settings.logoSize || '30px';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'center';
+                    el.style.gap = '12px';
+                    el.innerHTML = `<img src="${settings.logoUrl}" alt="${settings.siteName || 'Logo'}" style="height: ${size}; width: auto; object-fit: contain;"> <span style="font-size: 1.25rem;">${settings.siteName || ''}</span>`;
+                } else if (settings.siteName) {
+                    const icon = el.querySelector('i');
+                    const iconHtml = icon ? icon.outerHTML : '<i class="fas fa-graduation-cap"></i>';
+                    el.innerHTML = `${iconHtml} ${settings.siteName}`;
+                }
+            });
+        }
+
+        // Call it
+        document.addEventListener('DOMContentLoaded', loadAndApplyAdminSettings);
+
+        // Legal Pages Management
+        window.openLegalPagesModal = async () => {
+            openModal('legal-pages-modal');
+
+            // Load current content
+            try {
+                const privacy = await DB.getPrivacyPolicy();
+                const terms = await DB.getTermsOfService();
+
+                document.getElementById('privacy-textarea').value = privacy || '';
+                document.getElementById('terms-textarea').value = terms || '';
+            } catch (e) {
+                console.error('Error loading legal pages:', e);
+                Auth.showToast('Error loading content', 'error');
+            }
+        };
+
+        window.switchLegalTab = (tab) => {
+            // Update tab buttons
+            const tabs = document.querySelectorAll('.legal-tab');
+            tabs.forEach(t => {
+                t.style.borderBottom = '3px solid transparent';
+                t.style.color = 'var(--text-muted)';
+            });
+
+            const activeTab = document.getElementById(`tab-${tab}`);
+            activeTab.style.borderBottom = '3px solid var(--primary-color)';
+            activeTab.style.color = 'var(--primary-color)';
+
+            // Update content panels
+            document.getElementById('privacy-content').style.display = tab === 'privacy' ? 'block' : 'none';
+            document.getElementById('terms-content').style.display = tab === 'terms' ? 'block' : 'none';
+        };
+
+        window.saveLegalPages = async () => {
+            const privacyContent = document.getElementById('privacy-textarea').value;
+            const termsContent = document.getElementById('terms-textarea').value;
+
+            try {
+                await DB.savePrivacyPolicy(privacyContent);
+                await DB.saveTermsOfService(termsContent);
+
+                Auth.showToast('Legal pages updated successfully', 'success');
+                closeModal('legal-pages-modal');
+            } catch (e) {
+                console.error('Error saving legal pages:', e);
+                Auth.showToast('Failed to save changes', 'error');
+            }
+        };
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+    </script>
+</body>
+
+<!-- Live Manager Modal -->
+<div id="live-manager-modal" class="live-manager-modal"
+    style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);">
+    <div class="live-manager-container"
+        style="margin: 1.5% auto; width: 96%; height: 94%; max-width: 1400px; background: white; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; overflow: hidden;">
+
+        <!-- Header -->
+        <div class="live-manager-header"
+            style="padding: 1.25rem 1.75rem; background: linear-gradient(135deg, #1F2937 0%, #111827 100%); display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #EF4444;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div
+                        style="width: 36px; height: 36px; background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.4);">
+                        <i class="fas fa-video" style="color: white; font-size: 1rem;"></i>
+                    </div>
+                    <h3 style="margin: 0; color: white; font-size: 1.25rem; font-weight: 700;">Live Session Manager</h3>
+                </div>
+                <div class="live-badge"
+                    style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.375rem 0.875rem; background: rgba(239, 68, 68, 0.15); border: 1.5px solid #EF4444; border-radius: 20px; animation: pulse-live 2s ease-in-out infinite;">
+                    <span
+                        style="width: 8px; height: 8px; background: #EF4444; border-radius: 50%; box-shadow: 0 0 8px #EF4444;"></span>
+                    <span
+                        style="color: #FEE2E2; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">LIVE</span>
+                </div>
+            </div>
+            <button onclick="closeLiveManager()"
+                style="width: 36px; height: 36px; background: rgba(255, 255, 255, 0.1); border: 1.5px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 1.25rem; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center;"
+                onmouseover="this.style.background='rgba(239, 68, 68, 0.2)'; this.style.borderColor='#EF4444'"
+                onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'; this.style.borderColor='rgba(255, 255, 255, 0.2)'">&times;</button>
+        </div>
+
+        <!-- Main Content: Video + Chat -->
+        <div class="live-manager-content"
+            style="flex: 1; display: grid; grid-template-columns: 70% 30%; overflow: hidden; min-height: 0;">
+
+            <!-- Video Section -->
+            <div class="live-video-section"
+                style="background: #000000; display: flex; flex-direction: column; padding: 1.5rem; position: relative;">
+                <div
+                    style="flex: 1; display: flex; align-items: center; justify-content: center; max-width: 100%; margin: 0 auto; width: 100%;">
+                    <div
+                        style="position: relative; width: 100%; max-width: 100%; aspect-ratio: 16/9; background: #1a1a1a; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);">
+                        <iframe id="live-manager-frame"
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" src=""
+                            frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Panel -->
+            <div class="live-chat-panel"
+                style="display: flex; flex-direction: column; background: #FAFBFC; border-left: 2px solid #E4E7EB;">
+
+                <!-- Chat Header -->
+                <div class="chat-header"
+                    style="padding: 1rem 1.25rem; background: white; border-bottom: 2px solid #E4E7EB;">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1rem; font-weight: 700; color: #0F172A;">Live Chat</h4>
+                            <p style="margin: 0.25rem 0 0 0; font-size: 0.75rem; color: #94A3B8;">Real-time conversation
+                            </p>
+                        </div>
+                        <div
+                            style="width: 32px; height: 32px; background: #EEF2FF; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-comments" style="color: #4F46E5; font-size: 0.875rem;"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="admin-chat-messages" class="chat-messages"
+                    style="flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; background: #FAFBFC;">
+                    <!-- Messages will be inserted here -->
+                </div>
+
+                <!-- Chat Input -->
+                <form id="admin-chat-form" class="chat-input-form"
+                    style="padding: 1rem 1.25rem; background: white; border-top: 2px solid #E4E7EB;">
+                    <div style="display: flex; gap: 0.75rem; align-items: flex-end;">
+                        <div style="flex: 1; position: relative;">
+                            <input type="text" id="admin-chat-input"
+                                style="width: 100%; padding: 0.75rem 1rem; border: 1.5px solid #E4E7EB; border-radius: 10px; font-size: 0.875rem; outline: none; transition: all 0.2s ease; background: #F8FAFC;"
+                                placeholder="Type a message as admin…" autocomplete="off"
+                                onfocus="this.style.borderColor='#4F46E5'; this.style.boxShadow='0 0 0 3px rgba(79, 70, 229, 0.1)'; this.style.background='white'"
+                                onblur="this.style.borderColor='#E4E7EB'; this.style.boxShadow='none'; this.style.background='#F8FAFC'">
+                        </div>
+                        <button type="submit"
+                            style="width: 44px; height: 44px; background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%); border: none; border-radius: 10px; color: white; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3); flex-shrink: 0;"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(79, 70, 229, 0.4)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(79, 70, 229, 0.3)'">
+                            <i class="fas fa-paper-plane" style="font-size: 0.875rem;"></i>
+                        </button>
+                    </div>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.6875rem; color: #94A3B8;">
+                        <i class="fas fa-shield-alt" style="margin-right: 0.25rem;"></i>
+                        Messages sent as admin are highlighted
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes pulse-live {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+    }
+
+    /* Custom scrollbar for chat */
+    .chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+        background: #F0F2F5;
+        border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 10px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+        background: #94A3B8;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+        .live-manager-content {
+            grid-template-columns: 65% 35% !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .live-manager-content {
+            grid-template-columns: 1fr !important;
+        }
+
+        .live-chat-panel {
+            border-left: none !important;
+            border-top: 2px solid #E4E7EB !important;
+            max-height: 40vh;
+        }
+
+        .live-video-section {
+            padding: 1rem !important;
+        }
+    }
+</style>
+
+
+</html>

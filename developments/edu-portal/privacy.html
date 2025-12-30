@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - EduPortal</title>
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <header>
+        <div class="container navbar">
+            <a href="index.html" class="logo">
+                <i class="fas fa-graduation-cap"></i> EduPortal
+            </a>
+
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="courses.html">Courses</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+            <div class="nav-controls">
+                <div class="nav-cta" id="auth-buttons">
+                    <a href="auth/login.html" class="btn btn-secondary" title="Login">
+                        <i class="fas fa-sign-in-alt"></i> <span class="btn-text-mobile"
+                            style="margin-left: 0.5rem;">Login</span>
+                    </a>
+                    <a href="auth/signup.html" class="btn btn-primary" title="Get Started">
+                        <i class="fas fa-user-plus"></i> <span class="btn-text-mobile" style="margin-left: 0.5rem;">Get
+                            Started</span>
+                    </a>
+                </div>
+
+                <!-- User Menu (Hidden by default) -->
+                <div class="nav-cta hidden" id="user-menu">
+                    <a href="dashboard/" class="btn btn-primary" title="Dashboard">
+                        <i class="fas fa-columns"></i> <span class="btn-text-mobile"
+                            style="margin-left: 0.5rem;">Dashboard</span>
+                    </a>
+                    <button id="logout-btn" class="btn btn-secondary" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i> <span class="btn-text-mobile"
+                            style="margin-left: 0.5rem;">Logout</span>
+                    </button>
+                </div>
+
+                <div class="menu-toggle" id="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content: Dynamic Privacy Policy -->
+    <main id="privacy-main"
+        style="display: flex; justify-content: center; align-items: center; min-height: 60vh; flex-direction: column; gap: 1rem;">
+        <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--primary-color);"></i>
+        <h2 style="color: var(--text-muted);">Loading...</h2>
+    </main>
+
+    <!-- Privacy Policy Content Container -->
+    <div id="privacy-content-container" class="container" style="display: none; padding: 3rem 1rem; max-width: 900px;">
+        <h1 style="margin-bottom: 2rem; text-align: center;">Privacy Policy</h1>
+        <div id="privacy-content" style="line-height: 1.8; color: var(--text-color);">
+            <!-- Content will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section">
+                <h3 id="footer-site-name">EduPortal</h3>
+                <p style="opacity: 0.8;">Empowering students worldwide with quality education.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <div style="display: flex; gap: 1rem; font-size: 1.5rem;">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center"
+            style="margin-top: var(--spacing-md); padding-top: var(--spacing-md); border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.6; font-size: 0.9rem;">
+            &copy; 2024 <span id="footer-copy-name">EduPortal</span>. All rights reserved.
+            <div style="margin-top: 5px;">
+                powered by <a href="https://www.gridify.in" target="_blank"
+                    style="color: inherit; text-decoration: underline;">Gridify</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase Scripts -->
+    <script type="module" src="scripts/firebase-config.js"></script>
+    <script src="scripts/db.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/auth.js"></script>
+
+    <script>
+        // Load Privacy Policy Content
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const content = await DB.getPrivacyPolicy();
+
+                if (content && content.trim()) {
+                    // Content exists, display it
+                    document.getElementById('privacy-content').innerHTML = content;
+                    document.getElementById('privacy-main').style.display = 'none';
+                    document.getElementById('privacy-content-container').style.display = 'block';
+                } else {
+                    // No content, show buffering
+                    document.getElementById('privacy-main').querySelector('h2').textContent = 'Buffering...';
+                }
+            } catch (e) {
+                console.error('Error loading privacy policy:', e);
+                // Show buffering on error
+                document.getElementById('privacy-main').querySelector('h2').textContent = 'Buffering...';
+            }
+        });
+    </script>
+</body>
+
+</html>
