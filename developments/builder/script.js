@@ -51,9 +51,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (id === 'photo') {
                     const img = document.querySelector(targets);
                     const container = document.getElementById('rPhotoContainer');
+                    const preview = document.getElementById('resumePreview');
+
                     if (img && container) {
                         img.src = val;
                         container.style.display = val ? 'block' : 'none';
+
+                        if (preview) {
+                            if (val) preview.classList.add('has-photo');
+                            else preview.classList.remove('has-photo');
+                        }
+
                         // Adjust header alignment if needed
                         document.querySelector('.r-header-content').style.textAlign = val ? 'left' : 'center';
                         document.querySelector('.r-name').style.textAlign = val ? 'left' : 'center';
