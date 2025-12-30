@@ -875,21 +875,17 @@
                             <p>Start your journey towards a better career. No fees required.</p>
                         </div>
 
-                        <!--div class="social-auth">
-                            <button class="social-btn google-btn">
+                        <div class="social-auth">
+                            <button class="social-btn google-btn" type="button" onclick="handleGoogleLogin(this)">
                                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                                     alt="Google">
                                 Continue with Google
-                            </button>
-                            <button class="social-btn apple-btn">
-                                <i class="fab fa-apple"></i>
-                                Continue with Apple
                             </button>
                         </div>
 
                         <div class="separator">
                             <span>Or sign up with email</span>
-                        </div-->
+                        </div>
 
                         <form id="signupForm">
                             <div class="form-group mb-3">
@@ -951,8 +947,8 @@
                             <p>Enter your credentials to access your account.</p>
                         </div>
 
-                        <!--div class="social-auth">
-                            <button class="social-btn google-btn">
+                        <div class="social-auth">
+                            <button class="social-btn google-btn" type="button" onclick="handleGoogleLogin(this)">
                                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
                                     alt="Google">
                                 Continue with Google
@@ -961,7 +957,7 @@
 
                         <div class="separator">
                             <span>Or log in with email</span>
-                        </div-->
+                        </div>
 
                         <form id="loginForm">
                             <div class="form-group mb-3">
@@ -1938,7 +1934,7 @@
                 if (modal) modal.hide();
             } catch (e) {
                 console.error("Error saving Fun Zone config:", e);
-                alert("Failed to save changes: " + e.message);
+                alert("Failed to save changes: " + AdminManager.sanitizeMessage(e.message));
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -1971,6 +1967,26 @@
                 input.attr('type', type);
                 $(this).toggleClass('fa-eye fa-eye-slash');
             });
+
+            window.handleGoogleLogin = async function (btn) {
+                const originalContent = $(btn).html();
+                $(btn).html('<i class="fas fa-spinner fa-spin me-2"></i> Connecting...').prop('disabled', true);
+
+                try {
+                    const result = await AdminManager.googleLogin();
+                    if (result.success) {
+                        showDashboard(AdminManager.getSession());
+                    } else {
+                        $('#loginError').removeClass('d-none').text(result.message);
+                        $('#signupError').removeClass('d-none').text(result.message);
+                    }
+                } catch (error) {
+                    console.error("Google Login Catch:", error);
+                    alert("Google Login failed: " + AdminManager.sanitizeMessage(error.message));
+                } finally {
+                    $(btn).html(originalContent).prop('disabled', false);
+                }
+            };
 
             // --- Network Status Logic ---
             function updateOnlineStatus() {
@@ -2063,7 +2079,7 @@
                     $('#fpStep1').addClass('d-none');
                     $('#fpStep2').removeClass('d-none');
                 } else {
-                    alert("Error sending OTP: " + res.error);
+                    alert("Error sending OTP: " + AdminManager.sanitizeMessage(res.error));
                 }
                 btn.prop('disabled', false).text('Send OTP');
             });
@@ -2084,7 +2100,7 @@
                         alert("Password reset successful! Please login.");
                         fpModal.hide();
                     } else {
-                        alert(rRes.message);
+                        alert(AdminManager.sanitizeMessage(rRes.message));
                     }
                 } else {
                     alert("Invalid OTP");
@@ -2110,7 +2126,7 @@
                         toggleAuth('login');
                         $('#regEmail').val(''); $('#regPass').val(''); $('#regConfirmPass').val(''); $('#regFullName').val('');
                     } else {
-                        alert("Registration failed: " + cRes.message);
+                        alert("Registration failed: " + AdminManager.sanitizeMessage(cRes.message));
                     }
                 } else {
                     alert("Invalid OTP");
@@ -2133,7 +2149,7 @@
                 const btn = $(this);
                 btn.text('Setting up...');
                 const res = await AdminManager.setupInitialAdmin();
-                alert(res.message);
+                alert(AdminManager.sanitizeMessage(res.message));
                 btn.text('Setup Initial Admin');
             });
 
@@ -2166,11 +2182,11 @@
                         $('#userChangePasswordModal').modal('hide');
                         AdminManager.logout();
                     } else {
-                        alert(res.message);
+                        alert(AdminManager.sanitizeMessage(res.message));
                         btn.prop('disabled', false).text(originalText);
                     }
                 } catch (e) {
-                    alert("Error: " + e.message);
+                    alert("Error: " + AdminManager.sanitizeMessage(e.message));
                     btn.prop('disabled', false).text(originalText);
                 }
             });
@@ -2402,7 +2418,7 @@
                     alert("Program Registry Updated!");
                     await loadProgramRegistry();
                     await renderProgramCheckboxes(); // Refresh other UI parts
-                } catch (e) { alert("Error: " + e.message); }
+                } catch (e) { alert("Error: " + AdminManager.sanitizeMessage(e.message)); }
                 btn.prop('disabled', false).text('Save Program Registry');
             });
 
@@ -2486,7 +2502,7 @@
                     $('#new-coupon-value').val('');
                     await loadCoupons();
                 } catch (e) {
-                    alert("Error adding coupon: " + e.message);
+                    alert("Error adding coupon: " + AdminManager.sanitizeMessage(e.message));
                 } finally {
                     btn.prop('disabled', false).text('Add Coupon');
                 }
@@ -2574,7 +2590,7 @@
                 try {
                     await AdminManager.saveDefaultPrograms(defaults);
                     alert("Default settings saved!");
-                } catch (e) { alert("Error: " + e.message); }
+                } catch (e) { alert("Error: " + AdminManager.sanitizeMessage(e.message)); }
                 btn.prop('disabled', false).text('Save Default Settings');
             });
 
@@ -2626,7 +2642,7 @@
                     manageUserModal.hide();
                     loadUsers();
                 } catch (e) {
-                    alert("Error updating user: " + e.message);
+                    alert("Error updating user: " + AdminManager.sanitizeMessage(e.message));
                 }
                 btn.prop('disabled', false).text('Save Changes');
             });
@@ -2676,7 +2692,7 @@
                     $('#new-user-name').val('');
                     loadUsers();
                 } catch (e) {
-                    alert("Error: " + e.message);
+                    alert("Error: " + AdminManager.sanitizeMessage(e.message));
                 } finally {
                     btn.prop('disabled', false).text('Create User');
                 }
@@ -2788,7 +2804,7 @@
                     renderProducts();
                 } catch (e) {
                     console.error(e);
-                    alert("Update failed: " + e.message);
+                    alert("Update failed: " + AdminManager.sanitizeMessage(e.message));
                 } finally {
                     hideUpdate();
                 }
@@ -2806,7 +2822,7 @@
                         renderProducts();
                         populateFilters();
                     } catch (e) {
-                        alert("Delete failed: " + e.message);
+                        alert("Delete failed: " + AdminManager.sanitizeMessage(e.message));
                         btn.html(originalHtml).prop('disabled', false);
                     } finally {
                         hideUpdate();
@@ -2878,7 +2894,7 @@
                     populateFilters();
                 } catch (error) {
                     console.error(error);
-                    alert('Error saving product: ' + error.message);
+                    alert('Error saving product: ' + AdminManager.sanitizeMessage(error.message));
                 } finally {
                     btn.text(originalText).prop('disabled', false);
                     hideUpdate();
@@ -2991,7 +3007,7 @@
                     await AdminManager.updateOrderStatus(id, newStatus);
                     select.css('background-color', getStatusColor(newStatus));
                 } catch (e) {
-                    alert("Failed to update status: " + e.message);
+                    alert("Failed to update status: " + AdminManager.sanitizeMessage(e.message));
                 } finally {
                     select.prop('disabled', false);
                 }
@@ -3006,7 +3022,7 @@
                     await AdminManager.updatePaymentStatus(id, newStatus);
                     select.css('background-color', getPaymentColor(newStatus));
                 } catch (e) {
-                    alert("Failed to update status: " + e.message);
+                    alert("Failed to update status: " + AdminManager.sanitizeMessage(e.message));
                 } finally {
                     select.prop('disabled', false);
                 }
