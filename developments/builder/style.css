@@ -282,7 +282,7 @@ body {
     /* Allow growth */
     margin: 0 auto;
     /* Center horizontally */
-    padding: 15mm 20mm;
+    padding: 1.27cm;
     /* Standard margins */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     /* ATS FONT */
@@ -662,7 +662,7 @@ body {
 @media print {
     @page {
         size: A4;
-        margin: 0;
+        margin: 1.27cm;
     }
 
     body,
@@ -705,7 +705,7 @@ body {
 
     .resume-paper {
         margin: 0;
-        padding: 15mm 20mm;
+        padding: 0 !important;
         /* Keep margins */
         box-shadow: none;
         width: 100%;
@@ -721,8 +721,13 @@ body {
 
     /* Pagination / Breaks */
     .r-section {
-        page-break-inside: avoid;
-        break-inside: avoid;
+        page-break-inside: auto;
+        break-inside: auto;
+    }
+
+    .r-section-title {
+        page-break-after: avoid;
+        break-after: avoid;
     }
 
     /* Allow breaks inside long lists if needed, but prefer keeping blocks together */
@@ -736,6 +741,11 @@ body {
         color: #000;
         pointer-events: none;
         /* Prevent clickable links if preferred, but text remains selectable */
+    }
+
+    /* Fix theme offsets in print */
+    .theme-elegant-purple .resume-header {
+        margin: 0 !important;
     }
 }
 
@@ -1024,6 +1034,7 @@ body {
     background: linear-gradient(90deg, #3b82f6, #4ade80, #3b82f6);
     background-size: 200% auto;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: gradient-text 2s linear infinite;
 }
