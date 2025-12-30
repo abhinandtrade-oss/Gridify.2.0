@@ -500,7 +500,11 @@ body {
     height: 120px;
     border-radius: 50%;
     border: 3pt solid white;
-    display: block !important;
+}
+
+.theme-modern-blue:not(.has-photo) .resume-header {
+    justify-content: center;
+    text-align: center;
 }
 
 .theme-modern-blue .r-header-content {
@@ -561,7 +565,13 @@ body {
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    display: block !important;
+}
+
+.theme-minimalist:not(.has-photo) .resume-header {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
 }
 
 .theme-minimalist .r-header-content {
