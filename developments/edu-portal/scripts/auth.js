@@ -15,7 +15,7 @@ const Auth = {
 
     // Toast Notification Utility (Internal Helper)
     showToast: (message, type = 'info') => {
-        message = message.replace(/Firebase:?/gi, 'GRIDIFY-SERVER');
+        message = message.replace(/Firebase:?/gi, 'Gridify');
         let container = document.getElementById('toast-container');
         if (!container) {
             container = document.createElement('div');
@@ -135,7 +135,7 @@ const Auth = {
             if (error.code === 'auth/invalid-login-credentials') {
                 return { success: false, message: 'Invalid login credentials' };
             }
-            return { success: false, message: error.message.replace(/Firebase:?/gi, 'GRIDIFY-SERVER') };
+            return { success: false, message: error.message.replace(/Firebase:?/gi, 'Gridify') };
         }
     },
 
@@ -229,7 +229,7 @@ const Auth = {
             if (error.code === 'auth/email-already-in-use') {
                 return { success: false, message: 'The email address is already in use by another account' };
             }
-            return { success: false, message: error.message.replace(/Firebase:?/gi, 'GRIDIFY-SERVER') };
+            return { success: false, message: error.message.replace(/Firebase:?/gi, 'Gridify') };
         }
     },
 
@@ -278,7 +278,7 @@ const Auth = {
             if (error.code === 'auth/email-already-in-use') {
                 return { success: false, message: 'The email address is already in use by another account' };
             }
-            return { success: false, message: error.message.replace(/Firebase:?/gi, 'GRIDIFY-SERVER') };
+            return { success: false, message: error.message.replace(/Firebase:?/gi, 'Gridify') };
         } finally {
             if (secondaryApp) await secondaryApp.delete();
         }
@@ -308,7 +308,7 @@ const Auth = {
             if (error.code === 'auth/wrong-password') {
                 return { success: false, message: 'Incorrect Current Password.' };
             }
-            return { success: false, message: error.message.replace(/Firebase:?/gi, 'GRIDIFY-SERVER') };
+            return { success: false, message: error.message.replace(/Firebase:?/gi, 'Gridify') };
         }
     },
 
@@ -324,7 +324,7 @@ const Auth = {
             await window.auth.sendPasswordResetEmail(email);
             return { success: true };
         } catch (error) {
-            return { success: false, message: error.message.replace(/Firebase:?/gi, 'GRIDIFY-SERVER') };
+            return { success: false, message: error.message.replace(/Firebase:?/gi, 'Gridify') };
         }
     },
 
