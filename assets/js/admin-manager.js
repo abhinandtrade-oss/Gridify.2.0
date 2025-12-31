@@ -63,7 +63,7 @@ class AdminManager {
             }
 
             // Success
-            this.startSession(userData.username.toLowerCase().trim(), userData.role, userData.allowedPrograms || [], userData.fullName || '');
+            this.startSession(userData.username.toLowerCase().trim(), userData.role, userData.allowedPrograms || [], userData.fullName);
             return { success: true, role: userData.role };
 
         } catch (error) {
@@ -95,7 +95,7 @@ class AdminManager {
                 }
 
                 // Success
-                this.startSession(user.username, user.role, user.allowedPrograms || [], user.fullName || '');
+                this.startSession(user.username, user.role, user.allowedPrograms || [], user.fullName);
                 return { success: true, role: user.role };
             } else {
                 return { success: false, message: "Invalid password" };
