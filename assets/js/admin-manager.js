@@ -63,7 +63,7 @@ class AdminManager {
             }
 
             // Success
-            this.startSession(userData.username.toLowerCase().trim(), userData.role, userData.allowedPrograms || []);
+            this.startSession(userData.username.toLowerCase().trim(), userData.role, userData.allowedPrograms || [], userData.fullName || '');
             return { success: true, role: userData.role };
 
         } catch (error) {
@@ -95,7 +95,7 @@ class AdminManager {
                 }
 
                 // Success
-                this.startSession(user.username, user.role, user.allowedPrograms || []);
+                this.startSession(user.username, user.role, user.allowedPrograms || [], user.fullName || '');
                 return { success: true, role: user.role };
             } else {
                 return { success: false, message: "Invalid password" };
@@ -106,9 +106,10 @@ class AdminManager {
         }
     }
 
-    static startSession(username, role, allowedPrograms = []) {
+    static startSession(username, role, allowedPrograms = [], fullName = '') {
         const session = {
             username: username,
+            fullName: fullName,
             role: role,
             allowedPrograms: allowedPrograms,
             loginTime: Date.now(),
