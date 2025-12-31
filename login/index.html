@@ -2011,7 +2011,7 @@
             // Login
             $('#loginForm').on('submit', async function (e) {
                 e.preventDefault();
-                const u = $('#username').val();
+                const u = $('#username').val().toLowerCase().trim();
                 const p = $('#password').val();
 
                 const btn = $(this).find('button');
@@ -2034,7 +2034,7 @@
             $('#signupForm').on('submit', async function (e) {
                 e.preventDefault();
                 const fullName = $('#regFullName').val();
-                const email = $('#regEmail').val();
+                const email = $('#regEmail').val().toLowerCase().trim();
                 const pass = $('#regPass').val();
                 const confirm = $('#regConfirmPass').val();
                 if (pass !== confirm) {
@@ -2068,7 +2068,7 @@
             });
 
             $('#btnFpSendOtp').click(async function () {
-                const email = $('#fpEmail').val();
+                const email = $('#fpEmail').val().toLowerCase().trim();
                 if (!email) return;
                 const btn = $(this);
                 btn.prop('disabled', true).text('Sending...');
@@ -2670,7 +2670,7 @@
 
             // Create User (Manual)
             $('#btn-add-user').on('click', async function () {
-                const newUser = $('#new-user-name').val();
+                const newUser = $('#new-user-name').val().toLowerCase().trim();
                 const newRole = $('#new-user-role').val();
                 if (!newUser) return;
 
