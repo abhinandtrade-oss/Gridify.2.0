@@ -2195,7 +2195,7 @@
                 $('#loginSection').addClass('d-none');
                 $('#adminSection').addClass('d-none');
                 $('#dashboardSelection').removeClass('d-none').addClass('d-flex');
-                $('#dashUsername').text(session.username);
+                $('#dashUsername').text(session.fullName || session.username);
 
                 const container = $('#dynamicProgramCards');
                 container.empty();
