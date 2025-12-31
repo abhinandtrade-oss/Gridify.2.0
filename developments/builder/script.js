@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
             'secProjects': 'r-projects-list',
             'secAchievements': 'r-achievements-list',
             'secLanguages': 'r-languages-list', // content is text but logic same
-            'secReferences': 'r-references-list'
+            'secReferences': 'r-ref-content'
         };
 
         Object.keys(listMap).forEach(secId => {
@@ -370,6 +370,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const sumText = document.querySelector('.r-summary-text').textContent;
         document.getElementById('rSummaryTitle').textContent = summaryType === 'objective' ? 'Career Objective' : 'Professional Summary';
         sumSec.style.display = sumText ? 'block' : 'none';
+
+        // References specific logic (Show if request is chosen OR if list has items)
+        const refDisplay = document.getElementById('refDisplay').value;
+        const secRefs = document.getElementById('secReferences');
+        const refContent = document.getElementById('r-ref-content');
+        if (secRefs && refContent) {
+            if (refDisplay === 'request') {
+                secRefs.style.display = 'block';
+            } else {
+                const hasListItems = refContent.querySelector('.r-ref-grid')?.children.length > 0;
+                secRefs.style.display = hasListItems ? 'block' : 'none';
+            }
+        }
 
         // Profile Meta
         const meta = document.getElementById('rProfileMeta');
@@ -394,28 +407,121 @@ document.addEventListener('DOMContentLoaded', () => {
         // Remove all theme classes first
         const themes = [
             'theme-default', 'theme-modern-blue', 'theme-minimalist',
-            'theme-elegant-purple', 'theme-professional-green', 'theme-classic-purple'
+            'theme-elegant-purple', 'theme-professional-green', 'theme-classic-purple',
+            'theme-sidebar-split'
         ];
         themes.forEach(t => preview.classList.remove(t));
 
         // Add selected theme
         preview.classList.add(template);
 
+        // Handle structural changes for sidebar theme
+        handleThemeLayout(template);
+
         // Re-trigger layout-specific logic if needed
         checkVisibility();
     });
 
+    const handleThemeLayout = (template) => {
+        const preview = document.getElementById('resumePreview');
+        const header = document.getElementById('resumeHeader');
+        const body = document.getElementById('resumeBody');
+
+        // Check if sidebar wrapper exists
+        let sidebar = document.getElementById('r-sidebar-wrapper');
+        let main = document.getElementById('r-main-wrapper');
+
+        if (template === 'theme-sidebar-split') {
+            if (!sidebar) {
+                sidebar = document.createElement('div');
+                sidebar.id = 'r-sidebar-wrapper';
+                preview.appendChild(sidebar);
+            }
+            if (!main) {
+                main = document.createElement('div');
+                main.id = 'r-main-wrapper';
+                preview.appendChild(main);
+            }
+
+            // Move items to Sidebar
+            const toSidebar = [
+                '#rPhotoContainer',
+                '#secSummary',
+                '#secSkills',
+                '#secCerts',
+                '#secLanguages',
+                '#secHobbies'
+            ];
+            toSidebar.forEach(sel => {
+                const el = document.querySelector(sel);
+                if (el) sidebar.appendChild(el);
+            });
+
+            // Move items to Main
+            const toMain = [
+                '.r-header-content',
+                '#rProfileMeta',
+                '#secExperience',
+                '#secEducation',
+                '#secProjects',
+                '#secAchievements',
+                '#secReferences',
+                '#secDeclaration'
+            ];
+            toMain.forEach(sel => {
+                const el = document.querySelector(sel);
+                if (el) main.appendChild(el);
+            });
+
+            // Hide original containers
+            header.style.display = 'none';
+            body.style.display = 'none';
+
+        } else {
+            // Restore original layout
+            if (sidebar && main) {
+                // Return items to header
+                const toHeader = ['#rPhotoContainer', '.r-header-content', '#rProfileMeta'];
+                toHeader.forEach(sel => {
+                    const el = document.querySelector(sel);
+                    if (el) header.appendChild(el);
+                });
+
+                // Return items to body
+                const toBody = [
+                    '#secSummary', '#secSkills', '#secExperience', '#secEducation',
+                    '#secProjects', '#secAchievements', '#secCerts', '#secLanguages',
+                    '#secHobbies', '#secReferences', '#secDeclaration'
+                ];
+                toBody.forEach(sel => {
+                    const el = document.querySelector(sel);
+                    if (el) body.appendChild(el);
+                });
+
+                // Show original containers
+                header.style.display = '';
+                body.style.display = '';
+
+                // Remove wrappers
+                sidebar.remove();
+                main.remove();
+            }
+        }
+    };
+
     // CV Type (Ordering)
     document.getElementById('cvType').addEventListener('change', () => {
         const type = document.getElementById('cvType').value;
-        const body = document.getElementById('resumeBody');
         const exc = document.getElementById('secExperience');
         const edu = document.getElementById('secEducation');
+        const parent = exc.parentElement; // Dynamically get parent (body or r-main-wrapper)
 
-        if (type === 'fresher' || type === 'academic') {
-            body.insertBefore(edu, exc);
-        } else {
-            body.insertBefore(exc, edu);
+        if (parent) {
+            if (type === 'fresher' || type === 'academic') {
+                parent.insertBefore(edu, exc);
+            } else {
+                parent.insertBefore(exc, edu);
+            }
         }
     });
 
