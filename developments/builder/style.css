@@ -1054,3 +1054,150 @@ body {
         background-position: 200% center;
     }
 }
+
+/* 6. Modern Sidebar (Split Layout) */
+.theme-sidebar-split.resume-paper {
+    display: flex !important;
+    flex-direction: row !important;
+    padding: 0 !important;
+    font-family: 'Inter', sans-serif;
+    min-height: 297mm;
+    background: white;
+}
+
+#r-sidebar-wrapper {
+    width: 280px;
+    background-color: #f4f4f4;
+    padding: 30pt 20pt;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #eee;
+    height: auto;
+}
+
+#r-main-wrapper {
+    flex: 1;
+    padding: 30pt 30pt;
+    display: flex;
+    flex-direction: column;
+}
+
+.theme-sidebar-split .r-photo-container {
+    width: 150px !important;
+    height: 150px !important;
+    border-radius: 50% !important;
+    margin: 0 auto 25pt auto !important;
+    border: 5pt solid #fff !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08) !important;
+    display: block !important;
+    overflow: hidden;
+}
+
+.theme-sidebar-split .r-name {
+    text-align: left !important;
+    font-size: 32pt !important;
+    letter-spacing: -1px;
+    color: #1a1a1a;
+    margin: 0 !important;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.theme-sidebar-split .r-title {
+    text-align: left !important;
+    font-size: 14pt !important;
+    color: #555;
+    margin-top: 5pt !important;
+    margin-bottom: 15pt !important;
+    font-weight: 500;
+}
+
+.theme-sidebar-split .r-contact-info {
+    text-align: left !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8pt 15pt;
+    margin-bottom: 25pt !important;
+    padding-bottom: 15pt !important;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.theme-sidebar-split .r-contact-info span {
+    font-size: 9.5pt;
+    color: #444;
+}
+
+.theme-sidebar-split .r-contact-info span:not(:empty)::after {
+    display: none !important;
+}
+
+.theme-sidebar-split .r-section-title {
+    text-align: left !important;
+    font-size: 12pt !important;
+    font-weight: 700;
+    color: #333;
+    border: none !important;
+    border-bottom: 2pt solid #333 !important;
+    padding-bottom: 4pt !important;
+    margin-bottom: 12pt !important;
+    margin-top: 10pt !important;
+}
+
+/* Sidebar Specific */
+#r-sidebar-wrapper .r-section-title {
+    color: #444;
+    border-bottom: 2pt solid #999 !important;
+    font-size: 11pt !important;
+}
+
+#r-sidebar-wrapper .r-section {
+    margin-bottom: 20pt;
+}
+
+#r-sidebar-wrapper .r-summary-text,
+#r-sidebar-wrapper .r-skills-container,
+#r-sidebar-wrapper .r-certs-text,
+#r-sidebar-wrapper .r-languages-list,
+#r-sidebar-wrapper .r-hobbies-text {
+    font-size: 9pt;
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Main Specific */
+#r-main-wrapper .r-section {
+    margin-bottom: 18pt;
+}
+
+#r-main-wrapper .r-item-block {
+    margin-bottom: 12pt;
+}
+
+#r-main-wrapper .r-bold {
+    font-size: 11pt;
+    color: #222;
+}
+
+#r-main-wrapper .r-sub {
+    font-size: 10pt;
+    color: #666;
+}
+
+#r-main-wrapper .r-desc {
+    font-size: 9.5pt;
+    margin-top: 4pt;
+    color: #444;
+}
+
+/* Fix for profile meta if used */
+.theme-sidebar-split .r-profile-meta {
+    text-align: left !important;
+    border: none !important;
+    margin-bottom: 15pt !important;
+    padding: 0 !important;
+    color: #777;
+}
+
+.theme-sidebar-split .r-meta-item:not(:empty)::after {
+    color: #ccc;
+}
