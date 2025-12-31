@@ -32,8 +32,9 @@ class AdminManager {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
 
+            const normalizedEmail = user.email.toLowerCase().trim();
             // Check if user exists in Firestore
-            const q = query(collection(db, USERS_COLLECTION), where("username", "==", user.email));
+            const q = query(collection(db, USERS_COLLECTION), where("username", "==", normalizedEmail));
             const querySnapshot = await getDocs(q);
 
             let userData = null;
@@ -42,7 +43,7 @@ class AdminManager {
                 const defaults = await this.getDefaultPrograms();
                 // Create new user document if they don't exist
                 userData = {
-                    username: user.email,
+                    username: normalizedEmail,
                     fullName: user.displayName || 'Google User',
                     role: 'user',
                     allowedPrograms: defaults,
@@ -62,7 +63,7 @@ class AdminManager {
             }
 
             // Success
-            this.startSession(userData.username, userData.role, userData.allowedPrograms || []);
+            this.startSession(userData.username.toLowerCase().trim(), userData.role, userData.allowedPrograms || []);
             return { success: true, role: userData.role };
 
         } catch (error) {
@@ -74,6 +75,7 @@ class AdminManager {
 
     static async login(username, password) {
         try {
+            username = (username || '').toLowerCase().trim();
             console.log(`Attempting login for ${username}...`);
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", username));
             const querySnapshot = await getDocs(q);
@@ -175,6 +177,7 @@ class AdminManager {
         // Allow any admin to create users
         if (!session || session.role !== 'admin') throw new Error("Unauthorized");
 
+        username = (username || '').toLowerCase().trim();
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", username));
             const snap = await getDocs(q);
@@ -200,6 +203,7 @@ class AdminManager {
         const session = this.getSession();
         if (!session || session.role !== 'admin') throw new Error("Unauthorized");
 
+        targetUser = (targetUser || '').toLowerCase().trim();
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", targetUser));
             const querySnapshot = await getDocs(q);
@@ -218,6 +222,7 @@ class AdminManager {
         const session = this.getSession();
         if (!session || session.role !== 'admin') throw new Error("Unauthorized");
 
+        targetUser = (targetUser || '').toLowerCase().trim();
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", targetUser));
             const querySnapshot = await getDocs(q);
@@ -317,6 +322,7 @@ class AdminManager {
         const session = this.getSession();
         if (!session || session.role !== 'admin') throw new Error("Unauthorized");
 
+        targetUser = (targetUser || '').toLowerCase().trim();
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", targetUser));
             const querySnapshot = await getDocs(q);
@@ -353,6 +359,7 @@ class AdminManager {
     // --- OTP LOGIC (GAS) ---
 
     static async sendOtp(email) {
+        email = (email || '').toLowerCase().trim();
         try {
             const response = await fetch(this.GAS_URL, {
                 method: 'POST',
@@ -366,6 +373,7 @@ class AdminManager {
     }
 
     static async verifyOtp(email, otp) {
+        email = (email || '').toLowerCase().trim();
         try {
             const response = await fetch(this.GAS_URL, {
                 method: 'POST',
@@ -379,6 +387,7 @@ class AdminManager {
     }
 
     static async registerUser(email, password, fullName = '') {
+        email = (email || '').toLowerCase().trim();
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", email));
             const snap = await getDocs(q);
@@ -404,6 +413,7 @@ class AdminManager {
     }
 
     static async resetPassword(email, newPass) {
+        email = (email || '').toLowerCase().trim();
         try {
             const q = query(collection(db, USERS_COLLECTION), where("username", "==", email));
             const snap = await getDocs(q);
