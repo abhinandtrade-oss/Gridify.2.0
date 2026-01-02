@@ -1,0 +1,17 @@
+{
+    "rules": {
+        "rooms": {
+            "$meetingId": {
+                "participants": {
+                    // Anyone signed in can read the participant list
+                    ".read": "auth != null",
+                    // Users can only write to their own specific node (rooms/ID/participants/MY_UID)
+                    "$uid": {
+                        ".write": "auth != null && $uid === auth.uid",
+                        ".validate": "newData.hasChildren(['name', 'joinedAt'])"
+                    }
+                }
+            }
+        }
+    }
+}

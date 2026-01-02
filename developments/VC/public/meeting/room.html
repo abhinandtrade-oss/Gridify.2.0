@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Room - Gridify Video Conf</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="room-container">
+        <!-- Header -->
+        <div class="room-header">
+            <div>
+                <h3 id="meetingTitle">Meeting Room</h3>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span id="meetingIdDisplay" class="text-muted" style="font-size: 0.9rem;">ID: ...</span>
+                    <button id="copyRoomLinkBtn"
+                        style="background: none; border: none; color: var(--accent); cursor: pointer;"
+                        title="Copy Link">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="participantCount" class="text-muted">
+                <i class="fas fa-users"></i> 1
+            </div>
+        </div>
+
+        <!-- Video Grid -->
+        <div id="videoGrid" class="video-grid">
+            <!-- Local Video -->
+            <div class="video-tile">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="participant-label">You</div>
+            </div>
+            <!-- Remote videos will be added here -->
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-bar">
+            <button id="micBtn" class="control-btn" title="Toggle Microphone">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button id="camBtn" class="control-btn" title="Toggle Camera">
+                <i class="fas fa-video"></i>
+            </button>
+            <button id="screenBtn" class="control-btn" title="Share Screen">
+                <i class="fas fa-desktop"></i>
+            </button>
+            <button id="chatBtn" class="control-btn" title="Chat">
+                <i class="fas fa-comment-alt"></i>
+            </button>
+            <button id="leaveBtn" class="control-btn" style="background: var(--danger);" title="Leave Meeting">
+                <i class="fas fa-phone-slash"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Chat Sidebar -->
+    <div id="chatSidebar" class="chat-sidebar">
+        <div
+            style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+            <h3>Chat</h3>
+            <button id="closeChat" style="background: none; border: none; color: white; cursor: pointer;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+            <!-- Messages -->
+        </div>
+        <form id="chatForm" class="chat-input-area">
+            <div class="input-group" style="margin-bottom: 0;">
+                <input type="text" id="chatInput" class="form-control" placeholder="Type a message..." required>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        <p>Powered by <a href="https://www.gridify.in" target="_blank">GRIDIFY</a></p>
+    </footer>
+
+    <!-- WebRTC and Room Logic -->
+    <script type="module" src="../assets/js/webrtc.js"></script>
+    <script type="module" src="../assets/js/meeting.js"></script>
+
+    <script>
+        // Simple Copy Logic for Room Header Button
+        document.getElementById('copyRoomLinkBtn').addEventListener('click', () => {
+            const url = window.location.href;
+            navigator.clipboard.writeText(url).then(() => {
+                alert("Link copied to clipboard!");
+            }).catch(console.error);
+        });
+    </script>
+</body>
+
+</html>

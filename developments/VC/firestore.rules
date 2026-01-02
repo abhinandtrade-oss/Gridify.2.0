@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper: Check if user is authenticated
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Users: Any signed-in user can read profiles (to see names), but only owner can edit
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Meetings
+    match /meetings/{meetingId} {
+      // Anyone signed in can read meeting details (to join)
+      allow read: if isSignedIn();
+      
+      // Anyone signed in can create a meeting
+      allow create: if isSignedIn();
+      
+      // Only the host can update the meeting (e.g., to end it)
+      // We check if the existing document's hostUid matches the requester
+      allow update: if isSignedIn() && resource.data.hostUid == request.auth.uid;
+
+      // Subcollection: Signals (WebRTC Offer/Answer/Candidates)
+      // Open to signed-in users for P2P connection establishment
+      match /signals/{signalId} {
+        allow read, write: if isSignedIn();
+      }
+
+      // Subcollection: Messages (Chat)
+      match /messages/{messageId} {
+        allow read, write: if isSignedIn();
+      }
+    }
+  }
+}
