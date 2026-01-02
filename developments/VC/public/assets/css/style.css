@@ -1,0 +1,1243 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-hue: 250;
+    /* Deep Purple */
+    --primary: hsl(var(--primary-hue), 80%, 60%);
+    --primary-dark: hsl(var(--primary-hue), 80%, 50%);
+    --background: #0f172a;
+    /* Slate 900 */
+    --surface: #1e293b;
+    /* Slate 800 */
+    --surface-transparent: rgba(30, 41, 59, 0.7);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    /* Sky 400 */
+    --danger: #ef4444;
+    --success: #22c55e;
+    --border: rgba(255, 255, 255, 0.1);
+
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(76, 29, 149, 0.2) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.2) 0%, transparent 20%);
+}
+
+a {
+    text-decoration: none;
+    color: var(--accent);
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary);
+}
+
+/* Utilities */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow);
+    padding: 2rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-main);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* Auth Pages */
+.auth-container {
+    max-width: 400px;
+    margin: 5rem auto;
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, #fff, #94a3b8);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Dashboard */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.action-card {
+    transition: transform 0.3s ease;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+}
+
+.meeting-list {
+    margin-top: 2rem;
+}
+
+.meeting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+.meeting-item:hover {
+    border-color: var(--border);
+}
+
+/* Meeting Room */
+.room-container {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    overflow: hidden;
+}
+
+.room-header {
+    padding: 1rem 2rem;
+    background: rgba(15, 23, 42, 0.9);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
+    height: 100%;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+.video-grid::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+/* Center single video and keep 16:9 */
+.video-grid:has(.video-tile:only-child) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.video-grid .video-tile:only-child {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    aspect-ratio: 16/9;
+}
+
+.video-tile {
+    position: relative;
+    background: black;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+}
+
+.video-tile video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.participant-label {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: white;
+}
+
+.controls-bar {
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.9);
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 10;
+}
+
+.control-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+    background: var(--primary);
+}
+
+.control-btn.active {
+    background: var(--danger);
+    color: white;
+}
+
+/* Chat Sidebar (Hidden by default or overlay) */
+.chat-sidebar {
+    position: fixed;
+    right: -320px;
+    top: 0;
+    bottom: 0;
+    width: 300px;
+    background: var(--surface);
+    z-index: 20;
+    transition: right 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border);
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+.sidebar-content::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.chat-sidebar.open {
+    right: 0;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.chat-msg {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    border-radius: 8px;
+}
+
+.chat-msg.host-msg {
+    background: rgba(34, 197, 94, 0.1);
+    /* Slight green tint */
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.chat-delete-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px;
+    opacity: 0.6;
+    transition: all 0.2s;
+}
+
+.chat-delete-btn:hover {
+    color: var(--danger);
+    opacity: 1;
+}
+
+.chat-sender {
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 2px;
+}
+
+.chat-input-area {
+    padding: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    max-width: 500px;
+    width: 90%;
+    animation: slideUp 0.3s ease;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Footer (Required) */
+footer {
+    text-align: center;
+    padding: 2rem;
+    margin-top: auto;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+footer a {
+    color: var(--accent);
+    font-weight: 500;
+}
+
+/* Loaders/Alerts */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--surface);
+    border-left: 4px solid var(--primary);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(100px);
+    transition: transform 0.3s ease;
+    z-index: 100;
+}
+
+.toast.show {
+    transform: translateY(0);
+}
+
+/* Pin Video Styles */
+.pin-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    z-index: 5;
+}
+
+.video-tile:hover .pin-btn,
+.video-tile.pinned .pin-btn {
+    opacity: 1;
+}
+
+.video-tile.pinned {
+    border: 2px solid var(--primary);
+}
+
+.video-tile.pinned .pin-btn {
+    background: var(--primary);
+    transform: rotate(45deg);
+    /* Optional: visual indicator */
+}
+
+/* Pinned Layout Logic */
+
+/* Meeting Area Layout */
+.meeting-area {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
+/* Default Grid (No Pin) */
+.video-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    overflow-y: auto;
+    align-content: center;
+}
+
+/* Sidebar Mode (Has Pin) */
+.meeting-area.has-pin .video-grid {
+    width: 300px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+    gap: 0.8rem;
+    padding: 1rem 0.5rem 1rem 0;
+    /* Less padding on left to hug stage */
+    border-left: 1px solid var(--border);
+    background: var(--surface);
+    z-index: 5;
+}
+
+.meeting-area.has-pin .video-grid .video-tile {
+    width: 100%;
+    height: 170px;
+    /* Fixed height for sidebar items */
+    aspect-ratio: 16/9;
+    flex-shrink: 0;
+}
+
+/* Main Stage */
+.main-stage {
+    flex: 1;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    position: relative;
+}
+
+.main-stage .video-tile {
+    aspect-ratio: unset;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-stage video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 0;
+}
+
+/* Clean up old pin logic */
+.video-tile.pinned {
+    border: none;
+}
+
+/* Hide pin button on stage if desired, or keep to unpin */
+.main-stage .pin-btn {
+    opacity: 1;
+    background: var(--accent);
+    top: 20px;
+    right: 20px;
+    transform: scale(1.2);
+}
+
+/* Waiting Room */
+.waiting-room {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--background);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-left-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Request Item Styles */
+.request-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.8rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border);
+}
+
+.request-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.icon-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+}
+
+.icon-btn:hover {
+    transform: scale(1.1);
+}
+
+.btn-accept {
+    background: var(--success);
+    color: white;
+}
+
+/* Host Action Menu */
+.participant-actions {
+    position: relative;
+    margin-left: auto;
+}
+
+.action-menu {
+    position: absolute;
+    right: 40px;
+    /* Further left */
+    top: 50%;
+    /* Center vertically relative to button */
+    transform: translateY(-50%);
+    background: #0f172a;
+    /* Darker than surface */
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 160px;
+    z-index: 9999;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+
+.action-menu.show {
+    display: flex;
+}
+
+.action-item {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    padding: 0.5rem;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.action-item.danger {
+    color: var(--danger);
+}
+
+.action-item.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background-color: var(--success);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--success);
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+
+/* Host Badge with Heartbeat */
+.host-badge {
+    background-color: var(--success);
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 12px;
+    margin-left: auto;
+    /* Push to right */
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    animation: heartbeat 1.5s infinite;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+@keyframes heartbeat {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+    }
+}
+
+/* Custom Toast Notification */
+.custom-toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    /* Allow clicking through container */
+}
+
+.custom-toast {
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideDown 0.3s ease-out forwards;
+    pointer-events: auto;
+    min-width: 300px;
+    justify-content: center;
+}
+
+.custom-toast.error {
+    border-color: var(--danger);
+    background: rgba(239, 68, 68, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.custom-toast.success {
+    border-color: var(--success);
+    background: rgba(34, 197, 94, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Custom Confirm Modal */
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 10001;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+}
+
+.custom-modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.custom-confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    transform: scale(0.9);
+    transition: transform 0.2s;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.custom-modal-overlay.show .custom-confirm-box {
+    transform: scale(1);
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-confirm-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-confirm-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-confirm-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+}
+
+/* Connecting Spinner */
+.spinner-modern {
+    width: 60px;
+    height: 60px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s ease-in-out infinite;
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+}
+
+/* Mobile Optimization: Good 'Inhand' Feel */
+@media (max-width: 768px) {
+
+    /* Layout Logic */
+    .room-container {
+        height: 100dvh;
+        /* Dynamic viewport height */
+        grid-template-rows: auto 1fr auto;
+    }
+
+    /* Minimal Header */
+    .room-header {
+        padding: 0.8rem;
+        gap: 0.5rem;
+    }
+
+    .room-header h3 {
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 150px;
+    }
+
+    #meetingIdDisplay {
+        font-size: 0.75rem;
+    }
+
+    /* Make 'Manage' button compact */
+    #peopleBtn .btn-text {
+        display: none;
+    }
+
+    #peopleBtn i {
+        margin-right: 0 !important;
+    }
+
+    #peopleBtn {
+        width: 40px !important;
+        /* Override inline */
+        height: 40px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: none !important;
+    }
+
+    /* Controls Bar - Bottom Sheet feel */
+    .controls-bar {
+        padding: 0.8rem 0.5rem;
+        padding-bottom: max(0.8rem, env(safe-area-inset-bottom));
+        gap: 0.5rem;
+        justify-content: space-evenly;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+    }
+
+    .control-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
+        background: rgba(255, 255, 255, 0.05);
+        /* Slightly visible bg element */
+    }
+
+    .control-btn:active {
+        transform: scale(0.95);
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Video Grid - Vertical Scroll or Focused */
+    .video-grid {
+        grid-template-columns: 1fr;
+        /* Single column */
+        align-content: start;
+        /* Start from top */
+        padding: 0.5rem;
+    }
+
+    .video-tile {
+        aspect-ratio: 16/9;
+        max-height: 250px;
+    }
+
+    /* Pinned Mode Adjustments */
+    .meeting-area.has-pin {
+        flex-direction: column;
+    }
+
+    .meeting-area.has-pin .video-grid {
+        width: 100%;
+        height: 120px;
+        /* Fixed height strip at bottom */
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        padding: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+        order: 2;
+        /* Ensure it stays below stage */
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .meeting-area.has-pin .video-tile {
+        height: 100%;
+        width: 160px;
+        /* Aspect 16:9 approx */
+        flex: none;
+        /* Don't shrink */
+        aspect-ratio: 16/9;
+        border: 1px solid var(--border);
+    }
+
+    .meeting-area.has-pin .main-stage {
+        height: auto;
+        flex: 1;
+        order: 1;
+    }
+
+    /* Full screen sidebars */
+    .chat-sidebar {
+        width: 100%;
+        border-left: none;
+    }
+
+    .chat-sidebar .sidebar-header button {
+        padding: 10px;
+        /* larger close target */
+    }
+
+    /* Toast Position */
+    .toast {
+        left: 1rem;
+        right: 1rem;
+        bottom: 90px;
+        transform: translateY(150px);
+        width: auto;
+    }
+
+    .toast.show {
+        transform: translateY(0);
+    }
+}
+
+/* Mobile Dashboard & Auth Tweaks */
+@media (max-width: 768px) {
+
+    /* Auth Pages */
+    .auth-container {
+        margin: 2rem auto;
+        padding: 1rem;
+    }
+
+    .auth-header h1 {
+        font-size: 1.5rem;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+    }
+
+    .dashboard-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .user-profile #userName {
+        display: none;
+        /* Hide name on mobile */
+    }
+
+    /* Card Grid */
+    .card-grid {
+        grid-template-columns: 1fr;
+        /* Full width cards */
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Meeting Items */
+    .meeting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .meeting-item>div:last-child {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Mobile Pin Button & Video Tile Tweaks */
+@media (max-width: 768px) {
+
+    /* Always show controls on mobile video tiles since hover doesn't exist */
+    .pin-btn {
+        opacity: 1 !important;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+    .participant-label {
+        font-size: 0.75rem;
+        padding: 2px 6px;
+    }
+
+    /* Ensure chat/people sidebars are full screen with nice transition */
+    .chat-sidebar {
+        width: 100vw;
+        right: -100vw;
+    }
+
+    .chat-sidebar.open {
+        right: 0;
+    }
+}
+
+/* Meeting List Truncation & Layout */
+.meeting-item {
+    gap: 1rem;
+    /* Gap between info and actions */
+}
+
+.meeting-info {
+    flex: 1;
+    min-width: 0;
+    /* Essential for text-overflow in flex children */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.meeting-title {
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.meeting-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 4px;
+}
+
+.meeting-actions {
+    flex-shrink: 0;
+    /* Don't shrink actions */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+
+/* Fix overflow on mobile devices */
+@media (max-width: 768px) {
+    .meeting-info {
+        width: 100%;
+        overflow: hidden;
+        /* Ensure container respects parent width */
+    }
+
+    .meeting-item {
+        overflow: hidden;
+        /* Prevent item itself from expanding if something goes wrong */
+    }
+}
