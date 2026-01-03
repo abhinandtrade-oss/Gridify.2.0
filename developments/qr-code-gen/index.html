@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Generator | Gridify</title>
+    <link rel="shortcut icon" href="../../assets/images/logos/favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="main-container">
+        <header>
+            <div class="logo">
+                <img src="../../assets/images/logos/logo.png" alt="QR Studio">
+            </div>
+            <p class="subtitle">Create stunning QR codes with custom logos</p>
+        </header>
+
+        <div class="generator-card">
+            <div class="controls-section">
+                <div class="input-group">
+                    <label for="url-input"><i class="fa-solid fa-link"></i> Website URL</label>
+                    <input type="text" id="url-input" placeholder="https://example.com" value="https://gridify.in">
+                </div>
+
+                <div class="input-group">
+                    <label for="logo-input"><i class="fa-solid fa-image"></i> Center Logo (Optional)</label>
+                    <div class="logo-upload-container">
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="logo-input" accept="image/*">
+                            <div class="file-upload-btn">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Choose Image</span>
+                            </div>
+                        </div>
+                        <button id="remove-logo-btn" class="remove-btn" title="Remove Logo" style="display: none;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="customization-options">
+                    <div class="color-picker-group">
+                        <label>Dots Color</label>
+                        <input type="color" id="color-input" value="#3b82f6">
+                    </div>
+
+                    <div class="color-picker-group">
+                        <label>Background</label>
+                        <div class="bg-controls">
+                            <input type="color" id="bg-color-input" value="#ffffff">
+                            <div class="toggle-wrapper">
+                                <label class="toggle-switch" title="Transparent Background">
+                                    <input type="checkbox" id="transparent-bg">
+                                    <span class="slider"></span>
+                                </label>
+                                <span class="toggle-text">Transparent</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="style-group">
+                        <label>Dot Style</label>
+                        <select id="dots-style">
+                            <option value="rounded">Rounded</option>
+                            <option value="dots">Dots</option>
+                            <option value="classy">Classy</option>
+                            <option value="classy-rounded">Classy Rounded</option>
+                            <option value="square">Square</option>
+                            <option value="extra-rounded">Extra Rounded</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button id="generate-btn" class="primary-btn">
+                    Generate QR Code
+                </button>
+            </div>
+
+            <div class="preview-section">
+                <div class="qr-wrapper">
+                    <div id="canvas"></div>
+                </div>
+                <button id="download-btn" class="secondary-btn">
+                    <i class="fa-solid fa-download"></i> Download PNG
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

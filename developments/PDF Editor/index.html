@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online PDF Editor | Gridify</title>
+    <meta name="description"
+        content="A professional, browser-based PDF editor. Edit text, draw, and manage PDF pages easily.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo">
+                    <i data-lucide="file-text" class="logo-icon"></i>
+                    <h1>Online PDF Editor</h1>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="theme-toggle" id="theme-toggle" title="Toggle Dark Mode">
+                    <div class="toggle-thumb">
+                        <i data-lucide="sun" id="theme-icon"></i>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-upload-new">
+                    <i data-lucide="upload"></i>
+                    <span>Edit Another PDF</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Section -->
+        <main class="app-main">
+            <!-- Left Toolbar -->
+            <aside class="toolbar">
+                <div class="tool-group">
+                    <button class="tool-btn active" id="tool-select" title="Select (V)">
+                        <i data-lucide="mouse-pointer-2"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-text" title="Add Text (T)">
+                        <i data-lucide="type"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-draw" title="Draw (D)">
+                        <i data-lucide="pencil"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-shape" title="Shapes (S)">
+                        <i data-lucide="shapes"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-image" title="Add Image (I)">
+                        <i data-lucide="image"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-highlight" title="Highlight (H)">
+                        <i data-lucide="highlighter"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-whiteout" title="Whiteout (W)">
+                        <i data-lucide="eraser"></i>
+                    </button>
+                </div>
+                <div class="tool-group">
+                    <button class="tool-btn" id="tool-rotate-left" title="Rotate Left">
+                        <i data-lucide="rotate-ccw"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-rotate-right" title="Rotate Right">
+                        <i data-lucide="rotate-cw"></i>
+                    </button>
+                    <button class="tool-btn" id="tool-delete-page" title="Delete Page">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Workspace -->
+            <section class="workspace" id="pdf-workspace">
+                <div class="upload-zone" id="upload-zone">
+                    <div class="upload-content">
+                        <div class="upload-icon-wrapper">
+                            <i data-lucide="upload-cloud" class="upload-icon"></i>
+                        </div>
+                        <h2>Drop your PDF here</h2>
+                        <p>or click to browse from your computer</p>
+                        <span class="upload-limit">Max file size: 20MB</span>
+                        <input type="file" id="pdf-file-input" accept="application/pdf" hidden>
+                    </div>
+                </div>
+
+                <div class="pdf-viewer-container hidden" id="pdf-viewer-container">
+                    <div id="pdf-pages-container" class="pdf-pages-container">
+                        <!-- Pages will be rendered here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Properties Panel -->
+            <aside class="properties-panel" id="properties-panel">
+                <div class="panel-header">
+                    <h3>Properties</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="property-group" id="prop-text-group">
+                        <label>Font Size</label>
+                        <div class="input-controls">
+                            <input type="number" id="prop-font-size" value="16" min="8" max="100">
+                        </div>
+
+                        <label>Text Color</label>
+                        <div class="color-picker-group">
+                            <input type="color" id="prop-text-color" value="#000000" title="Text Color">
+                            <input type="color" id="prop-bg-color" value="#ffffff" title="Background Color">
+                        </div>
+
+                        <label>Alignment</label>
+                        <div class="align-controls">
+                            <button class="btn-icon active" id="align-left"><i data-lucide="align-left"></i></button>
+                            <button class="btn-icon" id="align-center"><i data-lucide="align-center"></i></button>
+                            <button class="btn-icon" id="align-right"><i data-lucide="align-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Bottom Action Bar -->
+        <footer class="action-bar">
+            <div class="action-left">
+                <div class="page-navigation">
+                    <button class="btn-icon" id="prev-page" title="Previous Page">
+                        <i data-lucide="chevron-left"></i>
+                    </button>
+                    <span class="page-counter">Page <span id="current-page">1</span> of <span
+                            id="total-pages">1</span></span>
+                    <button class="btn-icon" id="next-page" title="Next Page">
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="action-right">
+                <button class="btn btn-primary" id="btn-download">
+                    <i data-lucide="download"></i>
+                    <span>Download PDF</span>
+                </button>
+            </div>
+        </footer>
+
+        <!-- Credits Footer -->
+        <footer class="app-footer">
+            <p>Designed and developed by <a href="https://www.gridify.in" target="_blank">Gridify</a></p>
+        </footer>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/app.js"></script>
+    <script src="js/pdf-render.js"></script>
+    <script src="js/editor-tools.js"></script>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
