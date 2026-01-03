@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Gridify Video Conf</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --accent-red: #ef4444;
+            --accent-green: #22c55e;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background: #0f172a;
+            /* Darker background for admin */
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--glass-border);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .main-content {
+            padding: 2.5rem;
+            overflow-y: auto;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .admin-nav-item:hover,
+        .admin-nav-item.active {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+        }
+
+        .admin-nav-item i {
+            margin-right: 1rem;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .grid-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Table Styling */
+        .admin-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .admin-table th {
+            padding: 1rem;
+            text-align: left;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--glass-border);
+            vertical-align: middle;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* User Cell */
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-uid {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(34, 197, 94, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-offline {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+        }
+
+        .status-ended {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        /* Buttons */
+        .btn-icon {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+        }
+
+        /* View Switching */
+        .dashboard-view {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .dashboard-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Settings Toggle */
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--glass-border);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent-red);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background: #1e293b;
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .btn-modal {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .btn-modal-cancel {
+            background: transparent;
+            border-color: var(--glass-border);
+            color: white;
+        }
+
+        .btn-modal-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-modal-confirm {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .btn-modal-confirm:hover {
+            background: #dc2626;
+        }
+
+        .modal-details-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem 1.5rem;
+            align-items: baseline;
+        }
+
+        .modal-details-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .modal-details-value {
+            color: white;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Custom Modal -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                Modal content goes here...
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn-modal btn-modal-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-modal btn-modal-confirm" id="modalConfirmBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo"
+                style="margin-bottom: 3rem; font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-shield-cat" style="color: var(--accent-red);"></i>
+                <div>
+                    <span style="color: var(--accent-red);">GRIDIFY</span> ADMIN
+                </div>
+            </div>
+
+            <nav>
+                <div class="admin-nav-item active" id="nav-dashboard">
+                    <i class="fas fa-th-large"></i> Overview
+                </div>
+                <div class="admin-nav-item" id="nav-users">
+                    <i class="fas fa-users"></i> User Management
+                </div>
+                <div class="admin-nav-item" id="nav-active-users">
+                    <i class="fas fa-signal"></i> Online Users
+                </div>
+                <div class="admin-nav-item" id="nav-admins">
+                    <i class="fas fa-user-shield"></i> Admins
+                </div>
+                <div class="admin-nav-item" id="nav-meetings">
+                    <i class="fas fa-video"></i> Meetings
+                </div>
+                <div class="admin-nav-item" id="nav-settings">
+                    <i class="fas fa-cog"></i> Settings
+                </div>
+            </nav>
+
+            <div style="margin-top: auto;">
+                <div style="padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 12px; margin-bottom: 1rem;">
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">Logged in as</div>
+                    <div id="adminName"
+                        style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        Loading...</div>
+                </div>
+                <button id="logoutBtn" class="btn btn-secondary"
+                    style="width: 100%; border-color: var(--glass-border);">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="section-header">
+                <div>
+                    <h1 style="font-size: 2rem;" id="pageTitle">Portal Overview</h1>
+                    <p class="text-muted" id="pageDesc">Real-time monitoring and management system</p>
+                </div>
+                <div class="date-badge"
+                    style="background: var(--glass-bg); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-muted);">
+                    <i class="far fa-calendar-alt"></i> <span id="currentDate">Today</span>
+                </div>
+            </header>
+
+            <!-- VIEW: OVERVIEW -->
+            <div id="view-dashboard" class="dashboard-view active">
+                <div class="grid-stats">
+                    <div class="stat-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <span class="stat-value" id="statsTotalUsers">
+                                <i class="fas fa-circle-notch fa-spin"
+                                    style="font-size: 1.5rem; color: var(--text-muted);"></i>
+                            </span>
+                            <div
+                                style="background: rgba(59, 130, 246, 0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #3b82f6;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <span class="stat-label">Total Users</span>
+                    </div>
+                    <div class="stat-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <span class="stat-value" id="statsActiveMeetings">
+                                <i class="fas fa-circle-notch fa-spin"
+                                    style="font-size: 1.5rem; color: var(--text-muted);"></i>
+                            </span>
+                            <div
+                                style="background: rgba(34, 197, 94, 0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #22c55e;">
+                                <i class="fas fa-video"></i>
+                            </div>
+                        </div>
+                        <span class="stat-label">Active Meetings</span>
+                    </div>
+                    <div class="stat-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <span class="stat-value" id="statsTotalMeetings">
+                                <i class="fas fa-circle-notch fa-spin"
+                                    style="font-size: 1.5rem; color: var(--text-muted);"></i>
+                            </span>
+                            <div
+                                style="background: rgba(168, 85, 247, 0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #a855f7;">
+                                <i class="fas fa-history"></i>
+                            </div>
+                        </div>
+                        <span class="stat-label">Total Meetings</span>
+                    </div>
+                    <div class="stat-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <span class="stat-value" id="statsUptime">...</span>
+                            <div
+                                style="background: rgba(239, 68, 68, 0.2); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #ef4444;">
+                                <i class="fas fa-server"></i>
+                            </div>
+                        </div>
+                        <span class="stat-label">System Uptime</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel">
+                    <div class="section-header" style="margin-bottom: 1.5rem;">
+                        <h3><i class="fas fa-clock" style="color: var(--text-muted); margin-right: 0.5rem;"></i> Recent
+                            Activity (Users)</h3>
+                        <button class="btn btn-sm btn-primary" onclick="document.getElementById('nav-users').click()"
+                            style="background: var(--glass-border); border: none;">View All Users</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User Profile</th>
+                                    <th>Email Address</th>
+                                    <th>Last Active</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="overviewUsersTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: USERS -->
+            <div id="view-users" class="dashboard-view">
+                <div class="glass-panel">
+                    <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem;">
+                        <input type="text" id="userSearch" class="form-control" placeholder="Search users..."
+                            style="background: rgba(0,0,0,0.2); border-color: var(--glass-border); color: white; max-width: 300px;">
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User Profile</th>
+                                    <th>Email Address</th>
+                                    <th>Joined Date</th>
+                                    <th>Last Active</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fullUsersTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ACTIVE USERS -->
+            <div id="view-active-users" class="dashboard-view">
+                <div class="glass-panel">
+                    <div class="section-header" style="margin-bottom: 1.5rem;">
+                        <div>
+                            <h3 style="margin: 0;"><i class="fas fa-signal"
+                                    style="color: var(--accent-green); margin-right: 0.5rem;"></i> Online Users</h3>
+                            <div style="font-size: 0.9rem; color: var(--text-muted);">Users active in the last 5 minutes
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-secondary" id="refreshActiveUsersBtn"
+                            style="border-color: var(--glass-border);">
+                            <i class="fas fa-sync-alt"></i> Check Now
+                        </button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>User Profile</th>
+                                    <th>Email Address</th>
+                                    <th>Last Active</th>
+                                    <th>Current Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeUsersTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: ADMINS -->
+            <div id="view-admins" class="dashboard-view">
+                <div class="glass-panel">
+                    <div class="section-header" style="margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0;">Admin Users</h3>
+                        <button class="btn btn-primary" id="addAdminBtn"
+                            style="background: var(--accent-green); border: none;">
+                            <i class="fas fa-plus"></i> Add Admin
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Admin Profile</th>
+                                    <th>Email Address</th>
+                                    <th>Role Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminsTableBody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: MEETINGS -->
+            <div id="view-meetings" class="dashboard-view">
+                <div class="glass-panel">
+                    <h3 style="margin-bottom: 1.5rem;">Live Meetings</h3>
+                    <div class="table-responsive">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Meeting ID</th>
+                                    <th>Host</th>
+                                    <th>Started</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="meetingsTableBody">
+                                <tr>
+                                    <td colspan="5" class="text-center">Loading meetings...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SETTINGS -->
+            <div id="view-settings" class="dashboard-view">
+                <div class="glass-panel" style="max-width: 800px;">
+                    <div class="setting-item">
+                        <div>
+                            <h4>Maintenance Mode</h4>
+                            <p class="text-muted" style="margin: 0; font-size: 0.9rem;">Prevent new users from logging
+                                in or joining meetings.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-maintenance">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item" id="maintenance-time-container"
+                        style="display: none; padding-left: 1rem; border-bottom: 1px solid var(--glass-border); border-top: none;">
+                        <div style="flex: 1;">
+                            <h5 style="margin-bottom: 0.25rem;">Auto Logout Grace Period</h5>
+                            <p class="text-muted" style="font-size: 0.8rem; margin: 0;">Time before users are logged
+                                out.</p>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="number" id="setting-maintenance-time" class="form-control" value="20" min="1"
+                                style="width: 80px; padding: 0.5rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; border-radius: 8px;">
+                            <select id="setting-maintenance-unit" class="form-control"
+                                style="padding: 0.5rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; border-radius: 8px; cursor: pointer;">
+                                <option value="seconds" style="background: #1e293b; color: white;">Seconds</option>
+                                <option value="minutes" style="background: #1e293b; color: white;">Minutes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <h4>Public Registration</h4>
+                            <p class="text-muted" style="margin: 0; font-size: 0.9rem;">Allow anyone to create an
+                                account.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked id="setting-registration">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <h4>Guest Access</h4>
+                            <p class="text-muted" style="margin: 0; font-size: 0.9rem;">Allow users to join meetings
+                                without an account.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked id="setting-guest">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <h4>Google Authentication</h4>
+                            <p class="text-muted" style="margin: 0; font-size: 0.9rem;">Allow users to sign in with
+                                Google.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked id="setting-google">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div>
+                            <h4>Require Email Verification</h4>
+                            <p class="text-muted" style="margin: 0; font-size: 0.9rem;">New users must verify their
+                                email before logging in.</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-verification">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item" style="display: none;">
+                        <div style="margin-bottom: 1rem;">
+                            <h4>Password Entry Alert</h4>
+                            <p class="text-muted" style="margin: 0; font-size: 0.9rem;">Message to display when user
+                                types a password (e.g., policy or warning).</p>
+                        </div>
+                        <textarea id="setting-password-alert" class="form-control" rows="3"
+                            placeholder="Enter alert message (leave empty to disable)..."
+                            style="width: 100%; padding: 1rem; background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border); color: white; border-radius: 12px; resize: vertical;"></textarea>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                        <button class="btn btn-primary" id="saveSettingsBtn">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Set Date
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', dateOptions);
+    </script>
+    <script type="module" src="../assets/js/dashboard.js"></script>
+</body>
+
+</html>

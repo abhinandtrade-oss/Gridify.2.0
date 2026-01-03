@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Gridify Video Conf</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-toast-container" id="toastContainer"></div>
+    <div class="container auth-container">
+        <div class="glass-panel">
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join the live video conference platform</p>
+            </div>
+
+            <form id="registerForm">
+                <div class="input-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required
+                        minlength="6">
+                    <div id="passwordAlert"
+                        style="display: none; margin-top: 0.5rem; padding: 0.75rem; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; font-size: 0.85rem; color: #60a5fa;">
+                        <!-- Alert content from config -->
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+            </form>
+
+            <div
+                style="margin: 1.5rem 0; display: flex; align-items: center; gap: 1rem; color: var(--text-muted); font-size: 0.8rem;">
+                <div style="flex: 1; height: 1px; background: var(--border);"></div>
+                <span>OR</span>
+                <div style="flex: 1; height: 1px; background: var(--border);"></div>
+            </div>
+
+            <button id="googleLoginBtn" class="btn btn-google" style="width: 100%">
+                <i class="fab fa-google"></i> Continue with Google
+            </button>
+
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+                <p class="text-muted">Already have an account? <a href="login.html">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Powered by <a href="https://www.gridify.in" target="_blank">GRIDIFY</a></p>
+    </footer>
+
+    <script type="module">
+        import { registerUser, loginWithGoogle, subscribeToPublicConfig } from '../assets/js/auth.js';
+
+        // Toast Helper
+        const showToast = (message, type = 'info') => {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `portal-toast ${type}`;
+
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+
+            toast.innerHTML = `<i class="fas fa-${icon}"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            // Remove after 4s
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        };
+
+        // Store original form content to restore if needed
+        let originalFormContent = '';
+        const formElement = document.getElementById('registerForm');
+        if (formElement) originalFormContent = formElement.innerHTML;
+
+        // Load Config
+        window.addEventListener('DOMContentLoaded', () => {
+            subscribeToPublicConfig((config) => {
+                if (config) {
+                    // Google Auth Toggle
+                    const googleBtn = document.getElementById('googleLoginBtn');
+                    if (googleBtn) {
+                        googleBtn.style.display = config.googleAuthEnabled !== false ? 'block' : 'none';
+                    }
+
+                    // Password Alert Logic
+                    const passInput = document.getElementById('password');
+                    const passAlert = document.getElementById('passwordAlert');
+
+                    if (config.passwordAlertMessage && config.passwordAlertMessage.trim() !== '') {
+                        if (passAlert) passAlert.textContent = config.passwordAlertMessage;
+
+                        // Show on focus
+                        if (passInput) {
+                            passInput.addEventListener('focus', () => {
+                                if (passAlert) passAlert.style.display = 'block';
+                            });
+                            // Optional: Hide on blur? Or keep it? Prompt says "while the user entering". 
+                            // Usually good to keep it while typing. Blur hides it is cleaner.
+                            // However, if it's "policy", maybe keep it? Let's hide on blur for cleanliness unless invalid.
+                            passInput.addEventListener('blur', () => {
+                                if (passAlert) passAlert.style.display = 'none';
+                            });
+                        }
+                    } else {
+                        // If no message set, ensure hidden
+                        if (passAlert) {
+                            passAlert.style.display = 'none';
+                            passAlert.textContent = '';
+                        }
+                    }
+
+                    // Registration Toggle
+                    const form = document.getElementById('registerForm');
+                    const divider = document.querySelector('.auth-container .glass-panel > div:nth-child(3)'); // The OR divider
+
+                    if (config.registrationEnabled === false) {
+                        if (form) form.innerHTML = `<div style="text-align: center; color: var(--accent-red); padding: 2rem 0;">
+                            <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                            <p>New user registration is currently disabled by the administrator.</p>
+                            </div>`;
+
+                        // Also hide google/guest options if registration is disabled? Usually if registration is disabled, 
+                        // you might still allow login, but this is the REGISTER page.
+                        // If registration is disabled, you probably can't use Google *to create an account*, 
+                        // but `loginWithGoogle` handles both.
+                        // However, the user requirement said "hide the relevant section from /auth/ pages".
+
+                        if (divider) divider.style.display = 'none';
+                    } else {
+                        // Restore form if re-enabled
+                        if (form && form.innerHTML !== originalFormContent) {
+                            form.innerHTML = originalFormContent;
+                        }
+                        if (divider) divider.style.display = 'flex';
+                    }
+                }
+            });
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+                await registerUser(email, password, name);
+            } catch (error) {
+                showToast(error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-user-plus"></i> Register';
+            }
+        });
+
+        document.getElementById('googleLoginBtn').addEventListener('click', async (e) => {
+            const btn = e.target.closest('button');
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+                await loginWithGoogle();
+            } catch (error) {
+                showToast(error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+            }
+        });
+    </script>
+</body>
+
+</html>
