@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Login - Gridify Video Conf</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .auth-container {
+            max-width: 450px;
+        }
+
+        .admin-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .glass-panel {
+            border-top: 4px solid #dc3545;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="portal-toast-container" id="toastContainer"></div>
+    <div class="container auth-container">
+        <div class="glass-panel">
+            <div class="auth-header">
+                <span class="admin-badge">SUPER ADMIN</span>
+                <h1>Portal Management</h1>
+                <p>Sign in to manage the video conference portal</p>
+            </div>
+
+            <form id="adminLoginForm">
+                <div class="input-group">
+                    <label for="email">Admin Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="user ID" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                </div>
+
+                <!--div style="margin-bottom: 1.5rem; display: flex; align-items: center;">
+                    <input type="checkbox" id="remember" style="margin-right: 0.5rem; width: auto;">
+                    <label for="remember" style="margin: 0; font-size: 0.9rem;">Remember this device</label>
+                </div-->
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; background: linear-gradient(135deg, #dc3545 0%, #a71d2a 100%); border: none;">
+                    <i class="fas fa-shield-alt"></i> Access Portal
+                </button>
+            </form>
+
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+                <p class="text-muted"><a href="../../auth/login.html" style="color: var(--text-muted);"><i
+                            class="fas fa-arrow-left"></i> Back to User Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Restricted Access &copy; 2026 GRIDIFY</p>
+    </footer>
+
+    <script type="module">
+        import { loginSuperAdmin } from '../assets/js/auth.js';
+
+        // Toast Helper
+        const showToast = (message, type = 'info') => {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `portal-toast ${type}`;
+
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+
+            toast.innerHTML = `<i class="fas fa-${icon}"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            // Remove after 4s
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        };
+
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = e.target.querySelector('button');
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying Credentials...';
+                await loginSuperAdmin(email, password);
+            } catch (error) {
+                showToast(error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-shield-alt"></i> Access Portal';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper: Check if user is authenticated
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Helper: Check if user is Admin
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'admin@gridify.in' || 
+        request.auth.token.email == 'superadmin@gridify.in' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    // Users: Any signed-in user can read profiles (to see names), but only owner can edit
+    // Admins can also edit users (e.g. to ban them)
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      
+      // Meeting History subcollection
+      match /meeting_history/{historyId} {
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
+    // Meetings (Metadata)
+    match /meetings/{meetingId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        resource.data.hostUid == request.auth.uid ||
+        isAdmin() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastActivity', 'status'])
+      );
+
+      // Join Requests
+      match /requests/{userId} {
+        allow read: if isSignedIn();
+        // User creates their own request
+        allow create: if isSignedIn() && request.auth.uid == userId;
+        // Host or Admin can update status; User can update mostly to create
+        allow write: if isSignedIn(); 
+      }
+      
+      // Messages (Moved inside meetings/meetingId/messages based on meeting.js query)
+      match /messages/{messageId} {
+           allow read, write: if isSignedIn();
+      }
+
+      // Host Commands (Kick, Mute, Stop Share)
+      match /commands/{commandId} {
+           allow read: if isSignedIn();
+           allow create: if isSignedIn(); // logic handled by client for now (checking host)
+           allow delete: if isSignedIn(); // Cleanup
+      }
+    }
+
+    // Rooms (Signaling & Chat Data)
+    match /rooms/{meetingId} {
+      // Signals
+      match /signals/{signalId} {
+        allow read, write: if isSignedIn();
+      }
+      
+      // Messages
+      match /messages/{messageId} {
+        allow read, write: if isSignedIn();
+      }
+    }
+
+    // Config: Public settings
+    match /config/public {
+      allow read: if true;
+      allow write: if isAdmin(); // Only Admin can change settings
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+    "rules": {
+        "rooms": {
+            "$meetingId": {
+                "participants": {
+                    ".read": "auth != null",
+                    "$uid": {
+                        ".write": "auth != null && $uid === auth.uid",
+                        ".validate": "newData.hasChildren(['name', 'joinedAt'])"
+                    }
+                }
+            }
+        }
+    }
+}
