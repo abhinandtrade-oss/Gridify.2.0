@@ -34,6 +34,180 @@
     <!-- Main Style -->
     <link rel="stylesheet" href="assets/css/style.css">
 
+    <style>
+        /* Custom 404 Page Styles - Enhanced Aesthetics */
+        :root {
+            --error-primary: #FFD043;
+            /* Matches --ridda-primary-color */
+            --error-secondary: #28F67A;
+            /* Matches --ridda-secondary-color */
+            --error-dark: #111111;
+            --error-bg-gradient: radial-gradient(circle at 50% 50%, #fffbf0 0%, #ffffff 100%);
+        }
+
+        /* Ambient Background Animation */
+        .error-area {
+            background: var(--error-bg-gradient);
+            position: relative;
+            z-index: 1;
+        }
+
+        .error-area::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 208, 67, 0.08) 10%, transparent 60%);
+            animation: rotateAmbient 30s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes rotateAmbient {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 404 Image Animation */
+        .error-content .image {
+            position: relative;
+            display: inline-block;
+        }
+
+        .error-content .image img {
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .error-content .image:hover img {
+            transform: scale(1.02) translateY(-10px);
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Typography Styling */
+        .error-content .section-title h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--error-dark);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .error-content .section-title .h1 {
+            color: var(--error-primary);
+            font-size: 1.25em;
+            margin-right: 0.5rem;
+            display: inline-block;
+            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-content p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #555;
+            max-width: 550px;
+            margin: 0 auto 2rem;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.3s forwards;
+        }
+
+        /* Button Styling Enhanced */
+        .error-area .theme-btn {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 10px 25px rgba(255, 208, 67, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .error-area .theme-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 208, 67, 0.6);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Page Banner Subtle Overlay */
+        .page-banner-area {
+            position: relative;
+        }
+
+        .page-banner-area::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.1), transparent);
+            pointer-events: none;
+        }
+
+        /* Shape Decorations */
+        .error-area::after {
+            content: '404';
+            position: absolute;
+            bottom: 5%;
+            right: -5%;
+            font-size: 20rem;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.02);
+            z-index: -1;
+            transform: rotate(-15deg);
+            pointer-events: none;
+            font-family: var(--ridda-heading-font);
+        }
+
+        @media (max-width: 768px) {
+            .error-content .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .error-content .section-title .h1 {
+                display: block;
+                margin-bottom: 0.5rem;
+            }
+
+            .error-area::after {
+                font-size: 10rem;
+                bottom: 2%;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -68,8 +242,8 @@
                                         </a>
                                     </div>
 
-                                    <!-- Toggle Button -->                                    <button type="button" class="navbar-toggle" data-bs-toggle="collapse"
-                                        data-bs-target=".navbar-collapse">
+                                    <!-- Toggle Button --> <button type="button" class="navbar-toggle"
+                                        data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                                         <span class="icon-bar"></span>
                                         <span class="icon-bar"></span>
                                         <span class="icon-bar"></span>
@@ -339,6 +513,3 @@
 
 
 </html>
-
-
-
