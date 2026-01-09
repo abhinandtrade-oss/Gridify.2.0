@@ -1303,6 +1303,21 @@
                             <button class="btn btn-sm btn-danger text-white rounded-pill w-100 mt-2">Manage Sub</button>
                         </div>
                     </div>
+
+                    <!-- API Management Card -->
+                    <div class="col-md-6 col-lg-3" id="cardApiManagement">
+                        <div class="admin-card feature-card animate-up"
+                            onclick="const apiModal = new bootstrap.Modal(document.getElementById('apiManagementModal')); apiModal.show(); window.loadApiSettings();">
+                            <div class="icon-box-large bg-primary-soft"
+                                style="background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
+                                <i class="fas fa-key fa-2x"></i>
+                            </div>
+                            <h5 class="fw-700">API Management</h5>
+                            <p class="text-muted small px-2">Manage API keys and AI configurations.</p>
+                            <button class="btn btn-sm text-white rounded-pill w-100 mt-2"
+                                style="background-color: #4f46e5;">Manage APIs</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1466,6 +1481,43 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- API Management Modal -->
+    <div class="modal fade" id="apiManagementModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header custom-modal-header border-0 pb-0">
+                    <div>
+                        <h5 class="modal-title fw-800">API Management</h5>
+                        <p class="text-muted small mb-0">Manage global API keys and configurations.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="apiSettingsForm">
+                        <div class="mb-4">
+                            <label class="admin-label">OpenRouter API Key</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-key"></i>
+                                <input type="password" id="openrouter_api_key" class="form-control admin-input"
+                                    placeholder="sk-or-v1-..." style="padding-left: 55px;">
+                                <i class="fas fa-eye toggle-password" style="right: 25px; left: auto;"
+                                    onclick="const inp = document.getElementById('openrouter_api_key'); inp.type = inp.type === 'password' ? 'text' : 'password'; this.classList.toggle('fa-eye-slash');"></i>
+                            </div>
+                            <small class="text-muted">This key is used for AI resume enhancement and
+                                suggestions.</small>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-pill px-4"
+                                data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4" id="btnSaveApiSettings">Save
+                                Configuration</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Product Modal -->
@@ -2309,10 +2361,12 @@
                     $('#programs-tab').parent().show();
                     $('#dashBtnUsers').removeClass('d-none');
                     $('#cardManageSub').removeClass('d-none');
+                    $('#cardApiManagement').removeClass('d-none');
                 } else {
                     $('#programs-tab').parent().hide();
                     $('#dashBtnUsers').addClass('d-none');
                     $('#cardManageSub').addClass('d-none');
+                    $('#cardApiManagement').addClass('d-none');
                 }
             }
 
@@ -3039,6 +3093,31 @@
                     alert("Failed to update status: " + AdminManager.sanitizeMessage(e.message));
                 } finally {
                     select.prop('disabled', false);
+                }
+            });
+
+            // --- API Management Logic ---
+            window.loadApiSettings = async function () {
+                const settings = await AdminManager.getGlobalSettings();
+                if (settings && settings.openrouter_api_key) {
+                    $('#openrouter_api_key').val(settings.openrouter_api_key);
+                }
+            };
+
+            $('#apiSettingsForm').on('submit', async function (e) {
+                e.preventDefault();
+                const key = $('#openrouter_api_key').val().trim();
+                const btn = $('#btnSaveApiSettings');
+
+                btn.prop('disabled', true).text('Saving...');
+                try {
+                    await AdminManager.updateGlobalSettings({ openrouter_api_key: key });
+                    alert("API Configuration Updated successfully!");
+                    bootstrap.Modal.getInstance(document.getElementById('apiManagementModal')).hide();
+                } catch (e) {
+                    alert("Error saving API settings: " + AdminManager.sanitizeMessage(e.message));
+                } finally {
+                    btn.prop('disabled', false).text('Save Configuration');
                 }
             });
 
