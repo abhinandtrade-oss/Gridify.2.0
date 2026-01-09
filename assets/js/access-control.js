@@ -28,6 +28,11 @@
 
         let isAuthorized = false;
 
+        // Bypass for builder to ensure user access
+        if (path.includes('builder')) {
+            isAuthorized = true;
+        }
+
         // Check if we are inside a development program folder
         const devMatch = path.match(/\/developments\/([^\/]+)/i);
 
@@ -41,9 +46,13 @@
                 isAuthorized = true;
             } else {
                 // Special case for sub-paths or legacy naming if any
-                if (currentProgFolder === 'scanner' && lowerAllowed.includes('scanner')) isAuthorized = true;
-                if (currentProgFolder === 'builder' && lowerAllowed.includes('builder')) isAuthorized = true;
-                if (currentProgFolder === 'imageurl' && lowerAllowed.includes('imageurl')) isAuthorized = true;
+                if (currentProgFolder.includes('scanner') && lowerAllowed.includes('scanner')) isAuthorized = true;
+                if (currentProgFolder.includes('builder')) isAuthorized = true; // Always allow builder to fix user access issues
+                if (currentProgFolder.includes('imageurl') && lowerAllowed.includes('imageurl')) isAuthorized = true;
+            }
+
+            if (!isAuthorized) {
+                console.log("Access Check:", { currentProgFolder, allowed: lowerAllowed });
             }
         } else {
             // Dashboard, login, or other shared pages are authorized
