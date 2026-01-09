@@ -319,6 +319,34 @@ class AdminManager {
         }
     }
 
+    // --- GLOBAL SETTINGS MANAGEMENT ---
+    static async getGlobalSettings() {
+        try {
+            const docRef = doc(db, 'settings', 'global');
+            const d = await getDoc(docRef);
+            if (d.exists()) {
+                return d.data();
+            }
+            return {};
+        } catch (e) {
+            console.error("Get Global Settings Error:", e);
+            return {};
+        }
+    }
+
+    static async updateGlobalSettings(settings) {
+        const session = this.getSession();
+        if (!session || session.role !== 'admin') throw new Error("Unauthorized");
+        try {
+            const docRef = doc(db, 'settings', 'global');
+            await setDoc(docRef, settings, { merge: true });
+            return true;
+        } catch (e) {
+            console.error("Update Global Settings Error:", e);
+            throw e;
+        }
+    }
+
     static async deleteUser(targetUser) {
         const session = this.getSession();
         if (!session || session.role !== 'admin') throw new Error("Unauthorized");
