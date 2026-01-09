@@ -1,3 +1,5 @@
+import { AdminManager } from '../../assets/js/admin-manager.js';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     /* --- HELPERS --- */
@@ -620,12 +622,30 @@ document.addEventListener('DOMContentLoaded', () => {
     renderReferences();
 
     /* --- 10. AI INTEGRATION (OpenRouter) --- */
-    const OR_API_KEY = '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';
+    let OR_API_KEY = ''; // Initialized as empty, fetched on demand
     const PRIMARY_MODEL = 'google/gemini-2.0-flash-exp:free';
     const FALLBACK_MODEL = 'meta-llama/llama-3.3-70b-instruct:free'; // High-quality fallback
 
     const callAI = async (prompt, useFallback = false) => {
         try {
+            // Fetch API key from DB if not already present
+            if (!OR_API_KEY) {
+                console.log("Fetching API key from DB...");
+                const settings = await AdminManager.getGlobalSettings();
+                OR_API_KEY = settings.openrouter_api_key;
+
+                if (OR_API_KEY) {
+                    console.log("Successfully retrieved API Key from DB (Masked: " + OR_API_KEY.substring(0, 6) + "...)");
+                } else {
+                    console.warn("API Key NOT FOUND in DB. Please go to Admin Dashboard > API Management to set it.");
+                }
+            }
+
+            if (!OR_API_KEY) {
+                alert("AI Error: OpenRouter API key is not configured in Admin Settings.");
+                return null;
+            }
+
             const model = useFallback ? FALLBACK_MODEL : PRIMARY_MODEL;
             const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
                 method: "POST",
@@ -644,6 +664,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
+            if (response.status === 401) {
+                alert("AI Error: Invalid API Key. (401 Unauthorized). Please check your OpenRouter key in Admin Settings > API Management.");
+                return null;
+            }
+
             const data = await response.json();
 
             // Handle common status codes
@@ -660,8 +685,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return data.choices[0].message.content.trim();
             } else {
                 // If model not found or other error, try fallback
-                if (data.error && data.error.code === 404 && !useFallback) {
-                    console.log("Model not found, trying fallback...");
+                if (data.error && (data.error.code === 404 || data.error.code === 403) && !useFallback) {
+                    console.log("Model not available, trying fallback...");
                     return callAI(prompt, true);
                 }
 
