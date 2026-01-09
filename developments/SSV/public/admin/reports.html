@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Admin Dashboard</title>
+    <link rel="icon" href="../assets/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/db.js"></script>
+    <script type="module">
+        import { CSVExport, formatDate } from '../assets/js/utils.js';
+        window.CSVExport = CSVExport;
+        window.formatDate = formatDate;
+    </script>
+</head>
+
+<body>
+
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div style="text-align: center; margin-bottom: 1rem;">
+                <img src="../assets/images/logo.png" alt="SSV" style="height: 150px;">
+            </div>
+            <h2 style="color: var(--secondary-color); margin-bottom: 0.2rem; text-align: center;">Event Tracker Admin
+            </h2>
+            <div class="sidebar-brand-sub"
+                style="text-align: center; color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 0.5rem;">by
+                Gridify</div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-bottom: 2rem;">
+                dedicated portal for Jobins KJ</p>
+
+            <nav style="display: flex; flex-direction: column; gap: 1rem;">
+                <a href="dashboard.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid var(--border-color);">
+                    Dashboard
+                </a>
+                <a href="events.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid var(--border-color);">
+                    Events
+                </a>
+                <a href="staff-data.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid var(--border-color);">
+                    Update Staff Data
+                </a>
+                <a href="reports.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: rgba(255,255,255,0.1); border:none;">
+                    Reports
+                </a>
+                <a href="../user/dashboard.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid var(--border-color);">
+                    User View
+                </a>
+            </nav>
+
+            <div style="margin-top: auto;">
+                <button onclick="AuthService.logout()" class="btn btn-danger" style="width: 100%;">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="content-area">
+            <header class="flex justify-between items-center mb-4">
+                <h1>Report Generation</h1>
+                <span class="status-badge status-urgent">Admin Access</span>
+            </header>
+
+            <div class="card animate-fade-in" style="margin-bottom: 1rem;">
+                <h3>Summary Report</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Download a comprehensive report of all events, including completion status and coordinator details.
+                </p>
+                <div class="flex gap-4">
+                    <button onclick="exportAll()" class="btn btn-primary">Download All Events CSV</button>
+                </div>
+            </div>
+
+            <div class="card animate-fade-in">
+                <h3>Monthly Breakdown</h3>
+                <div id="monthlyStats" class="flex gap-4" style="flex-wrap: wrap; margin-top: 1rem;">
+                    Loading stats...
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { CSVExport, formatDate } from '../assets/js/utils.js';
+
+        AuthService.requireRole('admin');
+
+        let allEvents = [];
+
+        async function init() {
+            allEvents = await DBService.getEvents();
+            generateStats();
+            document.getElementById('monthlyStats').innerHTML = ''; // Clear loading
+        }
+
+        window.exportAll = () => {
+            if (allEvents.length === 0) return alert("No events to export.");
+            CSVExport.downloadCSV(allEvents, `SSV_Full_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+        };
+
+        function generateStats() {
+            if (!allEvents.length) return;
+
+            // Group by Month
+            const stats = {};
+
+            allEvents.forEach(e => {
+                const date = new Date(e.eventDate);
+                const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+                if (!stats[key]) stats[key] = { total: 0, completed: 0 };
+                stats[key].total++;
+                if (e.status === 'Completed' || e.status === 'Report Received') stats[key].completed++;
+            });
+
+            const container = document.getElementById('monthlyStats');
+
+            Object.keys(stats).sort().reverse().forEach(key => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.minWidth = '200px';
+                div.style.padding = '1rem';
+                div.style.background = 'rgba(255,255,255,0.05)';
+                div.innerHTML = `
+                    <h4 style="margin-bottom:0.5rem; color:var(--primary-color)">${key}</h4>
+                    <div style="font-size:2rem; font-weight:bold;">${stats[key].total} <span style="font-size:0.8rem; font-weight:normal; color:var(--text-secondary)">events</span></div>
+                    <div style="font-size:0.9rem; color: #4ade80;">${stats[key].completed} Completed</div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
