@@ -128,9 +128,15 @@
 
             <!-- Report Viewer -->
             <div id="reportViewer" class="card p-standard animate-fade-in" style="display: none;">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="reportTitle">Report Preview</h3>
-                    <button onclick="ReportApp.exportCSV()" class="btn btn-primary">Download CSV</button>
+                <div class="flex justify-between items-center mb-4" style="gap: 1rem; flex-wrap: wrap;">
+                    <h3 id="reportTitle" style="margin: 0; white-space: nowrap;">Report Preview</h3>
+                    <div style="flex: 1; display: flex; justify-content: flex-end; gap: 1rem; align-items: center;">
+                        <input type="text" id="reportSearch" placeholder="Search report..."
+                            style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem; width: 100%; max-width: 300px;"
+                            onkeyup="ReportApp.handleSearch(this.value)">
+                        <button onclick="ReportApp.exportCSV()" class="btn btn-primary"
+                            style="white-space: nowrap;">Download CSV</button>
+                    </div>
                 </div>
 
                 <div style="overflow-x: auto; max-height: 500px;">
@@ -225,6 +231,7 @@
                 staff: null,
                 clubs: null
             },
+            allData: [], // Store full dataset for filtering
             currentData: [],
             currentTitle: '',
             currentType: '', // Added currentType state
@@ -248,6 +255,10 @@
                 const viewer = document.getElementById('reportViewer');
                 viewer.style.display = 'block';
                 document.getElementById('tableBody').innerHTML = '<tr><td colspan="100" style="text-align:center; padding: 2rem;">Loading data...</td></tr>';
+
+                // Reset search
+                const searchInput = document.getElementById('reportSearch');
+                if (searchInput) searchInput.value = '';
 
                 await this.loadData();
 
@@ -282,10 +293,27 @@
                         break;
                 }
 
-                this.currentData = data;
+                this.allData = data;  // Store full data
+                this.currentData = data; // Current display data
                 this.currentTitle = title;
                 document.getElementById('reportTitle').innerText = title;
                 this.renderTable(data);
+            },
+
+            handleSearch(query) {
+                if (!query) {
+                    this.currentData = this.allData;
+                } else {
+                    const lowerQuery = query.toLowerCase();
+                    this.currentData = this.allData.filter(row => {
+                        return Object.keys(row).some(key => {
+                            if (key.startsWith('_')) return false; // Skip internal keys
+                            const val = row[key];
+                            return String(val).toLowerCase().includes(lowerQuery);
+                        });
+                    });
+                }
+                this.renderTable(this.currentData);
             },
 
             renderTable(data) {
@@ -303,19 +331,11 @@
                 thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
 
                 // Body
-                const type = this.currentType;
-
-                // Limit preview to 50 rows for performance
-                const previewData = data.slice(0, 50);
-                tbody.innerHTML = previewData.map((row, index) => {
+                tbody.innerHTML = data.map((row, index) => {
                     // We need a stable identifier. Using index to lookup in currentData is safest if we don't assume IDs.
                     const clickAttr = `onclick="ReportApp.handleClick(${index})" style="cursor:pointer;"`;
                     return `<tr ${clickAttr} title="Click to view details">${headers.map(h => `<td>${row[h]}</td>`).join('')}</tr>`;
                 }).join('');
-
-                if (data.length > 50) {
-                    tbody.innerHTML += `<tr><td colspan="${headers.length}" style="text-align:center; font-style:italic; color: #888;">... ${data.length - 50} more rows (Download CSV to view all) ...</td></tr>`;
-                }
             },
 
             handleClick(index) {
