@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Admin - Event Tracker By Gridify</title>
+    <link rel="icon" href="assets/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="assets/js/firebase-config.js"></script>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="card login-card animate-fade-in">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <img src="assets/images/logo.png" alt="SSV Logo" style="height: 150px; margin-bottom: 1rem;">
+                <h2 style="margin-bottom:0.2rem">System Setup</h2>
+                <div style="color:var(--text-secondary); margin-bottom:1rem;">by Gridify</div>
+                <p style="color: var(--warning-color); font-size: 0.9rem;">
+                    WARNING: Use this page ONLY to create the initial Super Admin.
+                    Delete this file (admin-setup) from the server after use.
+                </p>
+            </div>
+
+            <form id="setupForm">
+                <div class="form-group">
+                    <label class="form-label">Admin Email</label>
+                    <input type="email" id="email" class="form-control" required placeholder="admin@ssv.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" required placeholder="Strong Password"
+                        minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" id="confirmPassword" class="form-control" required
+                        placeholder="Confirm Password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create & Initialize</button>
+            </form>
+
+            <div id="message" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        powered by <a href="https://www.gridify.in" target="_blank">GRIDIFY</a>
+    </footer>
+
+    <script>
+        // auth and db are already initialized in firebase-config.js
+
+
+        document.getElementById('setupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const msg = document.getElementById('message');
+
+            if (password !== confirm) {
+                msg.style.color = 'var(--danger-color)';
+                msg.innerText = 'Passwords do not match.';
+                return;
+            }
+
+            msg.style.color = 'var(--text-secondary)';
+            msg.innerText = 'Creating Admin...';
+
+            try {
+                // 1. Create Auth User
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                // 2. Create User Profile in Firestore
+                await db.collection('users').doc(user.uid).set({
+                    email: email,
+                    role: 'admin',
+                    suspended: false,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // 3. Initialize Config (Optional)
+                await db.collection('config').doc('email_settings').set({
+                    scriptUrl: '',
+                    initialized: true
+                }, { merge: true });
+
+                msg.style.color = 'var(--success-color)';
+                msg.innerHTML = `Success! Admin created.<br><a href="admin/index.html" style="color:var(--primary-color)">Go to Admin Login</a>`;
+
+                // Clear form
+                document.getElementById('setupForm').reset();
+
+            } catch (error) {
+                console.error(error);
+                msg.style.color = 'var(--danger-color)';
+                if (error.code === 'auth/email-already-in-use') {
+                    msg.innerText = 'User already exists. Please login or use a different email.';
+                } else {
+                    msg.innerText = error.message;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
