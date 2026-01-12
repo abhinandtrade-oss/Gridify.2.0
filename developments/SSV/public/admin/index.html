@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Event Tracker By Gridify</title>
+    <link rel="icon" href="../assets/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="card login-card animate-fade-in">
+            <div style="text-align:center;">
+                <img src="../assets/images/logo.png" alt="SSV"
+                    style="width: 80%; max-width: 300px; height: auto; margin-bottom: 1rem;">
+            </div>
+            <h2 style="text-align: center; margin-bottom: 0px; color: var(--text-primary); font-weight: 700;">Admin
+                Portal</h2>
+            <div style="text-align: center; color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">by
+                Gridify</div>
+            <p
+                style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.85rem; opacity: 0.7;">
+                dedicated portal for
+                Jobins KJ</p>
+
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-control" required placeholder="admin@ssv.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label flex justify-between">
+                        Password
+                        <a href="#" onclick="showForgotPassword()"
+                            style="color: var(--primary-color); font-size: 0.8rem;">Forgot Password?</a>
+                    </label>
+                    <input type="password" id="password" class="form-control" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Secure Login</button>
+            </form>
+
+            <div id="message" style="margin-top: 1rem; text-align: center; font-size: 0.9rem;"></div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Reset Admin Password</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1rem;">Enter your email to receive a password reset
+                link.</p>
+            <div class="form-group">
+                <input type="email" id="resetEmail" class="form-control" placeholder="Enter admin email">
+            </div>
+            <div class="flex justify-between">
+                <button onclick="closeForgotModal()" class="btn btn-danger">Cancel</button>
+                <button onclick="sendResetLink()" class="btn btn-primary">Send Link</button>
+            </div>
+            <p id="resetMessage" style="margin-top:0.5rem; text-align:center; font-size:0.9rem;"></p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        powered by <a href="https://www.gridify.in" target="_blank">GRIDIFY</a>
+    </footer>
+
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const msg = document.getElementById('message');
+
+            msg.style.color = 'var(--text-secondary)';
+            msg.innerText = 'Authenticating...';
+
+            const result = await AuthService.login(email, password);
+
+            if (result.success) {
+                // Check Role
+                const profile = await AuthService.getUserProfile(result.user.uid);
+
+                if (!profile) {
+                    msg.style.color = 'var(--danger-color)';
+                    msg.innerText = 'Access Denied: You must be added by an admin.';
+                    auth.signOut();
+                    window.location.href = 'index.html'; // Redirect to index.html after logout
+                    return;
+                }
+
+                if (profile.role === 'admin') {
+                    window.location.href = 'dashboard.html';
+                } else {
+                    msg.style.color = 'var(--danger-color)';
+                    msg.innerText = 'Access Denied: Not an Administrator.';
+                    auth.signOut();
+                    window.location.href = 'index.html'; // Redirect to index.html after logout
+                }
+            } else {
+                msg.style.color = 'var(--danger-color)';
+                msg.innerText = result.message;
+            }
+        });
+
+        // Forgot Password Logic
+        function showForgotPassword() {
+            const emailVal = document.getElementById('email').value;
+            if (emailVal) document.getElementById('resetEmail').value = emailVal;
+            document.getElementById('forgotPasswordModal').classList.add('active');
+        }
+
+        function closeForgotModal() {
+            document.getElementById('forgotPasswordModal').classList.remove('active');
+            document.getElementById('resetMessage').innerText = '';
+        }
+
+        async function sendResetLink() {
+            const email = document.getElementById('resetEmail').value;
+            if (!email) {
+                document.getElementById('resetMessage').style.color = 'var(--danger-color)';
+                document.getElementById('resetMessage').innerText = 'Please enter an email.';
+                return;
+            }
+
+            const res = await AuthService.sendPasswordResetEmail(email);
+            if (res.success) {
+                document.getElementById('resetMessage').style.color = 'var(--success-color)';
+                document.getElementById('resetMessage').innerText = 'Reset link sent! Check your email.';
+                setTimeout(closeForgotModal, 2000);
+            } else {
+                document.getElementById('resetMessage').style.color = 'var(--danger-color)';
+                document.getElementById('resetMessage').innerText = res.message;
+            }
+        }
+
+        // Redirect if already logged in as admin
+        AuthService.requireRole('admin');
+    </script>
+</body>
+
+</html>

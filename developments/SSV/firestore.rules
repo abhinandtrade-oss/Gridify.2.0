@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // USERS COLLECTION
+    // - Users can read their own profile
+    // - Admins can read/write everything
+    // - TEMPORARY FIX: Allow users to write their OWN data (needed for initial admin setup)
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin()); 
+    }
+
+    // EVENTS COLLECTION
+    // - Authenticated users can read/write events
+    match /events/{eventId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // CONFIG COLLECTION (Google Script URL)
+    // - Admins can write
+    // - Authenticated users can read (to get the email trigger URL)
+    match /config/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // STAFF COLLECTION
+    // - Authenticated users can read (for dropdowns)
+    // - Admins can write
+    match /staff/{staffId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // CLUBS COLLECTION
+    match /clubs/{clubId} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+  }
+}
