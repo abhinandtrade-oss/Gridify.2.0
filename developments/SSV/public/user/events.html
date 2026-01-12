@@ -853,10 +853,10 @@
                 'Event Name': e.eventName,
                 'Date': formatDate(e.eventDate),
                 'Coordinator': e.coordinatorName,
-                'Department': e.department || '',
+                'Department': e.departmentName || '',
                 'Status': e.status,
                 'Reminders Sent': e.reminderCount,
-                'Description': e.description || ''
+                'Description': e.eventDetails || ''
             }));
         }
 
