@@ -283,8 +283,13 @@
 
         AuthService.requireRole('user');
 
+        let isSubmitting = false;
+
         document.getElementById('createEventForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            if (isSubmitting) return;
+            isSubmitting = true;
 
             const loading = document.getElementById('loadingOverlay');
             loading.classList.add('active');
@@ -336,6 +341,7 @@
                 if (!eventData.coordinatorName) missing.push("Coordinator");
 
                 showAlert("Warning", "Please fill in all required fields: " + missing.join(', '), false);
+                isSubmitting = false;
                 return;
             }
 
@@ -343,6 +349,7 @@
             const dbRes = await DBService.createEvent(eventData);
 
             loading.classList.remove('active');
+            isSubmitting = false;
 
             if (dbRes.success) {
                 showAlert("Success", "Event created successfully!");
