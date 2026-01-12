@@ -1313,9 +1313,23 @@
                                 <i class="fas fa-key fa-2x"></i>
                             </div>
                             <h5 class="fw-700">API Management</h5>
-                            <p class="text-muted small px-2">Manage API keys and AI configurations.</p>
+                            <p class="text-muted small px-2">Manage API keys and configurations.</p>
                             <button class="btn btn-sm text-white rounded-pill w-100 mt-2"
                                 style="background-color: #4f46e5;">Manage APIs</button>
+                        </div>
+                    </div>
+
+                    <!-- Script Dashboard Card -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="admin-card feature-card animate-up"
+                            onclick="new bootstrap.Modal(document.getElementById('scriptDashboardModal')).show()">
+                            <div class="icon-box-large" style="background: rgba(232, 58, 140, 0.1); color: #e83a8c;">
+                                <i class="fas fa-file-code fa-2x"></i>
+                            </div>
+                            <h5 class="fw-700">Script Dashboard</h5>
+                            <p class="text-muted small px-2">Access the external script dashboard.</p>
+                            <button class="btn btn-sm text-white rounded-pill w-100 mt-2"
+                                style="background-color: #e83a8c;">Open Dashboard</button>
                         </div>
                     </div>
                 </div>
@@ -1515,6 +1529,27 @@
                                 Configuration</button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Dashboard Modal -->
+    <div class="modal fade" id="scriptDashboardModal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 95vw;">
+            <div class="modal-content border-0 shadow-lg" style="height: 90vh;">
+                <div class="modal-header custom-modal-header border-0 pb-0 shadow-sm mb-2">
+                    <div>
+                        <h5 class="modal-title fw-800">Script Dashboard</h5>
+                        <p class="text-muted small mb-0">External Script Management Dashboard</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0"
+                    style="overflow: hidden; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <iframe
+                        src="https://script.google.com/macros/s/AKfycbzmvkZnRol2p5N2UPyCULHygXhz_x6PTMBUDX44iUsRYy4I8a6yzOse8auiDir4fun-SQ/exec"
+                        style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
                 </div>
             </div>
         </div>
