@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Admin Dashboard</title>
+    <link rel="icon" href="../assets/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/auth.js"></script>
+    <script src="../assets/js/db.js"></script>
+    <script type="module">
+        import { CSVExport, formatDate } from '../assets/js/utils.js';
+        window.CSVExport = CSVExport;
+        window.formatDate = formatDate;
+    </script>
+</head>
+
+<body>
+
+    <div class="main-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div style="text-align: left; padding-left: 0.75rem; margin-bottom: 2rem;">
+                <img src="../assets/images/logo.png" alt="SSV" style="height: 32px;">
+            </div>
+            <h2
+                style="color: var(--text-primary); margin: 0; font-size: 1.2rem; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 700;">
+                Event Tracker Admin</h2>
+            <div class="sidebar-brand-sub" style="color: var(--text-secondary); font-size: 0.8rem; opacity: 0.7;">
+                dedicated portal for <span style="color: var(--primary-color);">Jobins KJ</span></div>
+
+            <nav>
+                <a href="dashboard.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid transparent; color: var(--text-secondary);">
+                    Dashboard
+                </a>
+                <a href="events.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid transparent; color: var(--text-secondary);">
+                    Events
+                </a>
+                <a href="staff-data.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid transparent; color: var(--text-secondary);">
+                    Update Staff Data
+                </a>
+                <a href="reports.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: rgba(99, 102, 241, 0.05); color: var(--primary-color); border: 1px solid rgba(99, 102, 241, 0.1);">
+                    Reports
+                </a>
+                <a href="../user/dashboard.html" class="btn btn-primary"
+                    style="justify-content: flex-start; background: transparent; border: 1px solid transparent; color: var(--text-secondary);">
+                    User View
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; padding: 0.75rem;">
+                <button onclick="AuthService.logout()" class="btn btn-danger"
+                    style="width: 100%; border-radius: 0.5rem; font-size: 0.85rem; padding: 0.5rem;">Logout</button>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="content-area">
+            <header class="flex justify-between items-center mb-4">
+                <h1>Report Generation</h1>
+                <span class="status-badge status-urgent">Admin Access</span>
+            </header>
+
+            <!-- Report Selection Grid -->
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+
+                <!-- All Events -->
+                <div class="card p-standard hover-card" onclick="ReportApp.generate('all_events')">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">All Events</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Complete history
+                        of all events.</p>
+                    <button class="btn btn-outline" style="width: 100%;">View Report</button>
+                </div>
+
+                <!-- Staff Data -->
+                <div class="card p-standard hover-card" onclick="ReportApp.generate('staff_data')">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Staff Data</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">List of all
+                        registered staff.</p>
+                    <button class="btn btn-outline" style="width: 100%;">View Report</button>
+                </div>
+
+                <!-- Clubs Data -->
+                <div class="card p-standard hover-card" onclick="ReportApp.generate('clubs_data')">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Clubs Data</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Active clubs and
+                        details.</p>
+                    <button class="btn btn-outline" style="width: 100%;">View Report</button>
+                </div>
+
+                <!-- Dept Wise Summary -->
+                <div class="card p-standard hover-card" onclick="ReportApp.generate('dept_summary')">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Department Summary</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Staff counts &
+                        HODs per dept.</p>
+                    <button class="btn btn-outline" style="width: 100%;">View Report</button>
+                </div>
+
+                <!-- Dept Wise Events -->
+                <div class="card p-standard hover-card" onclick="ReportApp.generate('dept_events')">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Dept. Conducted Events</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Events grouped by
+                        department.</p>
+                    <button class="btn btn-outline" style="width: 100%;">View Report</button>
+                </div>
+
+                <!-- Club Wise Events -->
+                <div class="card p-standard hover-card" onclick="ReportApp.generate('club_events')">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Club Conducted Events</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">Events grouped by
+                        club.</p>
+                    <button class="btn btn-outline" style="width: 100%;">View Report</button>
+                </div>
+            </div>
+
+            <!-- Report Viewer -->
+            <div id="reportViewer" class="card p-standard animate-fade-in" style="display: none;">
+                <div class="flex justify-between items-center mb-4" style="gap: 1rem; flex-wrap: wrap;">
+                    <h3 id="reportTitle" style="margin: 0; white-space: nowrap;">Report Preview</h3>
+                    <div style="flex: 1; display: flex; justify-content: flex-end; gap: 1rem; align-items: center;">
+                        <input type="text" id="reportSearch" placeholder="Search report..."
+                            style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem; width: 100%; max-width: 300px;"
+                            onkeyup="ReportApp.handleSearch(this.value)">
+                        <button onclick="ReportApp.exportCSV()" class="btn btn-primary"
+                            style="white-space: nowrap;">Download CSV</button>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto; max-height: 500px;">
+                    <table class="data-table" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                        <thead id="tableHead" style="background: #f8fafc; position: sticky; top: 0;">
+                            <!-- JS populates -->
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- JS populates -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+    </div>
+
+    <!-- Dept Details Modal -->
+    <div id="deptDetailsModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="deptDetailTitle" style="margin:0;">Department Details</h2>
+                <button onclick="document.getElementById('deptDetailsModal').classList.remove('active')"
+                    class="btn btn-outline" style="border:none; font-size:1.5rem;">&times;</button>
+            </div>
+            <div id="deptDetailContent"></div>
+            <div style="margin-top: 2rem; text-align: right;">
+                <button onclick="document.getElementById('deptDetailsModal').classList.remove('active')"
+                    class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Details Modal -->
+    <div id="genericDetailsModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto;">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="genericDetailTitle" style="margin:0;">Details</h2>
+                <button onclick="document.getElementById('genericDetailsModal').classList.remove('active')"
+                    class="btn btn-outline" style="border:none; font-size:1.5rem;">&times;</button>
+            </div>
+            <div id="genericDetailContent"></div>
+            <div style="margin-top: 2rem; text-align: right;">
+                <button onclick="document.getElementById('genericDetailsModal').classList.remove('active')"
+                    class="btn btn-primary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        powered by <a href="https://www.gridify.in" target="_blank">GRIDIFY</a>
+    </footer>
+    </main>
+    </div>
+
+    <style>
+        .hover-card {
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-color: var(--primary-color);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .data-table th {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+    </style>
+
+    <script type="module">
+        import { CSVExport, formatDate } from '../assets/js/utils.js';
+
+        AuthService.requireRole('admin');
+
+        const ReportApp = {
+            cache: {
+                events: null,
+                staff: null,
+                clubs: null
+            },
+            allData: [], // Store full dataset for filtering
+            currentData: [],
+            currentTitle: '',
+            currentType: '', // Added currentType state
+
+            async loadData() {
+                // Parallel fetch
+                if (!this.cache.events || !this.cache.staff || !this.cache.clubs) {
+                    const [events, staff, clubs] = await Promise.all([
+                        DBService.getEvents(),
+                        DBService.getStaff(),
+                        DBService.getClubs()
+                    ]);
+                    this.cache.events = events;
+                    this.cache.staff = staff;
+                    this.cache.clubs = clubs;
+                }
+            },
+
+            async generate(type) {
+                // Show loading state
+                const viewer = document.getElementById('reportViewer');
+                viewer.style.display = 'block';
+                document.getElementById('tableBody').innerHTML = '<tr><td colspan="100" style="text-align:center; padding: 2rem;">Loading data...</td></tr>';
+
+                // Reset search
+                const searchInput = document.getElementById('reportSearch');
+                if (searchInput) searchInput.value = '';
+
+                await this.loadData();
+
+                let data = [];
+                let title = '';
+                this.currentType = type;
+
+                switch (type) {
+                    case 'all_events':
+                        title = 'All Events Report';
+                        data = this.processAllEvents();
+                        break;
+                    case 'staff_data':
+                        title = 'Staff Data Report';
+                        data = this.processStaffData();
+                        break;
+                    case 'clubs_data':
+                        title = 'Clubs Data Report';
+                        data = this.processClubsData();
+                        break;
+                    case 'dept_summary':
+                        title = 'Department Summary Report';
+                        data = this.processDeptSummary();
+                        break;
+                    case 'dept_events':
+                        title = 'Department Conducted Events';
+                        data = this.processDeptEvents();
+                        break;
+                    case 'club_events':
+                        title = 'Club Conducted Events';
+                        data = this.processClubEvents();
+                        break;
+                }
+
+                this.allData = data;  // Store full data
+                this.currentData = data; // Current display data
+                this.currentTitle = title;
+                document.getElementById('reportTitle').innerText = title;
+                this.renderTable(data);
+            },
+
+            handleSearch(query) {
+                if (!query) {
+                    this.currentData = this.allData;
+                } else {
+                    const lowerQuery = query.toLowerCase();
+                    this.currentData = this.allData.filter(row => {
+                        return Object.keys(row).some(key => {
+                            if (key.startsWith('_')) return false; // Skip internal keys
+                            const val = row[key];
+                            return String(val).toLowerCase().includes(lowerQuery);
+                        });
+                    });
+                }
+                this.renderTable(this.currentData);
+            },
+
+            renderTable(data) {
+                const thead = document.getElementById('tableHead');
+                const tbody = document.getElementById('tableBody');
+
+                if (data.length === 0) {
+                    thead.innerHTML = '';
+                    tbody.innerHTML = '<tr><td colspan="100" style="text-align:center; padding: 2rem;">No data found for this report.</td></tr>';
+                    return;
+                }
+
+                // Headers (exclude internal keys starting with _)
+                const headers = Object.keys(data[0]).filter(k => !k.startsWith('_'));
+                thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+
+                // Body
+                tbody.innerHTML = data.map((row, index) => {
+                    // We need a stable identifier. Using index to lookup in currentData is safest if we don't assume IDs.
+                    const clickAttr = `onclick="ReportApp.handleClick(${index})" style="cursor:pointer;"`;
+                    return `<tr ${clickAttr} title="Click to view details">${headers.map(h => `<td>${row[h]}</td>`).join('')}</tr>`;
+                }).join('');
+            },
+
+            handleClick(index) {
+                const row = this.currentData[index];
+                if (this.currentType === 'dept_summary') {
+                    this.showDeptDetails(row['Department']);
+                } else if (this.currentType === 'staff_data') {
+                    this.showStaffDetails(row._raw);
+                } else if (this.currentType === 'clubs_data') {
+                    this.showClubDetails(row._raw);
+                } else if (['all_events', 'dept_events', 'club_events'].includes(this.currentType)) {
+                    this.showEventDetails(row._raw);
+                }
+            },
+
+            // --- Detail Views ---
+
+            showDeptDetails(deptName) {
+                const modal = document.getElementById('deptDetailsModal');
+                document.getElementById('deptDetailTitle').textContent = deptName;
+                const content = document.getElementById('deptDetailContent');
+
+                // Filter Staff
+                const staffMembers = this.cache.staff.filter(s => s.department === deptName);
+                const staffHTML = staffMembers.length ?
+                    `<table class="data-table" style="width:100%; font-size: 0.9rem;"><thead><tr><th>Name</th><th>Designation</th><th>Email</th></tr></thead><tbody>${staffMembers.map(s => `<tr><td>${s.name}</td><td>${s.designation}</td><td>${s.email}</td></tr>`).join('')}</tbody></table>`
+                    : '<p class="text-secondary">No staff members found.</p>';
+
+                // Filter Events
+                const events = this.cache.events.filter(e => e.departmentName === deptName && (!e.clubIds || e.clubIds.length === 0));
+                const eventsHTML = this.generateEventsTable(events);
+
+                content.innerHTML = `
+                    <h3 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; margin-top: 1.5rem; margin-bottom: 1rem;">Staff Members</h3>
+                    ${staffHTML}
+                    <h3 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem;">Conducted Events</h3>
+                    ${eventsHTML}
+                `;
+                modal.classList.add('active');
+            },
+
+            showStaffDetails(staff) {
+                const modal = document.getElementById('genericDetailsModal');
+                document.getElementById('genericDetailTitle').textContent = 'Staff Details';
+
+                // Events coordinated by this staff
+                // Match by Name or Email. Name is stored in Event.coordinatorName
+                const events = this.cache.events.filter(e => e.coordinatorName === staff.name || e.coordinatorEmail === staff.email);
+
+                const html = `
+                    <div style="background:#f8fafc; padding:1.5rem; border-radius:0.5rem; margin-bottom:2rem;">
+                        <h2 style="margin:0; color:var(--primary-color)">${staff.name}</h2>
+                        <div style="color:var(--text-secondary); margin-top:0.5rem;">${staff.designation} &bull; ${staff.department}</div>
+                        <div style="margin-top:0.5rem;">Email: ${staff.email}</div>
+                        ${staff.phone ? `<div>Phone: ${staff.phone}</div>` : ''}
+                    </div>
+                    <h3 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">Events Coordinated</h3>
+                    ${this.generateEventsTable(events)}
+                `;
+                document.getElementById('genericDetailContent').innerHTML = html;
+                modal.classList.add('active');
+            },
+
+            showClubDetails(club) {
+                const modal = document.getElementById('genericDetailsModal');
+                document.getElementById('genericDetailTitle').textContent = 'Club Details';
+
+                // Find staff associated with club? club.staffIds
+                let staffHTML = '<p class="text-secondary">No staff assigned.</p>';
+                if (club.staffIds && club.staffIds.length > 0) {
+                    const members = this.cache.staff.filter(s => club.staffIds.includes(s.id));
+                    staffHTML = `<table class="data-table" style="width:100%; font-size: 0.9rem;"><thead><tr><th>Name</th><th>Email</th></tr></thead><tbody>${members.map(s => `<tr><td>${s.name}</td><td>${s.email}</td></tr>`).join('')}</tbody></table>`;
+                }
+
+                // Events by club
+                const events = this.cache.events.filter(e => e.clubIds && e.clubIds.includes(club.id));
+
+                const html = `
+                    <div style="background:#f8fafc; padding:1.5rem; border-radius:0.5rem; margin-bottom:2rem;">
+                        <h2 style="margin:0; color:var(--primary-color)">${club.name}</h2>
+                        <p style="margin-top:0.5rem;">${club.description || 'No description'}</p>
+                        <span class="status-badge ${club.isActive ? 'status-received' : 'status-urgent'}">${club.isActive ? 'Active' : 'Inactive'}</span>
+                    </div>
+                    <div class="flex gap-4" style="flex-wrap:wrap;">
+                        <div style="flex:1; min-width:300px;">
+                            <h3 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">Club Members/Staff</h3>
+                            ${staffHTML}
+                        </div>
+                    </div>
+                    <h3 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem;">Conducted Events</h3>
+                    ${this.generateEventsTable(events)}
+                `;
+                document.getElementById('genericDetailContent').innerHTML = html;
+                modal.classList.add('active');
+            },
+
+            showEventDetails(event) {
+                const modal = document.getElementById('genericDetailsModal');
+                document.getElementById('genericDetailTitle').textContent = 'Event Details';
+
+                const html = `
+                    <div style="background:#f8fafc; padding:1.5rem; border-radius:0.5rem; margin-bottom:2rem;">
+                        <div class="flex justify-between items-start">
+                             <div>
+                                <h2 style="margin:0; color:var(--primary-color)">${event.eventName}</h2>
+                                <div style="color:var(--text-secondary); margin-top:0.5rem;">${formatDate(event.eventDate)}</div>
+                             </div>
+                             <span class="status-badge ${this.getStatusClass(event.status)}">${event.status}</span>
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-top:1.5rem;">
+                            <div>
+                                <label style="font-weight:bold; font-size:0.8rem; color:var(--text-secondary);">Coordinator</label>
+                                <div>${event.coordinatorName}</div>
+                                <div style="font-size:0.9rem;">${event.coordinatorEmail}</div>
+                            </div>
+                            <div>
+                                <label style="font-weight:bold; font-size:0.8rem; color:var(--text-secondary);">Organizer</label>
+                                <div>${event.departmentName}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="font-size: 1.1rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; margin-bottom: 1rem;">Description</h3>
+                    <p style="line-height:1.6;">${event.eventDetails || 'No description provided.'}</p>
+                    
+                    ${event.id ? `<div style="margin-top:2rem; padding-top:1rem; border-top:1px solid #ddd; text-align:right;">
+                        <a href="../user/event-detail.html?id=${event.id}" class="btn btn-outline">View Full Page</a>
+                    </div>` : ''}
+                `;
+                document.getElementById('genericDetailContent').innerHTML = html;
+                modal.classList.add('active');
+            },
+
+            generateEventsTable(events) {
+                if (!events || events.length === 0) return '<p class="text-secondary">No events found.</p>';
+                return `
+                    <table class="data-table" style="width:100%; font-size: 0.9rem;">
+                        <thead>
+                            <tr><th>Event</th><th>Date</th><th>Coordinator</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            ${events.map(e => `
+                                <tr>
+                                    <td>${e.eventName}</td>
+                                    <td>${formatDate(e.eventDate)}</td>
+                                    <td>${e.coordinatorName}</td>
+                                    <td><span class="status-badge ${this.getStatusClass(e.status)}">${e.status}</span></td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>`;
+            },
+
+            getStatusClass(status) {
+                if (status === 'Completed' || status === 'Report Received') return 'status-received';
+                if (status === 'Under Review') return 'status-info';
+                if (status === 'Changes Requested') return 'status-urgent';
+                return 'status-pending';
+            },
+
+            exportCSV() {
+                if (this.currentData.length === 0) return alert("No data to export.");
+                // Clean data: remove keys starting with _
+                const cleanData = this.currentData.map(row => {
+                    const newRow = {};
+                    Object.keys(row).forEach(k => {
+                        if (!k.startsWith('_')) newRow[k] = row[k];
+                    });
+                    return newRow;
+                });
+                CSVExport.downloadCSV(cleanData, `${this.currentTitle.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`);
+            },
+
+            // --- Data Processors ---
+
+            processAllEvents() {
+                return this.cache.events.map(e => ({
+                    'Event Name': e.eventName,
+                    'Date': formatDate(e.eventDate),
+                    'Type': (e.clubIds && e.clubIds.length > 0) ? 'Club' : 'Department',
+                    'Organizer': e.departmentName, // effectively Dept or Club name
+                    'Coordinator': e.coordinatorName,
+                    'Status': e.status,
+                    'Created At': formatDate(e.createdAt?.toDate ? e.createdAt.toDate() : e.createdAt),
+                    '_raw': e
+                }));
+            },
+
+            processStaffData() {
+                return this.cache.staff.map(s => ({
+                    'Name': s.name,
+                    'Department': s.department,
+                    'Designation': s.designation,
+                    'Email': s.email,
+                    'Phone': s.phone || '-', // Assuming phone field might exist
+                    '_raw': s
+                })).sort((a, b) => a.Department.localeCompare(b.Department));
+            },
+
+            processClubsData() {
+                return this.cache.clubs.map(c => ({
+                    'Club Name': c.name,
+                    'Description': c.description,
+                    'Status': c.isActive ? 'Active' : 'Inactive',
+                    'Created At': formatDate(c.createdAt?.toDate ? c.createdAt.toDate() : c.createdAt),
+                    '_raw': c
+                }));
+            },
+
+            processDeptSummary() {
+                const deptMap = {};
+
+                // Aggregate from Staff
+                this.cache.staff.forEach(s => {
+                    if (!s.department) return;
+                    if (!deptMap[s.department]) {
+                        deptMap[s.department] = {
+                            'Department': s.department,
+                            'Total Staff': 0,
+                            'HOD Name': '-',
+                            'HOD Email': '-'
+                        };
+                    }
+                    deptMap[s.department]['Total Staff']++;
+                    if (s.designation === 'HOD') {
+                        deptMap[s.department]['HOD Name'] = s.name;
+                        deptMap[s.department]['HOD Email'] = s.email;
+                    }
+                });
+
+                return Object.values(deptMap).sort((a, b) => a.Department.localeCompare(b.Department));
+            },
+
+            processDeptEvents() {
+                // Filter: Events where Type is NOT Club
+                const deptEvents = this.cache.events.filter(e => !e.clubIds || e.clubIds.length === 0);
+
+                return deptEvents.map(e => ({
+                    'Department': e.departmentName,
+                    'Event Name': e.eventName,
+                    'Date': formatDate(e.eventDate),
+                    'Coordinator': e.coordinatorName,
+                    'Status': e.status,
+                    '_raw': e
+                })).sort((a, b) => a.Department.localeCompare(b.Department));
+            },
+
+            processClubEvents() {
+                // Filter: Events where Type IS Club
+                const clubEvents = this.cache.events.filter(e => e.clubIds && e.clubIds.length > 0);
+
+                return clubEvents.map(e => ({
+                    'Club': e.departmentName, // Stores club name in this field for club events
+                    'Event Name': e.eventName,
+                    'Date': formatDate(e.eventDate),
+                    'Coordinator': e.coordinatorName,
+                    'Status': e.status,
+                    '_raw': e
+                })).sort((a, b) => a.Club.localeCompare(b.Club));
+            }
+        };
+
+        // Expose to window
+        window.ReportApp = ReportApp;
+    </script>
+</body>
+
+</html>
