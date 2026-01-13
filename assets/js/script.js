@@ -452,13 +452,17 @@
         AOS.init();
 
         // ## Preloader
-        function handlePreloader() {
-            if ($('.preloader').length) {
-                $('.preloader').delay(200).fadeOut(500);
-            }
+        if ($('.preloader').length) {
+            $('.preloader').delay(200).fadeOut(500);
         }
-        handlePreloader();
         
     });
+
+    // Fallback: Force hide preloader if window load takes too long
+    setTimeout(function() {
+        if ($('.preloader').length && $('.preloader').css('display') !== 'none') {
+            $('.preloader').fadeOut(500);
+        }
+    }, 2500);
 
 })(window.jQuery);
