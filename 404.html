@@ -1,515 +1,261 @@
 <!DOCTYPE html>
-<html lang="zxx">
+<html lang="en">
 
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="description" content="">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>404 - Page Not Found | Gridify</title>
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+    rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <!-- Title -->
-    <title>Gridify - 404</title>
-    <!-- Favicon Icon -->
-    <link rel="shortcut icon" href="assets/images/logos/favicon.png" type="image/x-icon">
-    <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
-        rel="stylesheet">
+  <style>
+    /* ----------------------------------------------------------------------
+           Gridify 404 Page Styles - Standalone
+           ---------------------------------------------------------------------- */
+    :root {
+      --ridda-base-font: "Inter", sans-serif;
+      --ridda-heading-font: "Manrope", sans-serif;
+      --ridda-primary-color: #FFD043;
+      --ridda-secondary-color: #28F67A;
+      --ridda-heading-color: #111111;
+      --ridda-base-color: #696969;
+      --ridda-lighter-color: #F7F8FE;
+      --ridda-border-color: rgba(3, 27, 225, 0.1);
+    }
 
-    <!-- Flaticon -->
-    <link rel="stylesheet" href="assets/css/flaticon.min.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="assets/css/fontawesome-5.14.0.min.css">
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-    <!-- Magnific Popup -->
-    <link rel="stylesheet" href="assets/css/magnific-popup.min.css">
-    <!-- Nice Select -->
-    <link rel="stylesheet" href="assets/css/nice-select.min.css">
-    <!-- Animate -->
-    <link rel="stylesheet" href="assets/css/aos.css">
-    <!-- Slick -->
-    <link rel="stylesheet" href="assets/css/slick.min.css">
-    <!-- Main Style -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    * {
+      margin: 0;
+      padding: 0;
+      border: none;
+      outline: none;
+      box-sizing: border-box;
+    }
 
-    <style>
-        /* Custom 404 Page Styles - Enhanced Aesthetics */
-        :root {
-            --error-primary: #FFD043;
-            /* Matches --ridda-primary-color */
-            --error-secondary: #28F67A;
-            /* Matches --ridda-secondary-color */
-            --error-dark: #111111;
-            --error-bg-gradient: radial-gradient(circle at 50% 50%, #fffbf0 0%, #ffffff 100%);
-        }
+    body {
+      color: var(--ridda-base-color);
+      background: white;
+      font-weight: 400;
+      line-height: 1.6;
+      font-size: 16px;
+      font-family: var(--ridda-base-font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
 
-        /* Ambient Background Animation */
-        .error-area {
-            background: var(--error-bg-gradient);
-            position: relative;
-            z-index: 1;
-        }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: var(--ridda-heading-color);
+      font-family: var(--ridda-heading-font);
+      line-height: 1.2;
+      margin-bottom: 15px;
+    }
 
-        .error-area::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255, 208, 67, 0.08) 10%, transparent 60%);
-            animation: rotateAmbient 30s linear infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
+    a {
+      text-decoration: none;
+      transition: 0.3s;
+    }
 
-        @keyframes rotateAmbient {
-            0% {
-                transform: rotate(0deg);
-            }
+    .container {
+      width: 100%;
+      padding-right: 15px;
+      padding-left: 15px;
+      margin-right: auto;
+      margin-left: auto;
+      max-width: 1200px;
+      text-align: center;
+    }
 
-            100% {
-                transform: rotate(360deg);
-            }
-        }
+    /* 404 Area Styles */
+    .error-page-area {
+      padding: 100px 0;
+      position: relative;
+      z-index: 1;
+    }
 
-        /* 404 Image Animation */
-        .error-content .image {
-            position: relative;
-            display: inline-block;
-        }
+    .error-content {
+      max-width: 700px;
+      margin: 0 auto;
+    }
 
-        .error-content .image img {
-            animation: float 6s ease-in-out infinite;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
-            transition: transform 0.3s ease;
-        }
+    .error-content h1 {
+      font-size: 180px;
+      font-weight: 800;
+      margin-bottom: 0;
+      background: linear-gradient(135deg, var(--ridda-heading-color) 0%, var(--ridda-primary-color) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      animation: pulse-text 3s infinite alternate;
+    }
 
-        .error-content .image:hover img {
-            transform: scale(1.02) translateY(-10px);
-        }
+    @media (max-width: 767px) {
+      .error-content h1 {
+        font-size: 100px;
+      }
+    }
 
-        @keyframes float {
+    .error-content h2 {
+      font-size: 40px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-transform: capitalize;
+    }
 
-            0%,
-            100% {
-                transform: translateY(0);
-            }
+    .error-content p {
+      font-size: 18px;
+      margin-bottom: 40px;
+      max-width: 520px;
+      margin-left: auto;
+      margin-right: auto;
+    }
 
-            50% {
-                transform: translateY(-20px);
-            }
-        }
+    /* Button Style */
+    .theme-btn {
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: 700;
+      overflow: hidden;
+      text-align: center;
+      padding: 12px 35px;
+      border-radius: 10px;
+      position: relative;
+      align-items: center;
+      display: inline-flex;
+      justify-content: center;
+      text-transform: capitalize;
+      color: var(--ridda-heading-color);
+      background: var(--ridda-primary-color);
+      font-family: var(--ridda-heading-font);
+      font-size: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
 
-        /* Typography Styling */
-        .error-content .section-title h2 {
-            font-size: 3rem;
-            font-weight: 800;
-            color: var(--error-dark);
-            margin-bottom: 1.5rem;
-            position: relative;
-            display: inline-block;
-        }
+    .theme-btn span {
+      position: relative;
+      z-index: 2;
+      transition: 0.3s;
+    }
 
-        .error-content .section-title .h1 {
-            color: var(--error-primary);
-            font-size: 1.25em;
-            margin-right: 0.5rem;
-            display: inline-block;
-            text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
-        }
+    /* Button hover effect */
+    .theme-btn:hover {
+      background: var(--ridda-heading-color);
+      color: var(--ridda-primary-color);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
 
-        .error-content p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #555;
-            max-width: 550px;
-            margin: 0 auto 2rem;
-            opacity: 0;
-            animation: fadeInUp 0.8s ease-out 0.3s forwards;
-        }
+    /* Floating Shapes for visual interest */
+    .shapes span {
+      position: absolute;
+      z-index: -1;
+      border-radius: 50%;
+    }
 
-        /* Button Styling Enhanced */
-        .error-area .theme-btn {
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-            box-shadow: 0 10px 25px rgba(255, 208, 67, 0.4);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: none;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
+    .shape-1 {
+      width: 50px;
+      height: 50px;
+      background: var(--ridda-secondary-color);
+      top: 20%;
+      left: 10%;
+      opacity: 0.2;
+      animation: float 6s ease-in-out infinite;
+    }
 
-        .error-area .theme-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(255, 208, 67, 0.6);
-        }
+    .shape-2 {
+      width: 80px;
+      height: 80px;
+      background: var(--ridda-primary-color);
+      bottom: 20%;
+      right: 10%;
+      opacity: 0.15;
+      animation: float 8s ease-in-out infinite reverse;
+    }
 
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
+    .shape-3 {
+      width: 30px;
+      height: 30px;
+      border: 5px solid var(--ridda-heading-color);
+      top: 15%;
+      right: 20%;
+      opacity: 0.1;
+      animation: rotate 10s linear infinite;
+    }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    /* Animations */
+    @keyframes float {
+      0% {
+        transform: translateY(0px);
+      }
 
-        /* Page Banner Subtle Overlay */
-        .page-banner-area {
-            position: relative;
-        }
+      50% {
+        transform: translateY(-30px);
+      }
 
-        .page-banner-area::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 30%;
-            background: linear-gradient(to top, rgba(255, 255, 255, 0.1), transparent);
-            pointer-events: none;
-        }
+      100% {
+        transform: translateY(0px);
+      }
+    }
 
-        /* Shape Decorations */
-        .error-area::after {
-            content: '404';
-            position: absolute;
-            bottom: 5%;
-            right: -5%;
-            font-size: 20rem;
-            font-weight: 900;
-            color: rgba(0, 0, 0, 0.02);
-            z-index: -1;
-            transform: rotate(-15deg);
-            pointer-events: none;
-            font-family: var(--ridda-heading-font);
-        }
+    @keyframes rotate {
+      0% {
+        transform: rotate(0deg);
+      }
 
-        @media (max-width: 768px) {
-            .error-content .section-title h2 {
-                font-size: 2rem;
-            }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
 
-            .error-content .section-title .h1 {
-                display: block;
-                margin-bottom: 0.5rem;
-            }
+    @keyframes pulse-text {
+      0% {
+        opacity: 0.8;
+      }
 
-            .error-area::after {
-                font-size: 10rem;
-                bottom: 2%;
-            }
-        }
-    </style>
+      100% {
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <div class="page-wrapper">
 
-        <!-- Preloader -->
-        <div class="preloader">
-            <div class="custom-loader"></div>
-        </div>
-
-        <!-- main header -->
-        <header class="main-header header-one white-menu menu-absolute">
-            <!--Header-Upper-->
-            <div class="header-upper">
-                <div class="container px-xxl-0 bordered-x clearfix">
-
-                    <div class="header-inner rel d-flex align-items-center">
-                        <div class="logo-outer">
-                            <div class="logo"><a href="index.html"><img src="assets/images/logos/logo.png" alt="Logo"
-                                        title="Logo" style="width: 100px; height: 100px; object-fit: contain;"></a>
-                            </div>
-                        </div>
-
-                        <div class="nav-outer mx-lg-auto ps-xxl-5 clearfix">
-                            <!-- Main Menu -->
-                            <nav class="main-menu navbar-expand-lg">
-                                <div class="navbar-header rpy-10">
-                                    <div class="mobile-logo">
-                                        <a href="index.html">
-                                            <img src="assets/images/logos/logo.png" alt="Logo" title="Logo"
-                                                style="width: 100px; height: 100px; object-fit: contain;">
-                                        </a>
-                                    </div>
-
-                                    <!-- Toggle Button --> <button type="button" class="navbar-toggle"
-                                        data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                                        <span class="icon-bar"></span>
-                                        <span class="icon-bar"></span>
-                                        <span class="icon-bar"></span>
-                                    </button>
-                                </div>
-
-                                <div class="navbar-collapse collapse clearfix">
-                                    <ul class="navigation clearfix">
-                                        <li class=""><a href="index.html">Home</a>
-                                            <ul>
-                                                <!--li class="dropdown"><a href="#">MultiPage</a>
-                                                    <ul>
-                                                        <li><a href="index.html">Web Design Agency</a></li>
-                                                        <li><a href="index2.html">Social Media Marketing</a></li>
-                                                        <li><a href="index3.html">SEO Agency</a></li>
-                                                        <li><a href="index4.html">Video Marketing</a></li>
-                                                        <li><a href="index5.html">Web Development</a></li>
-                                                    </ul>
-                                                </li>
-                                                <li class="dropdown"><a href="#">OnePage</a>
-                                                    <ul>
-                                                        <li><a href="index1-onepage.html">Web Design Agency</a></li>
-                                                        <li><a href="index2-onepage.html">Social Media Marketing</a>
-                                                        </li>
-                                                        <li><a href="index3-onepage.html">SEO Agency</a></li>
-                                                        <li><a href="index4-onepage.html">Video Marketing</a></li>
-                                                        <li><a href="index5-onepage.html">Web Development</a></li>
-                                                    </ul>
-                                                </li-->
-                                            </ul>
-                                        </li>
-                                        <li><a href="about.html">About</a></li>
-                                        <li><a href="services.html">Services</a></li>
-                                        <li><a href="shop.html">Shop</a></li>
-                                        <li><a href="fun.html">Fun</a></li>
-                                        <li><a href="contact.html">Contact</a></li>
-                                        <!--li class="dropdown"><a href="#">blog</a>
-                                            <ul>
-                                                <li><a href="blog.html">blog Grid</a></li>
-                                                <li><a href="blog-standard.html">blog Standard</a></li>
-                                                <li><a href="blog-details.html">blog details</a></li>
-                                            </ul>
-                                        </li-->
-                                    </ul>
-                                </div>
-
-                            </nav>
-                            <!-- Main Menu End-->
-                        </div>
-
-                        <!-- Menu Button -->
-                        <div class="menu-btns">
-                            <a href="project-grid.html" class="theme-btn btn-small" data-hover="Start Projects">
-                                <span>Start Projects</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!--End Header Upper-->
-        </header>
-
-
-        <!-- Page Banner Start -->
-        <section class="page-banner-area bgc-black text-white rel z-1 overflow-hidden">
-            <div class="container bordered-x py-100 rpt-60 rpb-80">
-                <div class="banner-inner text-center px-xl-4 pt-90">
-                    <h1 class="page-title mb-20" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">404
-                    </h1>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb justify-content-center" data-aos="fade-up" data-aos-delay="200"
-                            data-aos-duration="1500" data-aos-offset="50">
-                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                            <li class="breadcrumb-item active">404 Error</li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-
-            <div class="page-banner-shapes">
-                <span class="marquee-wrap">
-                    <span class="marquee-inner left">
-                        <span class="marquee-item">Web Design Agency</span>
-                    </span>
-                    <span class="marquee-inner left">
-                        <span class="marquee-item">Web Design Agency</span>
-                    </span>
-                    <span class="marquee-inner left">
-                        <span class="marquee-item">Web Design Agency</span>
-                    </span>
-                </span>
-            </div>
-
-        </section>
-        <!-- Page Banner End -->
-
-
-        <!-- 404 Error Area start -->
-        <section class="error-area py-130 rpy-100 rel z-1">
-            <div class="container">
-                <div class="row align-items-center justify-content-center">
-                    <div class="col-xl-8 col-lg-10">
-                        <div class="error-content text-center" data-aos="fade-up" data-aos-duration="1500"
-                            data-aos-offset="50">
-                            <div class="image mb-40">
-                                <img class="w-75" src="assets/images/about/404.png" alt="404 Error">
-                            </div>
-                            <div class="section-title mt-15 mb-25">
-                                <h2><span class="h1">OPPS! </span> Page Can’t be Found</h2>
-                            </div>
-                            <p>code404
-                            </p>
-                            <a href="index.html" class="theme-btn hover-primary mt-25" data-hover="Back To Home">
-                                <span>Back To Home</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- 404 Error Area end -->
-
-
-        <!-- footer area start -->
-        <footer class="main-footer bgc-black text-white rel z-1">
-            <div class="footer-marquee pt-60 pb-75 rpy-90 rel">
-                <div class="container blank-container bordered-x"></div>
-                <span class="marquee-wrap">
-                    <span class="marquee-inner left">
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                    </span>
-                    <span class="marquee-inner left">
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                    </span>
-                    <span class="marquee-inner left">
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                        <span class="marquee-item"></span>
-                    </span>
-                </span>
-            </div>
-            <div class="container bordered-x pb-50">
-                <div class="row justify-content-between">
-                    <div class="col-lg-4 col-sm-8" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
-                        <div class="footer-widget footer-newsletter">
-                            <div class="footer-logo mb-20">
-                                <a href="index.html"><img src="assets/images/logos/logo-footer.png" alt="Logo"></a>
-                            </div>
-                            <p>We are fully committed to delivering an experience that keeps our customers satisfied
-                                every step of the way.</p>
-                            <!--form class="newsletter-form mt-25" action="#">
-                                <label for="news-email"><i class="fas fa-envelope"></i></label>
-                                <input id="news-email" type="email" placeholder="Email Address" required>
-                                <button type="submit" class="theme-btn btn-small hover-primary" data-hover="Subscribe">
-                                    <span>Subscribe</span>
-                                </button>
-                            </form-->
-                        </div>
-                    </div>
-                    <div class="col-lg-8">
-                        <div class="row justify-content-between">
-                            <div class="col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="50"
-                                data-aos-duration="1500" data-aos-offset="50">
-                                <!--div class="footer-widget footer-text">
-                                    <div class="footer-title">
-                                        <h6>Location</h6>
-                                    </div>
-                                    <div class="text">55 Main Street, 2nd block Malborne, Australia</div>
-                                </div>-->
-                            </div>
-                            <div class="col-xl-3 col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="100"
-                                data-aos-duration="1500" data-aos-offset="50">
-                                <div class="footer-widget footer-text">
-                                    <div class="footer-title">
-                                        <h6>Contact Us</h6>
-                                    </div>
-                                    <div class="text">
-                                        <a href="mailto:info@gridify.com">info@gridify.com</a><br>
-                                        <a href="callto:+918129566053">+91 81295 66053</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-sm-6" data-aos="fade-up" data-aos-delay="150"
-                                data-aos-duration="1500" data-aos-offset="50">
-                                <div class="footer-widget footer-contact">
-                                    <div class="footer-title">
-                                        <h6>Follow Us on</h6>
-                                    </div>
-                                    <div class="social-style-two mt-15">
-                                        <a href="www.facebook.com"><i class="fab fa-facebook-f"></i></a>
-                                        <a href="www.instagram.com"><i class="fab fa-instagram"></i></a>
-                                        <a href="https://wa.me/918129566053"><i class="fab fa-whatsapp"></i></a>
-                                        <!--<a href="contact.html"><i class="fab fa-behance"></i></a>
-                                        <a href="contact.html"><i class="fab fa-linkedin-in"></i></a>-->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="container bordered-x bordered-top pt-25 pb-10">
-                    <div class="row">
-                        <div class="col-lg-5">
-                            <div class="copyright-text text-center text-lg-start">
-                                <p>Copyright 2025 © <a href="index.html">Gridify</a>, all rights reserved.</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-7 text-center text-lg-end">
-                            <ul class="footer-bottom-nav">
-                                <li><a href="faqs.html">FAQ</a></li>
-                                <li><a href="404.html">Privacy Policy</a></li>
-                                <li><a href="404.html">Terms & Conditions</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <!-- Scroll Top Button -->
-                    <button class="scroll-top scroll-to-target" data-target="html"><i
-                            class="far fa-arrow-up"></i></button>
-                </div>
-            </div>
-            <div class="footer-shapes">
-                <!--div class="shape">
-                    <img src="assets/images/shapes/footer-shape.png" alt="Shape">
-                </div-->
-            </div>
-        </footer>
-        <!-- footer area end -->
-
-
+  <div class="error-page-area">
+    <!-- Floating Shapes -->
+    <div class="shapes">
+      <span class="shape-1"></span>
+      <span class="shape-2"></span>
+      <span class="shape-3"></span>
     </div>
-    <!--End pagewrapper-->
 
-
-    <!-- Jquery -->
-    <script src="assets/js/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="assets/js/bootstrap.min.js"></script>
-    <!-- Appear Js -->
-    <script src="assets/js/appear.min.js"></script>
-    <!-- Slick -->
-    <script src="assets/js/slick.min.js"></script>
-    <!-- Magnific Popup -->
-    <script src="assets/js/jquery.magnific-popup.min.js"></script>
-    <!-- Nice Select -->
-    <script src="assets/js/jquery.nice-select.min.js"></script>
-    <!-- Image Loader -->
-    <script src="assets/js/imagesloaded.pkgd.min.js"></script>
-    <!-- Skillbar -->
-    <script src="assets/js/skill.bars.jquery.min.js"></script>
-    <!-- Isotope -->
-    <script src="assets/js/isotope.pkgd.min.js"></script>
-    <!--  AOS Animation -->
-    <script src="assets/js/aos.js"></script>
-    <!-- Custom script -->
-    <script src="assets/js/script.js"></script>
+    <div class="container">
+      <div class="error-content">
+        <div class="image mb-20">
+          <!-- 404 Text is styled as H1 below, avoiding external images for portability -->
+        </div>
+        <h1>404</h1>
+        <h2>Oops! Page Not Found</h2>
+        <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+        </p>
+        <a href="index.html" class="theme-btn">
+          <span>Back to Home</span>
+        </a>
+      </div>
+    </div>
+  </div>
 
 </body>
-
 
 </html>
