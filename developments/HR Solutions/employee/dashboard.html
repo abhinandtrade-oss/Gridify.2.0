@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal - Gridify</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-layout">
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 2.5rem; text-align: left; padding: 0.5rem;">
+                <div class="logo" style="margin-bottom: 0.25rem;">Gridify</div>
+                <p
+                    style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">
+                    Employee Hub</p>
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="nav-item active">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="attendance.html" class="nav-item">
+                    <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+                <a href="leave-requests.html" class="nav-item">
+                    <i class="fas fa-envelope-open-text"></i> Leave Requests
+                </a>
+                <a href="profile.html" class="nav-item">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+                <a href="payslips.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i> Payslips
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <div class="nav-item" style="cursor: pointer; color: var(--error-color);" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+        <main class="main-content">
+            <header
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Salutations, <span id="empName">...</span></h1>
+                    <p style="color: var(--text-secondary);">Your daily operational telemetry is synchronized.</p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="glass-panel"
+                        style="padding: 0.6rem 1.25rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <div id="statusPulse" class="pulse"
+                            style="width: 10px; height: 10px; border-radius: 50%; background: var(--text-muted);"></div>
+                        <span id="statusText"
+                            style="font-weight: 700; font-size: 0.85rem; letter-spacing: 0.02em; text-transform: uppercase;">Syncing...</span>
+                    </div>
+                    <div class="mobile-nav-toggle"
+                        onclick="document.getElementById('sidebar').classList.toggle('active')">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="stack-on-mobile"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+                <!-- Live Timer Card -->
+                <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--primary-color);">
+                    <p
+                        style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Active Shift Duration</p>
+                    <h3 id="hoursWorked" style="font-size: 1.75rem; font-weight: 800; color: white;">00:00:00</h3>
+                    <p id="punchTimeLabel" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        Awaiting session initialization</p>
+                </div>
+
+                <!-- Work Time Info Card -->
+                <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--info-color);">
+                    <p
+                        style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Official Work Hours</p>
+                    <h3 id="workTimeDisplay" style="font-size: 1.75rem; font-weight: 800; color: white;">--:-- to --:--
+                    </h3>
+                    <p id="graceTimeLabel" style="font-size: 0.75rem; color: var(--info-color); margin-top: 0.5rem;">
+                        Grace period: -- minutes</p>
+                </div>
+
+                <!-- Leave Balance -->
+                <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--secondary-color);">
+                    <p
+                        style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Quota Utilization</p>
+                    <h3 id="leaveBalance" style="font-size: 1.75rem; font-weight: 800; color: white;">--</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">Approved cycles this
+                        tenure</p>
+                </div>
+
+                <!-- Next Holiday -->
+                <div class="glass-panel" style="padding: 1.5rem; border-left: 4px solid var(--success-color);">
+                    <p
+                        style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                        Scheduled Protocol Break</p>
+                    <h3 id="nextHoliday"
+                        style="font-size: 1.25rem; font-weight: 800; color: white; margin-bottom: 0.25rem;">Republic Day
+                    </h3>
+                    <p id="holidayDate" style="font-size: 0.75rem; color: var(--success-color); font-weight: 600;">Jan
+                        26, 2026</p>
+                </div>
+            </div>
+
+            <div class="stack-on-mobile"
+                style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; align-items: start;">
+                <!-- Activity Column -->
+                <div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; font-weight: 700;">Operational Protocols</h3>
+                    </div>
+                    <div
+                        style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2.5rem;">
+                        <div class="glass-panel"
+                            style="padding: 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: transform 0.2s;"
+                            onclick="location.href='attendance.html'"
+                            onmouseover="this.style.transform='translateY(-2px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width: 40px; height: 40px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary-color);">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <span style="font-weight: 600; font-size: 0.9rem;">Punch In/Out</span>
+                        </div>
+                        <div class="glass-panel"
+                            style="padding: 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: transform 0.2s;"
+                            onclick="location.href='leave-requests.html?action=new'"
+                            onmouseover="this.style.transform='translateY(-2px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width: 40px; height: 40px; background: rgba(236, 72, 153, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--secondary-color);">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <span style="font-weight: 600; font-size: 0.9rem;">Apply Leave</span>
+                        </div>
+                        <div class="glass-panel"
+                            style="padding: 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: transform 0.2s;"
+                            onclick="showCorrectionModal()" onmouseover="this.style.transform='translateY(-2px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--success-color);">
+                                <i class="fas fa-wrench"></i>
+                            </div>
+                            <span style="font-weight: 600; font-size: 0.9rem;">Data Correction</span>
+                        </div>
+                        <div class="glass-panel"
+                            style="padding: 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: transform 0.2s;"
+                            onclick="location.href='profile.html'" onmouseover="this.style.transform='translateY(-2px)'"
+                            onmouseout="this.style.transform='none'">
+                            <div
+                                style="width: 40px; height: 40px; background: rgba(245, 158, 11, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--warning-color);">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <span style="font-weight: 600; font-size: 0.9rem;">Entity Profile</span>
+                        </div>
+                    </div>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; font-weight: 700;">Verification Stream</h3>
+                        <a href="attendance.html"
+                            style="font-size: 0.75rem; color: var(--primary-color); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Full
+                            Transcript</a>
+                    </div>
+                    <div id="recentAttendance" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="glass-panel" style="padding: 2.5rem; text-align: center; opacity: 0.5;">
+                            <i class="fas fa-circle-notch fa-spin fa-lg" style="margin-bottom: 1rem;"></i>
+                            <p>Scanning logs...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Updates Column -->
+                <div>
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.1rem; font-weight: 700;">Intel & Updates</h3>
+                        <div id="notifCount" class="badge badge-primary"
+                            style="font-size: 0.7rem; padding: 0.25rem 0.5rem; min-width: 20px; text-align: center;">0
+                        </div>
+                    </div>
+                    <div class="glass-panel"
+                        style="max-height: 600px; overflow-y: auto; padding: 0; border: 1px solid var(--glass-border);">
+                        <div id="notificationList">
+                            <div style="padding: 4rem 2rem; text-align: center; opacity: 0.5;">
+                                <i class="fas fa-satellite-dish fa-2x" style="margin-bottom: 1rem;"></i>
+                                <p>Static silence detected.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Attendance Correction Modal -->
+    <div id="correctionModal" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; backdrop-filter: blur(12px);">
+        <div class="glass-panel"
+            style="width: 95%; max-width: 500px; padding: 2.5rem; border: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="font-size: 1.5rem; font-weight: 800;">Log Correction</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Request a manual adjustment to your
+                        records.</p>
+                </div>
+                <button onclick="closeCorrectionModal()" class="btn btn-outline"
+                    style="min-width: unset; padding: 0.5rem 0.75rem; border-radius: 50%;"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <form id="correctionForm">
+                <div class="form-group">
+                    <label class="form-label">Protocol Date</label>
+                    <input type="date" id="corrDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Classification</label>
+                    <select id="corrType" class="form-input" required>
+                        <option value="Missed Punch">Missed Session</option>
+                        <option value="Wrong Time">Time Correction</option>
+                        <option value="Wrong Location">Geo-tag Correction</option>
+                        <option value="Technical Error">Interface Glitch</option>
+                    </select>
+                </div>
+                <!-- New Time Inputs -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">New Check-In</label>
+                        <input type="time" id="corrInTime" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Check-Out</label>
+                        <input type="time" id="corrOutTime" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Diagnostic Rationale</label>
+                    <textarea id="corrReason" class="form-input" style="height: 100px; resize: none;"
+                        placeholder="Provide a detailed verification rationale..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Transmit
+                    Request</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, query, where, onSnapshot, getDocs, getDoc, addDoc, serverTimestamp, orderBy, limit, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const userData = JSON.parse(sessionStorage.getItem('empUser'));
+        if (!userData) window.location.href = 'index.html';
+
+        let timerInterval;
+
+        document.getElementById('empName').textContent = userData.name || userData.email.split('@')[0];
+
+        window.logout = () => { sessionStorage.removeItem('empUser'); window.location.href = 'index.html'; };
+
+        function initAttendanceListener() {
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const searchEmail = userData.email.toLowerCase().trim();
+
+            const q = query(
+                collection(db, "organizations", userData.orgId, "attendance"),
+                where("userId", "==", searchEmail),
+                where("date", "==", todayStr)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                const statusPulse = document.getElementById('statusPulse');
+                const statusText = document.getElementById('statusText');
+                const hoursDisplay = document.getElementById('hoursWorked');
+                const punchLabel = document.getElementById('punchTimeLabel');
+
+                if (!snapshot.empty) {
+                    const data = snapshot.docs[0].data();
+                    if (data.status === 'Running') {
+                        statusPulse.style.background = 'var(--success-color)';
+                        statusText.textContent = 'Operational';
+                        startTimer(data.checkInTime.seconds);
+                        punchLabel.textContent = `In since ${formatTime(data.checkInTime.seconds)}`;
+                    } else if (data.status === 'Completed') {
+                        statusPulse.style.background = 'var(--text-muted)';
+                        statusText.textContent = 'Finalized';
+                        statusPulse.classList.remove('pulse');
+                        stopTimer();
+                        hoursDisplay.textContent = formatDecimalToTime(data.workingHours || 0);
+                        punchLabel.textContent = `Out at ${formatTime(data.checkOutTime.seconds)}`;
+                    }
+                } else {
+                    statusPulse.style.background = 'var(--text-muted)';
+                    statusText.textContent = 'Idle';
+                    hoursDisplay.textContent = '00:00:00';
+                    punchLabel.textContent = 'Ready for session initialization';
+                    stopTimer();
+                }
+            }, (error) => {
+                console.warn('Attendance listener error:', error.code);
+                // Fallback to showing idle state on permission errors
+                const statusPulse = document.getElementById('statusPulse');
+                const statusText = document.getElementById('statusText');
+                const hoursDisplay = document.getElementById('hoursWorked');
+                const punchLabel = document.getElementById('punchTimeLabel');
+
+                statusPulse.style.background = 'var(--text-muted)';
+                statusText.textContent = 'Idle';
+                hoursDisplay.textContent = '00:00:00';
+                punchLabel.textContent = 'Ready for session initialization';
+                stopTimer();
+            });
+        }
+
+        function startTimer(startTimeSeconds) {
+            if (timerInterval) clearInterval(timerInterval);
+            const hoursDisplay = document.getElementById('hoursWorked');
+            const startTime = startTimeSeconds * 1000;
+            const update = () => {
+                const diff = Date.now() - startTime;
+                const h = Math.floor(diff / 3600000);
+                const m = Math.floor((diff % 3600000) / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                hoursDisplay.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+            };
+            update();
+            timerInterval = setInterval(update, 1000);
+        }
+
+        function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+
+        async function loadLeaveInfo() {
+            try {
+                const searchEmail = userData.email.toLowerCase().trim();
+                const q = query(collection(db, "organizations", userData.orgId, "leave_requests"), where("userId", "==", searchEmail), where("status", "==", "Approved"));
+                const snapshot = await getDocs(q);
+                let total = 0;
+                snapshot.forEach(doc => total += doc.data().days || 0);
+                document.getElementById('leaveBalance').textContent = `${total} Units`;
+            } catch (err) { console.error(err); }
+        }
+
+        async function loadWorkTimeInfo() {
+            try {
+                const orgDoc = await getDoc(doc(db, "organizations", userData.orgId));
+                if (orgDoc.exists()) {
+                    const orgData = orgDoc.data();
+                    const workStartTime = orgData.workStartTime || '09:00';
+                    const workEndTime = orgData.workEndTime || '18:00';
+                    const gracePeriod = orgData.gracePeriod || 15;
+
+                    document.getElementById('workTimeDisplay').textContent = `${workStartTime} to ${workEndTime}`;
+                    document.getElementById('graceTimeLabel').textContent = `Grace period: ${gracePeriod} minutes`;
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function initNotificationListener() {
+            const q = query(collection(db, "organizations", userData.orgId, "employees", userData.email, "notifications"), orderBy("timestamp", "desc"), limit(10));
+
+            onSnapshot(q, (snapshot) => {
+                const list = document.getElementById('notificationList');
+                const countBadge = document.getElementById('notifCount');
+
+                if (snapshot.empty) { countBadge.textContent = "0"; return; }
+
+                let unread = 0;
+                list.innerHTML = '';
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.isRead) unread++;
+
+                    const item = document.createElement('div');
+                    item.style.padding = '1.25rem 1.5rem';
+                    item.style.display = 'flex';
+                    item.style.gap = '1.25rem';
+                    item.style.borderBottom = '1px solid var(--glass-border)';
+                    item.className = data.isRead ? '' : 'unread-notif';
+
+                    let icon = 'fa-info-circle';
+                    let bg = 'rgba(99, 102, 241, 0.1)';
+                    let color = 'var(--primary-color)';
+
+                    if (data.type === 'attendance') { icon = 'fa-calendar-check'; bg = 'rgba(16, 185, 129, 0.1)'; color = 'var(--success-color)'; }
+                    if (data.type === 'leave') { icon = 'fa-envelope-open'; bg = 'rgba(236, 72, 153, 0.1)'; color = 'var(--secondary-color)'; }
+                    if (data.type === 'payslip') { icon = 'fa-file-invoice-dollar'; bg = 'rgba(245, 158, 11, 0.1)'; color = 'var(--warning-color)'; }
+
+                    item.innerHTML = `
+                        <div style="width: 40px; height: 40px; background: ${bg}; color: ${color}; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                <span style="font-weight: 700; font-size: 0.95rem;">${data.title}</span>
+                                <span style="font-size: 0.7rem; color: var(--text-muted);">${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}</span>
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">${data.body}</p>
+                        </div>
+                    `;
+                    list.appendChild(item);
+                });
+                countBadge.textContent = unread;
+            }, (error) => {
+                console.warn('Notification listener error:', error.code);
+                // Silently fail - notifications are not critical
+                document.getElementById('notifCount').textContent = '0';
+            });
+        }
+
+        async function loadRecentAttendance() {
+            // OPTIMIZATION: Removed orderBy to avoid composite index requirement
+            const q = query(collection(db, "organizations", userData.orgId, "attendance"), where("userId", "==", userData.email));
+            try {
+                const snapshot = await getDocs(q);
+                const container = document.getElementById('recentAttendance');
+                container.innerHTML = '';
+                if (snapshot.empty) { container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">Zero active logs found.</p>'; return; }
+
+                // Client-side Sort & Limit
+                const recentDocs = snapshot.docs
+                    .map(d => d.data())
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 3);
+
+                recentDocs.forEach(data => {
+                    const item = document.createElement('div');
+                    item.className = 'glass-panel';
+                    item.style.padding = '1rem 1.5rem';
+                    item.style.display = 'flex';
+                    item.style.justifyContent = 'space-between';
+                    item.style.alignItems = 'center';
+                    item.style.border = '1px solid var(--glass-border)';
+
+                    item.innerHTML = `
+                        <div>
+                            <div style="font-weight: 700; font-size: 1rem;">${new Date(data.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Transcript Verified</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 600; font-size: 0.9rem; color: white;">${data.workingHours || 0} Hours</div>
+                            <span class="badge" style="font-size: 0.65rem; background: ${data.status === 'Completed' ? 'var(--success-color)15' : 'var(--warning-color)15'}; color: ${data.status === 'Completed' ? 'var(--success-color)' : 'var(--warning-color)'};">${data.status.toUpperCase()}</span>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (err) { console.warn(err); }
+        }
+
+        window.showCorrectionModal = () => document.getElementById('correctionModal').style.display = 'flex';
+        window.closeCorrectionModal = () => document.getElementById('correctionModal').style.display = 'none';
+
+        document.getElementById('correctionForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Initializing Transmission...';
+
+            try {
+                // Fixed: Write to organization-level collection for admin visibility
+                await addDoc(collection(db, "organizations", userData.orgId, "attendance_requests"), {
+                    userId: userData.email,
+                    userName: (userData.name || userData.email),
+                    date: document.getElementById('corrDate').value,
+                    type: document.getElementById('corrType').value,
+                    newInTime: document.getElementById('corrInTime').value,
+                    newOutTime: document.getElementById('corrOutTime').value,
+                    reason: document.getElementById('corrReason').value,
+                    status: 'Pending',
+                    submittedAt: serverTimestamp(),
+                    orgId: userData.orgId
+                });
+                alert("Protocol transmission successful.");
+                closeCorrectionModal();
+                e.target.reset();
+            } catch (err) { alert("Fail: " + err.message); } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Transmit Request';
+            }
+        };
+
+        function formatTime(seconds) { return new Date(seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); }
+        function formatDecimalToTime(decimal) { const h = Math.floor(decimal); const m = Math.floor((decimal - h) * 60); return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`; }
+
+        initAttendanceListener();
+        initNotificationListener();
+        loadLeaveInfo();
+        loadWorkTimeInfo();
+        loadRecentAttendance();
+    </script>
+</body>
+
+</html>

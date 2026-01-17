@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approvals Hub - Gridify Organization</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-layout">
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 2.5rem; text-align: left; padding: 0.5rem;">
+                <div class="logo" style="margin-bottom: 0.25rem;">Gridify</div>
+                <p
+                    style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">
+                    Organization Console</p>
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="employees.html" class="nav-item">
+                    <i class="fas fa-users"></i> Employees
+                </a>
+                <a href="departments.html" class="nav-item">
+                    <i class="fas fa-layer-group"></i> Departments
+                </a>
+                <a href="approvals.html" class="nav-item active">
+                    <i class="fas fa-inbox"></i> Approval Hub
+                </a>
+                <a href="attendance.html" class="nav-item">
+                    <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+                <a href="leave-requests.html" class="nav-item">
+                    <i class="fas fa-envelope-open-text"></i> Leave Requests
+                </a>
+                <a href="payroll.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i> Payroll
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <div class="nav-item" style="cursor: pointer; color: var(--error-color);" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+        <main class="main-content">
+            <header
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">HR Approval Hub</h1>
+                    <p style="color: var(--text-secondary);">Unified inbox for all pending personnel requests and
+                        audits.</p>
+                </div>
+                <div class="mobile-nav-toggle" onclick="document.getElementById('sidebar').classList.toggle('active')">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </header>
+
+            <div class="tab-container"
+                style="display: flex; gap: 2.5rem; border-bottom: 1px solid var(--glass-border); margin-bottom: 2.5rem;">
+                <div id="tabAt" class="tab-item active" onclick="switchTab('attendance')">
+                    <i class="fas fa-clock" style="margin-right: 0.5rem;"></i> Attendance
+                    <span id="atCount" class="badge badge-warning" style="margin-left: 0.5rem; display: none;">0</span>
+                </div>
+                <div id="tabLv" class="tab-item" onclick="switchTab('leaves')">
+                    <i class="fas fa-envelope-open-text" style="margin-right: 0.5rem;"></i> Leaves
+                    <span id="lvCount" class="badge badge-warning" style="margin-left: 0.5rem; display: none;">0</span>
+                </div>
+                <div id="tabPr" class="tab-item" onclick="switchTab('profile')">
+                    <i class="fas fa-user-edit" style="margin-right: 0.5rem;"></i> Profile
+                    <span id="prCount" class="badge badge-warning" style="margin-left: 0.5rem; display: none;">0</span>
+                </div>
+            </div>
+
+            <div id="attendancePanel" class="tab-content">
+                <div class="glass-panel" style="padding: 0; overflow: hidden; border: 1px solid var(--glass-border);">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr
+                                    style="text-align: left; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border);">
+                                    <th style="padding: 1.25rem;">Employee</th>
+                                    <th style="padding: 1.25rem;">Request Date</th>
+                                    <th style="padding: 1.25rem;">Classification</th>
+                                    <th style="padding: 1.25rem;">Rationale</th>
+                                    <th style="padding: 1.25rem; text-align: right;">Authorization</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceRequestsList">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 5rem; opacity: 0.5;">
+                                        <i class="fas fa-check-circle fa-2x" style="margin-bottom: 1rem;"></i>
+                                        <p>No pending log overrides.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="leavesPanel" class="tab-content" style="display: none;">
+                <div class="glass-panel" style="padding: 0; overflow: hidden; border: 1px solid var(--glass-border);">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr
+                                    style="text-align: left; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border);">
+                                    <th style="padding: 1.25rem;">Employee</th>
+                                    <th style="padding: 1.25rem;">Duration</th>
+                                    <th style="padding: 1.25rem;">Type</th>
+                                    <th style="padding: 1.25rem;">Reason</th>
+                                    <th style="padding: 1.25rem; text-align: right;">Authorization</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaveRequestsList">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 5rem; opacity: 0.5;">
+                                        <i class="fas fa-check-circle fa-2x" style="margin-bottom: 1rem;"></i>
+                                        <p>No pending leave requests.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profilePanel" class="tab-content" style="display: none;">
+                <div class="glass-panel" style="padding: 0; overflow: hidden; border: 1px solid var(--glass-border);">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr
+                                    style="text-align: left; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--glass-border);">
+                                    <th style="padding: 1.25rem;">Employee</th>
+                                    <th style="padding: 1.25rem;">Update Window</th>
+                                    <th style="padding: 1.25rem;">Field Analysis</th>
+                                    <th style="padding: 1.25rem;">Value Delta</th>
+                                    <th style="padding: 1.25rem; text-align: right;">Authorization</th>
+                                </tr>
+                            </thead>
+                            <tbody id="profileRequestsList">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 5rem; opacity: 0.5;">
+                                        <i class="fas fa-check-circle fa-2x" style="margin-bottom: 1rem;"></i>
+                                        <p>No pending personnel metadata updates.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, query, where, onSnapshot, doc, updateDoc, serverTimestamp, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const userData = JSON.parse(sessionStorage.getItem('orgUser'));
+        if (!userData) window.location.href = 'index.html';
+
+        window.logout = () => { sessionStorage.removeItem('orgUser'); window.location.href = 'index.html'; };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+
+            if (tab === 'attendance') {
+                document.getElementById('tabAt').classList.add('active');
+                document.getElementById('attendancePanel').style.display = 'block';
+            } else if (tab === 'leaves') {
+                document.getElementById('tabLv').classList.add('active');
+                document.getElementById('leavesPanel').style.display = 'block';
+            } else {
+                document.getElementById('tabPr').classList.add('active');
+                document.getElementById('profilePanel').style.display = 'block';
+            }
+        }
+        window.switchTab = switchTab;
+
+        function initApprovals() {
+            // Debug: Show Org ID
+            const header = document.querySelector('header p');
+            if (header && !header.textContent.includes('Org:')) {
+                header.innerHTML += ` <span style="font-family:monospace; opacity:0.6; font-size:0.8em; margin-left:1rem;">(Org: ${userData.orgId})</span>`;
+            }
+
+            // Attendance Corrections - Client-side Filtering
+            // We fetch all to ensure no index issues, then filter in memory
+            const atQ = query(collection(db, "organizations", userData.orgId, "attendance_requests"));
+            onSnapshot(atQ, (snap) => {
+                const list = document.getElementById('attendanceRequestsList');
+                const countBadge = document.getElementById('atCount');
+
+                // Filter pending requests in memory
+                const pendingDocs = snap.docs.filter(d => d.data().status === 'Pending');
+
+                if (pendingDocs.length === 0) {
+                    list.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 5rem; opacity: 0.5;"><i class="fas fa-check-circle fa-2x" style="margin-bottom: 1rem;"></i><p>No pending log overrides.</p></td></tr>';
+                    countBadge.style.display = 'none';
+                    return;
+                }
+
+                countBadge.textContent = pendingDocs.length;
+                countBadge.style.display = 'inline-block';
+                list.innerHTML = '';
+                pendingDocs.forEach(d => {
+                    const req = d.data();
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid var(--glass-border)';
+                    row.innerHTML = `
+                        <td style="padding: 1.25rem;">
+                            <div style="font-weight: 700;">${req.userName || req.userId}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${req.userId}</div>
+                        </td>
+                        <td style="padding: 1.25rem; font-family: monospace;">${req.date}</td>
+                        <td style="padding: 1.25rem;"><span class="badge badge-info">${req.type}</span></td>
+                        <td style="padding: 1.25rem; font-size: 0.85rem; max-width: 250px;">${req.reason}</td>
+                        <td style="padding: 1.25rem; text-align: right;">
+                            <button class="btn btn-sm btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;" onclick="processAttendance('${d.id}', 'Approved')">ACCEPT</button>
+                            <button class="btn btn-sm" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.1); color: var(--error-color);" onclick="processAttendance('${d.id}', 'Rejected')">REJECT</button>
+                        </td>
+                    `;
+                    list.appendChild(row);
+                });
+            }, (error) => {
+                console.error("Error fetching attendance requests:", error);
+                document.getElementById('attendanceRequestsList').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 5rem; color: var(--error-color);">Sync stream interrupted. Ref: ' + error.code + '</td></tr>';
+            });
+
+            // Leave Requests
+            const lvQ = query(collection(db, "organizations", userData.orgId, "leave_requests"), where("status", "==", "Pending"));
+            onSnapshot(lvQ, (snap) => {
+                const list = document.getElementById('leaveRequestsList');
+                const countBadge = document.getElementById('lvCount');
+                if (snap.empty) {
+                    list.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 5rem; opacity: 0.5;"><i class="fas fa-check-circle fa-2x" style="margin-bottom: 1rem;"></i><p>No pending leave requests.</p></td></tr>';
+                    countBadge.style.display = 'none';
+                    return;
+                }
+
+                countBadge.textContent = snap.size;
+                countBadge.style.display = 'inline-block';
+                list.innerHTML = '';
+                snap.forEach(d => {
+                    const req = d.data();
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid var(--glass-border)';
+                    row.innerHTML = `
+                        <td style="padding: 1.25rem;">
+                            <div style="font-weight: 700;">${req.userName || req.userId}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${req.userId}</div>
+                        </td>
+                        <td style="padding: 1.25rem; font-family: monospace;">${req.startDate} to ${req.endDate}</td>
+                        <td style="padding: 1.25rem;"><span class="badge badge-info">${req.leaveType}</span></td>
+                        <td style="padding: 1.25rem; font-size: 0.85rem; max-width: 250px;">${req.reason}</td>
+                        <td style="padding: 1.25rem; text-align: right;">
+                            <button class="btn btn-sm btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;" onclick="processLeave('${d.id}', 'Approved')">APPROVE</button>
+                            <button class="btn btn-sm" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.1); color: var(--error-color);" onclick="processLeave('${d.id}', 'Rejected')">REJECT</button>
+                        </td>
+                    `;
+                    list.appendChild(row);
+                });
+            });
+
+            // Profile Updates
+            const prQ = query(collection(db, "organizations", userData.orgId, "employee_updates"), where("status", "==", "Pending"));
+            onSnapshot(prQ, (snap) => {
+                const list = document.getElementById('profileRequestsList');
+                const countBadge = document.getElementById('prCount');
+                if (snap.empty) {
+                    list.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 5rem; opacity: 0.5;"><i class="fas fa-check-circle fa-2x" style="margin-bottom: 1rem;"></i><p>No pending personnel metadata updates.</p></td></tr>';
+                    countBadge.style.display = 'none';
+                    return;
+                }
+
+                countBadge.textContent = snap.size;
+                countBadge.style.display = 'inline-block';
+                list.innerHTML = '';
+                snap.forEach(d => {
+                    const req = d.data();
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid var(--glass-border)';
+                    row.innerHTML = `
+                        <td style="padding: 1.25rem;">
+                            <div style="font-weight: 700;">${req.userName || req.userId}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${req.userId}</div>
+                        </td>
+                        <td style="padding: 1.25rem; font-size: 0.85rem;">${new Date(req.timestamp?.seconds * 1000).toLocaleString()}</td>
+                        <td style="padding: 1.25rem;"><span class="badge badge-info">${req.field}</span></td>
+                        <td style="padding: 1.25rem; font-size: 0.85rem;">
+                            <div style="opacity: 0.5; text-decoration: line-through;">${req.oldValue}</div>
+                            <div style="color: var(--success-color); font-weight: 600;">${req.newValue}</div>
+                        </td>
+                        <td style="padding: 1.25rem; text-align: right;">
+                            <button class="btn btn-sm btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;" onclick="processProfileUpdate('${d.id}', 'Approved')">AUTHORIZE</button>
+                            <button class="btn btn-sm" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.1); color: var(--error-color);" onclick="processProfileUpdate('${d.id}', 'Rejected')">DENY</button>
+                        </td>
+                    `;
+                    list.appendChild(row);
+                });
+            });
+        }
+
+        window.processAttendance = async (reqId, status) => {
+            if (!confirm(`Authorize ${status} for this attendance correction?`)) return;
+            try {
+                const reqRef = doc(db, "organizations", userData.orgId, "attendance_requests", reqId);
+                const reqSnap = await getDoc(reqRef);
+                const req = reqSnap.data();
+
+                if (status === 'Approved') {
+                    // Update actual attendance record
+                    const attnQ = query(collection(db, "organizations", userData.orgId, "attendance"),
+                        where("userId", "==", req.userId),
+                        where("date", "==", req.date));
+
+                    const attnSnap = await getDocs(attnQ);
+
+                    let newIn = null;
+                    let newOut = null;
+                    let workingHours = 0;
+
+                    // Parse new times (YYYY-MM-DD THH:mm:00)
+                    if (req.newInTime) newIn = new Date(`${req.date}T${req.newInTime}:00`);
+                    if (req.newOutTime) newOut = new Date(`${req.date}T${req.newOutTime}:00`);
+
+                    // Simple Duration Calc (assuming same day)
+                    if (newIn && newOut) {
+                        workingHours = ((newOut - newIn) / 36e5).toFixed(2);
+                    }
+
+                    if (!attnSnap.empty) {
+                        // Update existing
+                        const attnDoc = attnSnap.docs[0];
+                        const cur = attnDoc.data();
+
+                        // Use new times if provided, else fall back to existing
+                        // CRITICAL: Ensure the date component matches req.date for accurate diff
+                        let finalIn = newIn;
+                        if (!finalIn && cur.checkInTime) {
+                            const d = new Date(cur.checkInTime.seconds * 1000);
+                            finalIn = new Date(`${req.date}T${d.toTimeString().slice(0, 8)}`);
+                        }
+
+                        let finalOut = newOut;
+                        if (!finalOut && cur.checkOutTime) {
+                            const d = new Date(cur.checkOutTime.seconds * 1000);
+                            finalOut = new Date(`${req.date}T${d.toTimeString().slice(0, 8)}`);
+                        }
+
+                        // Recalculate duration if we have both start and end
+                        if (finalIn && finalOut) {
+                            workingHours = Math.abs((finalOut - finalIn) / 36e5).toFixed(2);
+                        } else {
+                            workingHours = cur.workingHours || "0";
+                        }
+
+                        await updateDoc(attnDoc.ref, {
+                            checkInTime: finalIn ? { seconds: Math.floor(finalIn.getTime() / 1000) } : null,
+                            checkOutTime: finalOut ? { seconds: Math.floor(finalOut.getTime() / 1000) } : null,
+                            workingHours: workingHours,
+                            status: (finalIn && finalOut) ? 'Completed' : 'Present',
+                            manualUpdate: true
+                        });
+                    } else {
+                        // Create retrospective entry
+                        await addDoc(collection(db, "organizations", userData.orgId, "attendance"), {
+                            userId: req.userId,
+                            userName: req.userName,
+                            date: req.date,
+                            checkInTime: newIn ? { seconds: Math.floor(newIn.getTime() / 1000) } : null,
+                            checkOutTime: newOut ? { seconds: Math.floor(newOut.getTime() / 1000) } : null,
+                            workingHours: workingHours || "0",
+                            status: (newIn && newOut) ? 'Completed' : 'Present',
+                            orgId: userData.orgId,
+                            manualUpdate: true
+                        });
+                    }
+                }
+
+                await updateDoc(reqRef, { status, approvedBy: userData.email, processedAt: serverTimestamp() });
+                alert('Log override successful. Operational record updated.');
+            } catch (err) { console.error(err); alert('Authorization failure: ' + err.message); }
+        };
+
+        window.processLeave = async (reqId, status) => {
+            if (!confirm(`Authorize ${status} for this leave request?`)) return;
+            try {
+                const ref = doc(db, "organizations", userData.orgId, "leave_requests", reqId);
+                await updateDoc(ref, { status, approvedBy: userData.email, processedAt: serverTimestamp() });
+                alert('Leave protocol updated.');
+            } catch (e) { alert('Authorization failure.'); }
+        };
+
+        window.processProfileUpdate = async (reqId, status) => {
+            if (!confirm(`Authorize ${status} for this personnel update?`)) return;
+            try {
+                const ref = doc(db, "organizations", userData.orgId, "employee_updates", reqId);
+                const snap = await getDoc(ref);
+                const req = snap.data();
+
+                await updateDoc(ref, { status, approvedBy: userData.email, processedAt: serverTimestamp() });
+
+                if (status === 'Approved') {
+                    // Find employee and update field
+                    const empQ = query(collection(db, "organizations", userData.orgId, "employees"), where("email", "==", req.userId));
+                    const empSnap = await getDocs(empQ);
+                    if (!empSnap.empty) {
+                        await updateDoc(doc(db, "organizations", userData.orgId, "employees", empSnap.docs[0].id), { [req.field]: req.newValue });
+                    }
+                    alert('Identity matrix updated.');
+                }
+            } catch (err) { alert('Authorization failure.'); }
+        };
+
+        initApprovals();
+    </script>
+</body>
+
+</html>

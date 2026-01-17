@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Terminal - Access Protocol</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="setup-container" style="background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 100%);">
+
+    <div class="glass-panel"
+        style="width: 100%; max-width: 460px; padding: 3.5rem; margin: 1rem; position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+        <!-- Kinetic Glow Elements -->
+        <div
+            style="position: absolute; top: -100px; right: -100px; width: 250px; height: 250px; background: var(--primary-color); filter: blur(100px); opacity: 0.1; pointer-events: none;">
+        </div>
+        <div
+            style="position: absolute; bottom: -100px; left: -100px; width: 200px; height: 200px; background: var(--success-color); filter: blur(100px); opacity: 0.05; pointer-events: none;">
+        </div>
+
+        <div style="text-align: center; margin-bottom: 3.5rem;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 1rem;">
+                <div
+                    style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-family: 'Outfit'; font-size: 1.5rem; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);">
+                    G</div>
+                <div class="logo" style="font-size: 2.25rem; letter-spacing: -0.02em; margin: 0;">Gridify</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem;">
+                <div style="height: 1px; width: 30px; background: var(--glass-border);"></div>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; margin: 0;">
+                    Staff Terminal</p>
+                <div style="height: 1px; width: 30px; background: var(--glass-border);"></div>
+            </div>
+        </div>
+
+        <form id="loginForm" onsubmit="handleEmpLogin(event)">
+            <div class="form-group">
+                <label class="form-label"
+                    style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Personnel
+                    ID</label>
+                <div style="position: relative;">
+                    <i class="fas fa-fingerprint"
+                        style="position: absolute; left: 1.25rem; top: 1.1rem; color: var(--primary-color); opacity: 0.5; font-size: 1rem;"></i>
+                    <input type="email" id="email" class="form-input"
+                        style="padding-left: 3.25rem; height: 55px; background: rgba(255,255,255,0.02); border-color: var(--glass-border); border-radius: 14px;"
+                        placeholder="employee@domain.com" required>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label"
+                    style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">Access
+                    Token</label>
+                <div style="position: relative;">
+                    <i class="fas fa-shield-halved"
+                        style="position: absolute; left: 1.25rem; top: 1.1rem; color: var(--primary-color); opacity: 0.5; font-size: 1rem;"></i>
+                    <input type="password" id="password" class="form-input"
+                        style="padding-left: 3.25rem; height: 55px; background: rgba(255,255,255,0.02); border-color: var(--glass-border); border-radius: 14px;"
+                        placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <div id="loginError" class="badge badge-error"
+                style="width: 100%; margin-bottom: 1.5rem; text-align: center; display: none; padding: 1rem; border-radius: 12px; font-weight: 600; border: 1px solid rgba(239, 68, 68, 0.2);">
+                <i class="fas fa-shield-warning" style="margin-right: 0.75rem;"></i> Authorization Revoked
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn btn-primary"
+                style="width: 100%; height: 55px; font-size: 1rem; font-weight: 800; letter-spacing: 0.05em; border-radius: 14px; box-shadow: 0 15px 30px rgba(99, 102, 241, 0.2);">
+                INITIALIZE SYNC
+            </button>
+        </form>
+
+        <div
+            style="margin-top: 3rem; text-align: center; border-top: 1px solid var(--glass-border); padding-top: 2.5rem;">
+            <a href="../index.html" class="flex-center"
+                style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none; gap: 0.75rem; transition: all 0.3s; width: fit-content; margin: 0 auto; padding: 0.5rem 1rem; border-radius: 10px;"
+                onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='white'"
+                onmouseout="this.style.background='transparent'; this.style.color='var(--text-muted)'">
+                <i class="fas fa-home-alt"></i> Back to Main Domain
+            </a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collectionGroup, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        window.handleEmpLogin = async function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> TRANSMITTING...';
+            btn.disabled = true;
+            errorDiv.style.display = 'none';
+
+            try {
+                // Cross-tenant discovery for staff credentials
+                const q = query(collectionGroup(db, "employees"));
+                const snapshot = await getDocs(q);
+
+                let foundUser = null;
+                let foundOrgId = null;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.email && data.email.toLowerCase() === email.toLowerCase()) {
+                        if (data.password === password && data.status === 'ACTIVE') {
+                            foundUser = { ...data, id: doc.id };
+                            const pathSegments = doc.ref.path.split('/');
+                            if (pathSegments.length >= 4 && pathSegments[0] === 'organizations') {
+                                foundOrgId = pathSegments[1];
+                            }
+                        }
+                    }
+                });
+
+                if (foundUser && foundOrgId) {
+                    sessionStorage.setItem('empUser', JSON.stringify({
+                        id: foundUser.id,
+                        email: foundUser.email,
+                        orgId: foundOrgId,
+                        name: foundUser.name || foundUser.firstName,
+                        role: foundUser.role || 'EMPLOYEE'
+                    }));
+
+                    btn.innerHTML = '<i class="fas fa-unlock"></i> LINK ESTABLISHED';
+                    btn.style.background = 'var(--success-color)';
+                    setTimeout(() => window.location.href = 'dashboard.html', 800);
+                } else {
+                    throw new Error('Access Denied');
+                }
+
+            } catch (error) {
+                btn.innerHTML = 'INITIALIZE SYNC';
+                btn.disabled = false;
+                errorDiv.style.display = 'flex';
+                errorDiv.style.alignItems = 'center';
+                errorDiv.style.justifyContent = 'center';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Identity - Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 3rem; padding: 0.5rem; display: flex; align-items: center; gap: 1rem;">
+                <div
+                    style="width: 45px; height: 45px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-family: 'Outfit'; font-size: 1.25rem; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);">
+                    G</div>
+                <div>
+                    <div class="logo" style="font-size: 1.25rem; margin-bottom: 0;">Gridify</div>
+                    <div
+                        style="font-size: 0.65rem; color: var(--success-color); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+                        Employee Hub</div>
+                </div>
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large nav-icon"></i> Overview
+                </a>
+                <a href="attendance.html" class="nav-item">
+                    <i class="fas fa-fingerprint nav-icon"></i> Attendance
+                </a>
+                <a href="leave-requests.html" class="nav-item">
+                    <i class="fas fa-calendar-plus nav-icon"></i> Absences
+                </a>
+                <a href="payslips.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar nav-icon"></i> Financials
+                </a>
+                <a href="profile.html" class="nav-item active">
+                    <i class="fas fa-user-shield nav-icon"></i> Profile
+                </a>
+            </nav>
+
+            <div
+                style="margin-top: auto; padding: 1.5rem; background: rgba(259, 68, 68, 0.05); border-radius: 16px; border: 1px solid rgba(239, 68, 68, 0.1);">
+                <div class="nav-item" style="cursor: pointer; color: #ef4444; margin: 0; padding: 0;"
+                    onclick="logout()">
+                    <i class="fas fa-power-off nav-icon"></i> Disconnect
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Employee Identity</h1>
+                    <p style="color: var(--text-secondary);">Manage your professional profile and digital credentials.
+                    </p>
+                </div>
+                <div class="mobile-nav-toggle" onclick="document.getElementById('sidebar').classList.toggle('active')">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </header>
+
+            <div class="stack-on-mobile" style="display: grid; grid-template-columns: 350px 1fr; gap: 2.5rem;">
+                <!-- Left: Identity Card -->
+                <div class="glass-panel"
+                    style="padding: 2.5rem; text-align: center; height: fit-content; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100px; background: linear-gradient(to bottom, rgba(99, 102, 241, 0.1), transparent); z-index: 0;">
+                    </div>
+
+                    <div style="position: relative; z-index: 1;">
+                        <div
+                            style="width: 140px; height: 140px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white; font-family: 'Outfit'; font-weight: 800; border: 4px solid var(--glass-border); box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
+                            <span id="profileAvatar">?</span>
+                        </div>
+                        <h2 id="summaryName" style="margin-bottom: 0.5rem; font-family: 'Outfit';">--</h2>
+                        <span id="summaryRole"
+                            style="display: inline-block; padding: 0.4rem 1rem; background: rgba(99, 102, 241, 0.1); color: var(--primary-color); border-radius: 50px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 2rem;">--</span>
+
+                        <div
+                            style="text-align: left; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; margin-top: 1rem;">
+                            <div style="margin-bottom: 1.25rem;">
+                                <label
+                                    style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.25rem;">Digital
+                                    Node</label>
+                                <span id="summaryEmail"
+                                    style="font-weight: 600; font-size: 0.95rem; color: white;">--</span>
+                            </div>
+                            <div>
+                                <label
+                                    style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.25rem;">Sector
+                                    Assignment</label>
+                                <span id="summaryDept"
+                                    style="font-weight: 600; font-size: 0.95rem; color: white;">--</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Information Matrix -->
+                <div class="glass-panel" style="padding: 3rem;">
+                    <div
+                        style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 1.5rem;">
+                        <div
+                            style="width: 40px; height: 40px; border-radius: 10px; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center; color: var(--primary-color);">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h3 style="margin: 0; font-family: 'Outfit';">Personnel Metadata</h3>
+                    </div>
+
+                    <div class="stack-on-mobile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="form-group">
+                            <label class="form-label">Given Name</label>
+                            <input type="text" id="firstName" class="form-input"
+                                style="background: rgba(255,255,255,0.02); color: white; border-color: var(--glass-border);"
+                                readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Family Name</label>
+                            <input type="text" id="lastName" class="form-input"
+                                style="background: rgba(255,255,255,0.02); color: white; border-color: var(--glass-border);"
+                                readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Primary Communication Link</label>
+                            <input type="email" id="email" class="form-input"
+                                style="background: rgba(255,255,255,0.02); color: white; border-color: var(--glass-border);"
+                                readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Operational Designation</label>
+                            <input type="text" id="designation" class="form-input"
+                                style="background: rgba(255,255,255,0.02); color: white; border-color: var(--glass-border);"
+                                readonly>
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label">Activation Temporal Marker</label>
+                            <div
+                                style="display: flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 12px;">
+                                <i class="fas fa-calendar-check" style="color: var(--success-color);"></i>
+                                <span id="joiningDate" style="font-weight: 600; color: white;">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        style="margin-top: 3rem; padding: 1.5rem; background: rgba(16, 185, 129, 0.05); border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.1); display: flex; gap: 1.25rem; align-items: flex-start;">
+                        <i class="fas fa-shield-halved"
+                            style="color: var(--success-color); font-size: 1.25rem; margin-top: 0.25rem;"></i>
+                        <div>
+                            <h4 style="margin: 0 0 0.25rem 0; color: white; font-size: 0.9rem;">Hardened Profile
+                                Isolation</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.5;">
+                                Your digital identity is protected by multi-tenant encryption. Profile modifications are
+                                governed by high-level administrative protocols. Contact HR for record adjustments.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; justify-content: flex-end;">
+                        <button onclick="openPasswordModal()" class="btn btn-outline"
+                            style="border-color: var(--secondary-color); color: var(--secondary-color);">
+                            <i class="fas fa-key" style="margin-right: 0.75rem;"></i> Update Access Key
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Password Change Modal -->
+    <div id="passwordModal" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; backdrop-filter: blur(12px);">
+        <div class="glass-panel"
+            style="width: 95%; max-width: 400px; padding: 2.5rem; border: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3 style="font-size: 1.25rem; font-weight: 800; font-family: 'Outfit';">Security Override</h3>
+                <button onclick="closePasswordModal()" class="btn btn-outline"
+                    style="min-width: unset; padding: 0.5rem 0.75rem; border-radius: 50%; border: none;"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label class="form-label">Current Access Token</label>
+                    <input type="password" id="currentPass" class="form-input" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">New Digital Key</label>
+                    <input type="password" id="newPass" class="form-input" required placeholder="••••••••">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Verify New Key</label>
+                    <input type="password" id="verifyPass" class="form-input" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1rem; border-radius: 12px; height: 50px; font-weight: 800;">AUTHORIZE
+                    UPDATE</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast"
+        style="visibility: hidden; min-width: 250px; background-color: #0f172a; color: #fff; text-align: center; border-radius: 12px; padding: 1rem; position: fixed; z-index: 4000; left: 50%; bottom: 30px; transform: translateX(-50%); border: 1px solid var(--glass-border); font-weight: 600; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, query, where, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const userData = JSON.parse(sessionStorage.getItem('empUser'));
+        if (!userData) window.location.href = '../index.html';
+
+        window.logout = () => { sessionStorage.clear(); window.location.href = '../index.html'; };
+
+        async function loadProfile() {
+            try {
+                if (!userData.email) return;
+
+                let data = null;
+                let docId = null;
+                // Fetch from tenant-isolated collection
+                if (userData.orgId) {
+                    const q = query(collection(db, "organizations", userData.orgId, "employees"), where("email", "==", userData.email));
+                    const snapshot = await getDocs(q);
+                    if (!snapshot.empty) {
+                        data = snapshot.docs[0].data();
+                        docId = snapshot.docs[0].id;
+                        userData.currentDocId = docId; // Store for password update
+                        userData.storedPassword = data.password;
+                    }
+                }
+
+                if (data) {
+                    const fullName = `${data.firstName || ''} ${data.lastName || ''}`;
+                    // Populate Information Matrix
+                    document.getElementById('firstName').value = data.firstName || '--';
+                    document.getElementById('lastName').value = data.lastName || '--';
+                    document.getElementById('email').value = data.email || '--';
+                    document.getElementById('designation').value = data.designation || '--';
+                    document.getElementById('joiningDate').textContent = data.joiningDate || 'Baseline Protocol';
+
+                    // Populate Identity Card
+                    document.getElementById('summaryName').textContent = fullName || 'Anonymous Node';
+                    document.getElementById('summaryRole').textContent = data.designation || 'Personnel';
+                    document.getElementById('summaryEmail').textContent = data.email;
+                    document.getElementById('summaryDept').textContent = data.department || 'General Sector';
+                    document.getElementById('profileAvatar').textContent = (data.firstName || data.email || '?')[0].toUpperCase();
+                }
+            } catch (error) {
+                console.error("Critical Profile Extraction Failure:", error);
+            }
+        }
+
+        window.openPasswordModal = () => document.getElementById('passwordModal').style.display = 'flex';
+        window.closePasswordModal = () => {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById('passwordForm').reset();
+        };
+
+        document.getElementById('passwordForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const current = document.getElementById('currentPass').value;
+            const next = document.getElementById('newPass').value;
+            const verify = document.getElementById('verifyPass').value;
+            const btn = e.target.querySelector('button');
+
+            if (current !== userData.storedPassword) { showToast("Current token mismatch!"); return; }
+            if (next !== verify) { showToast("Keys do not match!"); return; }
+            if (next.length < 4) { showToast("Key too short (min 4)!"); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> ENCRYPTING...';
+
+            try {
+                await updateDoc(doc(db, "organizations", userData.orgId, "employees", userData.currentDocId), {
+                    password: next
+                });
+                userData.storedPassword = next;
+                showToast("Access Key Updated Successfully");
+                setTimeout(closePasswordModal, 1500);
+            } catch (err) {
+                showToast("Transmission Error: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'AUTHORIZE UPDATE';
+            }
+        };
+
+        function showToast(m) {
+            const t = document.getElementById("toast");
+            t.textContent = m;
+            t.style.visibility = "visible";
+            setTimeout(() => { t.style.visibility = "hidden"; }, 3000);
+        }
+
+        loadProfile();
+    </script>
+</body>
+
+</html>

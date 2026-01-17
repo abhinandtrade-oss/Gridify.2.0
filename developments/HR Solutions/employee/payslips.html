@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Records - Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-layout">
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 3rem; padding: 0.5rem; display: flex; align-items: center; gap: 1rem;">
+                <div
+                    style="width: 45px; height: 45px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-family: 'Outfit'; font-size: 1.25rem; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);">
+                    G</div>
+                <div>
+                    <div class="logo" style="font-size: 1.25rem; margin-bottom: 0;">Gridify</div>
+                    <div
+                        style="font-size: 0.65rem; color: var(--success-color); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">
+                        Employee Hub</div>
+                </div>
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large nav-icon"></i> Overview
+                </a>
+                <a href="attendance.html" class="nav-item">
+                    <i class="fas fa-fingerprint nav-icon"></i> Attendance
+                </a>
+                <a href="leave-requests.html" class="nav-item">
+                    <i class="fas fa-calendar-plus nav-icon"></i> Absences
+                </a>
+                <a href="payslips.html" class="nav-item active">
+                    <i class="fas fa-file-invoice-dollar nav-icon"></i> Financials
+                </a>
+                <a href="profile.html" class="nav-item">
+                    <i class="fas fa-user-shield nav-icon"></i> Profile
+                </a>
+            </nav>
+
+            <div
+                style="margin-top: auto; padding: 1.5rem; background: rgba(259, 68, 68, 0.05); border-radius: 16px; border: 1px solid rgba(239, 68, 68, 0.1);">
+                <div class="nav-item" style="cursor: pointer; color: #ef4444; margin: 0; padding: 0;"
+                    onclick="logout()">
+                    <i class="fas fa-power-off nav-icon"></i> Disconnect
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+        <main class="main-content">
+            <header
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Financial Documents</h1>
+                    <p style="color: var(--text-secondary);">Access monthly remuneration manifests and structural
+                        composition.</p>
+                </div>
+                <div class="mobile-nav-toggle" onclick="document.getElementById('sidebar').classList.toggle('active')">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </header>
+
+            <div class="tab-container"
+                style="display: flex; gap: 2.5rem; border-bottom: 1px solid var(--glass-border); margin-bottom: 2.5rem;">
+                <div id="tabSlip" class="tab-item active" onclick="switchTab('slips')">
+                    <i class="fas fa-receipt" style="margin-right: 0.5rem;"></i> Payslip Vault
+                </div>
+                <div id="tabStruct" class="tab-item" onclick="switchTab('struct')">
+                    <i class="fas fa-coins" style="margin-right: 0.5rem;"></i> Salary & Benefits
+                </div>
+            </div>
+
+            <div id="slipsPanel" class="tab-content">
+                <div class="glass-panel" style="padding: 0; overflow: hidden; height: fit-content;">
+                    <div class="table-responsive">
+                        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+                            <thead>
+                                <tr
+                                    style="text-align: left; background: rgba(0,0,0,0.2); color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.1em;">
+                                    <th style="padding: 1.25rem 2rem;">Cycle Period</th>
+                                    <th style="padding: 1.25rem 2rem;">Remuneration Breakup</th>
+                                    <th style="padding: 1.25rem 2rem;">Net Quantum</th>
+                                    <th style="padding: 1.25rem 2rem; text-align: right;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payslipList">
+                                <tr>
+                                    <td colspan="4" style="text-align: center; padding: 5rem; opacity: 0.5;">
+                                        <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+                                        <p style="margin-top:1rem;">Decrypting secure archives...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="structPanel" class="tab-content" style="display: none;">
+                <div class="stack-on-mobile"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start;">
+
+                    <!-- Salary Structure -->
+                    <div class="glass-panel" style="padding: 2.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                            <div
+                                style="width: 40px; height: 40px; border-radius: 10px; background: rgba(99, 102, 241, 0.1); display: flex; align-items: center; justify-content: center; color: var(--primary-color);">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h3 style="margin: 0; font-family: 'Outfit';">Compensation Structure</h3>
+                        </div>
+
+                        <div id="salaryBreakup" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <div
+                                style="padding:1.5rem; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid var(--glass-border); text-align:center;">
+                                <div
+                                    style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">
+                                    Annual CTC</div>
+                                <div id="ctcVal" style="font-size:2rem; font-weight:800; color:white;">--</div>
+                            </div>
+
+                            <div
+                                style="display:flex; justify-content:space-between; padding-bottom:0.75rem; border-bottom:1px solid var(--glass-border);">
+                                <span style="color:var(--text-secondary);">Monthly Base</span>
+                                <span id="baseVal" style="font-weight:600;">--</span>
+                            </div>
+                            <div
+                                style="display:flex; justify-content:space-between; padding-bottom:0.75rem; border-bottom:1px solid var(--glass-border);">
+                                <span style="color:var(--text-secondary);">House Rent Allowance (HRA)</span>
+                                <span id="hraVal" style="font-weight:600; color:var(--success-color);">--</span>
+                            </div>
+                            <div
+                                style="display:flex; justify-content:space-between; padding-bottom:0.75rem; border-bottom:1px solid var(--glass-border);">
+                                <span style="color:var(--text-secondary);">Provident Fund (PF) Deduction</span>
+                                <span id="pfVal" style="font-weight:600; color:var(--error-color);">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benefits -->
+                    <div class="glass-panel" style="padding: 2.5rem;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                            <div
+                                style="width: 40px; height: 40px; border-radius: 10px; background: rgba(236, 72, 153, 0.1); display: flex; align-items: center; justify-content: center; color: var(--secondary-color);">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <h3 style="margin: 0; font-family: 'Outfit';">Active Benefits</h3>
+                        </div>
+                        <div id="benefitsList" style="display: grid; gap: 1rem;">
+                            <p style="text-align: center; opacity: 0.5;">Scanning entitlements policy...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Payslip Viewer Modal -->
+    <div id="payslipModal" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 5000; backdrop-filter: blur(15px); padding: 2rem;">
+
+        <div class="glass-panel"
+            style="width: 100%; max-width: 800px; height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border: 1px solid var(--glass-border); position: relative;">
+
+            <!-- Toolbar -->
+            <div
+                style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03);">
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <h3 style="margin: 0; font-size: 1rem; color: var(--text-secondary);">CONFIDENTIAL PAYSLIP</h3>
+                    <span id="slipStatusBadge" class="badge badge-success">RELEASED</span>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-outline btn-sm" onclick="printPayslip()">
+                        <i class="fas fa-print" style="margin-right: 0.5rem;"></i> Print / PDF
+                    </button>
+                    <button onclick="document.getElementById('payslipModal').style.display = 'none'"
+                        style="background:none; border:none; color:white; font-size: 1.2rem; cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Content -->
+            <div id="printArea" style="flex: 1; overflow-y: auto; padding: 3rem; background: #0f111a;">
+                <!-- Invoice-style Layout -->
+                <div
+                    style="border: 1px solid var(--glass-border); border-radius: 4px; padding: 2rem; background: rgba(255,255,255,0.01);">
+
+                    <!-- Header -->
+                    <div
+                        style="display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 2px solid var(--glass-border); padding-bottom: 1.5rem;">
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div id="slipLogoContainer"
+                                style="width: 50px; height: 50px; background: white; border-radius: 8px; color: black; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.5rem;">
+                                G</div>
+                            <div>
+                                <h2 id="slipOrgName"
+                                    style="margin: 0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 1.5rem;">
+                                    Gridify</h2>
+                                <p id="slipOrgAddress"
+                                    style="margin: 0.25rem 0 0; color: var(--text-muted); font-size: 0.8rem;">12
+                                    Financial District, Cyberabad, Hyderabad, TG 500081</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <h1 style="margin: 0; font-family: 'Outfit'; font-size: 2rem; color: var(--primary-color);">
+                                PAYSLIP</h1>
+                            <p id="slipMonth"
+                                style="margin: 0.25rem 0 0; font-size: 1rem; font-weight: 600; color: white;">--</p>
+                        </div>
+                    </div>
+
+                    <!-- Employee Details Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+                        </table>
+                    </div>
+                    <div>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <tr>
+                                <td style="color:var(--text-muted); padding: 4px 0;">Bank Account</td>
+                                <td style="font-weight: 600; text-align: right;" id="slipBank">************4582</td>
+                            </tr>
+                            <tr>
+                                <td style="color:var(--text-muted); padding: 4px 0;">PAN</td>
+                                <td style="font-weight: 600; text-align: right;" id="slipPan">ABCDE1234F</td>
+                            </tr>
+                            <tr>
+                                <td style="color:var(--text-muted); padding: 4px 0;">Days Payable</td>
+                                <td style="font-weight: 600; text-align: right;" id="slipDays">30.0</td>
+                            </tr>
+                            <tr>
+                                <td style="color:var(--text-muted); padding: 4px 0;">Payment Mode</td>
+                                <td style="font-weight: 600; text-align: right;">Bank Transfer</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Earnings & Deductions Table -->
+                <div
+                    style="border: 1px solid var(--glass-border); border-radius: 4px; overflow: hidden; margin-bottom: 2rem;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr
+                                style="background: rgba(255,255,255,0.05); text-transform: uppercase; font-size: 0.75rem; color: var(--text-secondary);">
+                                <th
+                                    style="padding: 1rem; text-align: left; width: 50%; border-right: 1px solid var(--glass-border);">
+                                    Earnings</th>
+                                <th style="padding: 1rem; text-align: right; width: 50%;">Deductions</th>
+                            </tr>
+                        </thead>
+                        <tbody style="font-size: 0.9rem;">
+                            <tr>
+                                <td
+                                    style="padding: 0; border-right: 1px solid var(--glass-border); vertical-align: top;">
+                                    <div id="earningsList" style="padding: 1rem;">
+                                        <!-- Dynamic Content -->
+                                    </div>
+                                </td>
+                                <td style="padding: 0; vertical-align: top;">
+                                    <div id="deductionsList" style="padding: 1rem;">
+                                        <!-- Dynamic Content -->
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr
+                                style="background: rgba(255,255,255,0.02); font-weight: 700; border-top: 1px solid var(--glass-border);">
+                                <td style="padding: 1rem; border-right: 1px solid var(--glass-border);">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Gross Earnings</span>
+                                        <span id="slipTotalEarn">₹ 0.00</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <div
+                                        style="display: flex; justify-content: space-between; color: var(--error-color);">
+                                        <span>Total Deductions</span>
+                                        <span id="slipTotalDed">₹ 0.00</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Net Pay -->
+                <div
+                    style="background: var(--primary-color); color: white; padding: 1.5rem; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <div>
+                        <span
+                            style="display: block; font-size: 0.8rem; text-transform: uppercase; opacity: 0.8; letter-spacing: 0.1em;">Net
+                            Payable</span>
+                        <span id="slipNetWord" style="font-size: 0.9rem; font-style: italic;">Rupees ... Only</span>
+                    </div>
+                    <div id="slipNetVal" style="font-size: 2rem; font-weight: 800; font-family: 'Outfit';">₹ 0.00
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="text-align: center; font-size: 0.7rem; color: var(--text-muted); line-height: 1.6;">
+                    <p>This is a system-generated document and does not require a physical signature.</p>
+                    <p>Generated on <span id="slipGenDate">--</span> | Secure ID: <span id="slipId"
+                            style="font-family: monospace;">--</span></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, query, where, getDocs, doc, getDoc, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const userData = JSON.parse(sessionStorage.getItem('empUser'));
+        if (!userData) window.location.href = '../index.html';
+
+        window.logout = () => { sessionStorage.clear(); window.location.href = '../index.html'; };
+
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            if (tab === 'slips') {
+                document.getElementById('tabSlip').classList.add('active');
+                document.getElementById('slipsPanel').style.display = 'block';
+            } else {
+                document.getElementById('tabStruct').classList.add('active');
+                document.getElementById('structPanel').style.display = 'block';
+                loadStructure();
+            }
+        };
+
+        async function loadPayslips() {
+            const list = document.getElementById('payslipList');
+            if (!userData || !userData.orgId || !userData.email) {
+                console.error("Missing User Data:", userData);
+                list.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 5rem; color:var(--error-color);">Session invalid. Please relogin.</td></tr>';
+                return;
+            }
+
+            try {
+                const q = query(collection(db, "organizations", userData.orgId, "payroll"), where("userId", "==", userData.email));
+                const snap = await getDocs(q);
+
+                if (snap.empty) {
+                    list.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 5rem; opacity: 0.5;">No released payslips found.</td></tr>';
+                    window.payslipData = [];
+                    return;
+                }
+
+                list.innerHTML = '';
+
+                // Client-side sort by month (descending) with safety check
+                const payslips = snap.docs.map(d => d.data());
+
+                payslips.sort((a, b) => {
+                    const mA = a.month || '0000-00';
+                    const mB = b.month || '0000-00';
+                    return mB.localeCompare(mA);
+                });
+
+                // Store globally
+                window.payslipData = payslips;
+
+                payslips.forEach((p, index) => {
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid var(--glass-border)';
+                    row.style.background = 'rgba(255,255,255,0.01)';
+                    // Ensure numbers
+                    p.baseSalary = parseFloat(p.baseSalary) || 0;
+                    p.adjustments = parseFloat(p.adjustments) || 0;
+                    p.lopDeduction = parseFloat(p.lopDeduction) || 0;
+                    p.netSalary = parseFloat(p.netSalary) || 0;
+
+                    row.innerHTML = `
+                        <td style="padding: 1.5rem 2rem;">
+                            <div style="font-weight: 700; color: white;">${p.month || 'Unknown'}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Released: ${p.releasedAt ? new Date(p.releasedAt.seconds * 1000).toLocaleDateString() : 'N/A'}</div>
+                        </td>
+                        <td style="padding: 1.5rem 2rem; font-size: 0.85rem;">
+                             Base: ₹ ${p.baseSalary.toLocaleString()} | LOP: ₹ ${p.lopDeduction.toFixed(2)} | Adj: ₹ ${p.adjustments.toLocaleString()}
+                        </td>
+                        <td style="padding: 1.5rem 2rem; font-family: 'Outfit'; font-weight: 800; color:white; font-size:1.1rem;">₹ ${p.netSalary.toFixed(2)}</td>
+                        <td style="padding: 1.5rem 2rem; text-align: right;">
+                            <button class="btn btn-primary btn-sm" onclick="openPayslip(${index})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                        </td>
+                    `;
+                    list.appendChild(row);
+                });
+
+            } catch (e) {
+                console.error("Load Payslips Error:", e);
+                list.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 5rem; color:var(--error-color);">
+                    <i class="fas fa-exclamation-triangle"></i> Failed to load records.<br>
+                    <span style="font-size:0.7rem; opacity:0.7">${e.message}</span>
+                </td></tr>`;
+            }
+        }
+
+        async function loadStructure() {
+            try {
+                // Load Salary Structure from Employee Doc
+                const empRef = doc(db, "organizations", userData.orgId, "employees", userData.id || userData.email); // Need ID. 
+                // userData from sessionStorage might not have ID if stored from login. 
+                // Login usually stores the doc data. Let's check if we have to query.
+
+                let salaryStruct = null;
+                // Query by email if id is missing
+                const qEmp = query(collection(db, "organizations", userData.orgId, "employees"), where("email", "==", userData.email));
+                const snapEmp = await getDocs(qEmp);
+                if (!snapEmp.empty) {
+                    const d = snapEmp.docs[0].data();
+                    salaryStruct = d.salaryStructure;
+                }
+
+                const container = document.getElementById('salaryBreakup');
+                if (salaryStruct) {
+                    const base = salaryStruct.base || 0;
+                    let html = `
+                        <div style="padding:1.5rem; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid var(--glass-border); text-align:center; margin-bottom:1.5rem;">
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:0.5rem;">Monthly Basic Salary</div>
+                            <div style="font-size:2rem; font-weight:800; color:white;">₹ ${base.toLocaleString()}</div>
+                        </div>
+                    `;
+
+                    // Allowances
+                    if (salaryStruct.allowances && salaryStruct.allowances.length > 0) {
+                        html += `<div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem; text-transform:uppercase;">Allowances</div>`;
+                        salaryStruct.allowances.forEach(a => {
+                            html += `
+                                <div style="display:flex; justify-content:space-between; padding-bottom:0.75rem; border-bottom:1px solid var(--glass-border); margin-bottom:0.5rem;">
+                                    <span style="color:var(--text-secondary);">${a.name}</span>
+                                    <span style="font-weight:600; color:var(--success-color);">+ ₹ ${a.amount.toLocaleString()}</span>
+                                </div>`;
+                        });
+                    }
+
+                    // Deductions
+                    if (salaryStruct.deductions && salaryStruct.deductions.length > 0) {
+                        html += `<div style="font-size:0.8rem; color:var(--text-muted); margin:1rem 0 0.5rem 0; text-transform:uppercase;">Deductions</div>`;
+                        salaryStruct.deductions.forEach(d => {
+                            html += `
+                                <div style="display:flex; justify-content:space-between; padding-bottom:0.75rem; border-bottom:1px solid var(--glass-border); margin-bottom:0.5rem;">
+                                    <span style="color:var(--text-secondary);">${d.name}</span>
+                                    <span style="font-weight:600; color:var(--error-color);">- ₹ ${d.amount.toLocaleString()}</span>
+                                </div>`;
+                        });
+                    }
+
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<p style="opacity:0.5; text-align:center;">Structure not defined by HR.</p>';
+                }
+
+                // Load Benefits
+                const bList = document.getElementById('benefitsList');
+                const qBene = collection(db, "organizations", userData.orgId, "benefits");
+                const snapBene = await getDocs(qBene);
+
+                if (snapBene.empty) {
+                    bList.innerHTML = '<p style="opacity:0.5; text-align:center;">No active benefits.</p>';
+                } else {
+                    bList.innerHTML = '';
+                    snapBene.forEach(d => {
+                        const b = d.data();
+                        const el = document.createElement('div');
+                        el.className = 'glass-panel';
+                        el.style.padding = '1rem';
+                        el.style.border = '1px solid var(--glass-border)';
+                        el.innerHTML = `
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div style="font-weight:600;">${b.name}</div>
+                                <span class="badge badge-info">${b.type}</span>
+                            </div>
+                            <div style="font-size:0.8rem; color:var(--text-muted); margin-top:0.25rem;">Entitlement: ${b.type === 'Fixed' ? '₹ ' + b.value : b.value + '% of Base'}</div>
+                        `;
+                        bList.appendChild(el);
+                    });
+                }
+
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        window.openPayslip = (index) => {
+            const data = window.payslipData[index];
+            if (!data) return;
+
+            const modal = document.getElementById('payslipModal');
+            modal.style.display = 'flex';
+            const printArea = document.getElementById('printArea');
+            const org = window.orgDetails || {};
+
+            // Helper to match new schema or fallback
+            // If old data, we construct a 'fullDetails' mock on the fly
+            let details = data.fullDetails;
+            if (!details) {
+                // Legacy Mapper
+                const days = data.daysInMonth || 30;
+                const adj = parseFloat(data.adjustments) || 0;
+                const fixedEarnings = [{ name: 'Basic Salary', amount: parseFloat(data.baseSalary) || 0 }, { name: 'Allowances', amount: parseFloat(data.totalAllow) || 0 }];
+                const deductionsList = [{ name: 'Loss of Pay', amount: parseFloat(data.lopDeduction) || 0 }, { name: 'Deductions', amount: parseFloat(data.totalDeduct) || 0 }];
+
+                if (adj > 0) fixedEarnings.push({ name: 'Manual Adjustment', amount: adj });
+                else if (adj < 0) deductionsList.push({ name: 'Manual Adjustment', amount: Math.abs(adj) });
+
+                details = {
+                    details: {
+                        name: data.userName || userData.displayName,
+                        email: data.userId,
+                        pan: 'N/A', uan: 'N/A', esi: 'N/A', accountNumber: '****',
+                        designation: userData.designation || 'Associate',
+                        department: userData.department || 'General',
+                        joiningDate: 'N/A'
+                    },
+                    attendance: {
+                        daysInMonth: days,
+                        paidDays: data.presentDays || (days - (parseFloat(data.lopDeduction) > 0 ? 1 : 0)),
+                        lopDays: parseFloat(data.lopDeduction) > 0 ? (parseFloat(data.lopDeduction) / (parseFloat(data.baseSalary) / days)) : 0,
+                        absentDays: 0,
+                        approvedLeaves: 0,
+                        overtimeHours: 0
+                    },
+                    earnings: {
+                        fixed: fixedEarnings,
+                        variable: []
+                    },
+                    deductions: deductionsList,
+                    totals: {
+                        gross: (parseFloat(data.baseSalary) || 0) + (parseFloat(data.totalAllow) || 0) + (adj > 0 ? adj : 0),
+                        totalDeductions: (parseFloat(data.lopDeduction) || 0) + (parseFloat(data.totalDeduct) || 0) + (adj < 0 ? Math.abs(adj) : 0),
+                        net: parseFloat(data.netSalary) || 0
+                    }
+                };
+            } else {
+                // Check if adjustment needs injection (for records released before the org/payroll.html fix)
+                const adj = parseFloat(data.adjustments) || 0;
+                const hasAdj = details.earnings.fixed.some(e => e.name === 'Manual Adjustment') ||
+                    details.deductions.some(d => d.name === 'Manual Adjustment');
+
+                if (adj !== 0 && !hasAdj) {
+                    if (adj > 0) {
+                        details.earnings.fixed.push({ name: 'Manual Adjustment', amount: adj });
+                        details.totals.gross += adj;
+                    } else {
+                        details.deductions.push({ name: 'Manual Adjustment', amount: Math.abs(adj) });
+                        details.totals.totalDeductions += Math.abs(adj);
+                    }
+                    details.totals.net = parseFloat(data.netSalary) || details.totals.net;
+                }
+            }
+
+
+            // Generate HTML
+            printArea.innerHTML = `
+                <div style="padding: 2rem; color: white; user-select: text;">
+                    <!-- Header -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 2px solid var(--glass-border); padding-bottom: 1.5rem;">
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <div style="width: 50px; height: 50px; background: white; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                ${org.logoUrl ? `<img src="${org.logoUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<span style="font-weight:800; color:black; font-size:1.5rem;">${(org.name || 'Gridify')[0]}</span>`}
+                            </div>
+                            <div>
+                                <h2 style="margin: 0; text-transform: uppercase; font-size: 1.5rem; letter-spacing: 0.02em;">${org.name || 'Gridify Organization'}</h2>
+                                <p style="margin: 0.3rem 0 0; color: var(--text-muted); font-size: 0.85rem; max-width: 350px; line-height: 1.4;">${org.address || 'Corporate Headquarters - Financial District'}</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <h1 style="margin: 0; color: var(--primary-color); letter-spacing: 0.1em; font-family: 'Outfit'; font-size: 2.5rem;">PAYSLIP</h1>
+                            <p style="margin: 0.25rem 0 0; font-size: 1.1rem; font-weight: 700; color: var(--text-secondary);">${data.month}</p>
+                        </div>
+                    </div>
+
+                    <!-- Employee Details Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; font-size: 0.9rem;">
+                        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 0.5rem; align-content: start;">
+                            <span style="color: var(--text-muted);">Name</span> <span style="font-weight: 600;">${details.details.name}</span>
+                            <span style="color: var(--text-muted);">Employee ID</span> <span>${details.details.email}</span>
+                            <span style="color: var(--text-muted);">Designation</span> <span>${details.details.designation}</span>
+                            <span style="color: var(--text-muted);">Department</span> <span>${details.details.department}</span>
+                            <span style="color: var(--text-muted);">Released</span> <span>${new Date().toLocaleDateString()}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 120px 1fr; gap: 0.5rem; align-content: start;">
+                            <span style="color: var(--text-muted);">PAN</span> <span>${details.details.pan}</span>
+                            <span style="color: var(--text-muted);">Bank Account</span> <span style="font-family:monospace;">${details.details.accountNumber || '****'}</span>
+                            <span style="color: var(--text-muted);">UAN / PF</span> <span>${details.details.uan}</span>
+                            <span style="color: var(--text-muted);">ESI</span> <span>${details.details.esi}</span>
+                            <span style="color: var(--text-muted);">Joining Date</span> <span>${details.details.joiningDate || '--'}</span>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Summary -->
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 8px; padding: 1rem; margin-bottom: 2rem; display: flex; justify-content: space-between; font-size: 0.85rem;">
+                        <div style="text-align: center;">
+                            <div style="columns: var(--text-muted);">Total Days</div>
+                            <div style="font-weight: 700;">${details.attendance.daysInMonth}</div>
+                        </div>
+                         <div style="text-align: center;">
+                            <div style="columns: var(--text-muted);">Paid Days</div>
+                            <div style="font-weight: 700; color: var(--success-color);">${details.attendance.paidDays.toFixed(1)}</div>
+                        </div>
+                         <div style="text-align: center;">
+                            <div style="columns: var(--text-muted);">L.O.P Days</div>
+                            <div style="font-weight: 700; color: var(--error-color);">${(details.attendance.lopDays || 0).toFixed(1)}</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="columns: var(--text-muted);">Approved Leaves</div>
+                            <div style="font-weight: 700;">${details.attendance.approvedLeaves || 0}</div>
+                        </div>
+                         <div style="text-align: center;">
+                            <div style="columns: var(--text-muted);">Absent</div>
+                            <div style="font-weight: 700;">${details.attendance.absentDays || 0}</div>
+                        </div>
+                    </div>
+
+                    <!-- Earnings & Deductions Table -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--glass-border); border-radius: 8px; overflow: hidden; margin-bottom: 2rem;">
+                        <!-- Earnings -->
+                        <div style="border-right: 1px solid var(--glass-border);">
+                            <div style="background: rgba(255,255,255,0.05); padding: 0.75rem 1rem; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Earnings</div>
+                            <div style="padding: 1rem;">
+                                ${[...details.earnings.fixed, ...details.earnings.variable].map(e => `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                        <span>${e.name}</span>
+                                        <span>₹ ${e.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                             <div style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; font-weight: 700;">
+                                <span>Gross Earnings</span>
+                                <span>₹ ${details.totals.gross.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Deductions -->
+                        <div>
+                            <div style="background: rgba(255,255,255,0.05); padding: 0.75rem 1rem; font-weight: 600; font-size: 0.8rem; text-transform: uppercase;">Deductions</div>
+                            <div style="padding: 1rem;">
+                                 ${details.deductions.map(d => `
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                                        <span>${d.name}</span>
+                                        <span>₹ ${d.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="padding: 1rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; font-weight: 700; color: var(--error-color);">
+                                <span>Total Deductions</span>
+                                <span>₹ ${details.totals.totalDeductions.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Net Pay -->
+                    <div style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); padding: 1.5rem; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Net Payable</div>
+                            <div style="font-style: italic; font-size: 0.9rem;">Rupees ${numberToWords(Math.floor(details.totals.net))} Only</div>
+                        </div>
+                        <div style="font-size: 2rem; font-weight: 800; font-family: 'Outfit';">₹ ${details.totals.net.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                    </div>
+
+                    <!-- Active Benefits Inventory -->
+                    <div style="margin-top: 2rem; border-top: 1px dashed var(--glass-border); padding-top: 1rem;">
+                        <div style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--text-muted);">Active Benefits Inventory</div>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            ${[...details.earnings.fixed, ...details.deductions].filter(x => x.name !== 'Basic Salary' && x.name !== 'Loss of Pay' && x.name !== 'Deductions').map(b => `
+                                <div style="background: rgba(255,255,255,0.05); padding: 0.5rem 0.75rem; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--glass-border);">
+                                    ${b.name}
+                                </div>
+                            `).join('') || '<span style="opacity:0.5; font-size:0.8rem;">None enrolled</span>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.printPayslip = () => {
+            const content = document.getElementById('printArea').innerHTML;
+            const win = window.open('', '', 'height=800,width=800');
+            win.document.write('<html><head><title>Payslip</title>');
+            win.document.write('<style>body { font-family: sans-serif; padding: 20px; } </style>');
+            win.document.write('<' + '/head><body>');
+            win.document.write(content);
+            win.document.write('<' + '/body><' + '/html>');
+            win.document.close();
+            win.print();
+        }
+
+        function numberToWords(n) {
+            if (n < 0) return "Minus " + numberToWords(-n);
+            if (n === 0) return "Zero";
+
+            const units = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
+            const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+
+            function convert(num) {
+                if (num === 0) return "";
+                if (num < 20) return units[num] + " ";
+                if (num < 100) return tens[Math.floor(num / 10)] + " " + convert(num % 10);
+                if (num < 1000) return units[Math.floor(num / 100)] + " Hundred " + convert(num % 100);
+                if (num < 100000) return convert(Math.floor(num / 1000)) + " Thousand " + convert(num % 1000);
+                if (num < 10000000) return convert(Math.floor(num / 100000)) + " Lakh " + convert(num % 100000);
+                return convert(Math.floor(num / 10000000)) + " Crore " + convert(num % 10000000);
+            }
+
+            return convert(Math.floor(n)).trim();
+        }
+
+        async function loadOrgDetails() {
+            try {
+                if (!userData || !userData.orgId) {
+                    console.warn("[Sync] Missing OrgID in session.");
+                    return;
+                }
+
+                // Mode 1: Direct Doc ID lookup
+                const orgRef = doc(db, "organizations", userData.orgId);
+                let orgDoc = await getDoc(orgRef);
+
+                if (!orgDoc.exists()) {
+                    console.log(`[Sync] Direct lookup failed for ${userData.orgId}. Attempting field-based query...`);
+                    // Mode 2: Human-readable orgId field query
+                    const q = query(collection(db, "organizations"), where("orgId", "==", userData.orgId));
+                    const snap = await getDocs(q);
+                    if (!snap.empty) {
+                        orgDoc = snap.docs[0];
+                    }
+                }
+
+                if (orgDoc && orgDoc.exists()) {
+                    const data = orgDoc.data();
+                    window.orgDetails = {
+                        name: data.name || data.orgName || 'Gridify Organization',
+                        address: data.address || 'Corporate Headquarters - Financial District',
+                        logoUrl: data.logoUrl || null
+                    };
+                    console.log("[Sync] Org details resolved:", window.orgDetails.name);
+                } else {
+                    console.warn("[Sync] Could not resolve Organization branding for ID:", userData.orgId);
+                }
+            } catch (e) {
+                console.error("[Sync] Organizational Sync Failure:", e);
+            }
+        }
+
+        // Initialize
+        (async () => {
+            await loadOrgDetails();
+            loadPayslips();
+        })();
+    </script>
+</body>
+
+</html>

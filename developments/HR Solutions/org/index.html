@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Gridify</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="setup-container" style="background: radial-gradient(circle at top right, #312e81 0%, #0f172a 100%);">
+
+    <div class="glass-panel"
+        style="width: 100%; max-width: 440px; padding: 3rem; margin: 1rem; position: relative; overflow: hidden;">
+        <!-- Decorative Glow -->
+        <div
+            style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: var(--primary-color); filter: blur(60px); opacity: 0.2; pointer-events: none;">
+        </div>
+
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <div class="logo" style="font-size: 2.5rem; margin-bottom: 0.5rem;">Gridify</div>
+            <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500; letter-spacing: 0.02em;">
+                ORGANIZATION ADMIN</p>
+        </div>
+
+        <form onsubmit="handleOrgLogin(event)">
+            <div class="form-group">
+                <label class="form-label">Administrator ID</label>
+                <div style="position: relative;">
+                    <i class="fas fa-envelope"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--text-muted); font-size: 0.9rem;"></i>
+                    <input type="email" id="email" class="form-input" style="padding-left: 2.8rem;"
+                        placeholder="admin@company.com" required>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label class="form-label">Terminal Password</label>
+                <div style="position: relative;">
+                    <i class="fas fa-key"
+                        style="position: absolute; left: 1rem; top: 1rem; color: var(--text-muted); font-size: 0.9rem;"></i>
+                    <input type="password" id="password" class="form-input" style="padding-left: 2.8rem;"
+                        placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <div id="loginError" class="badge badge-error"
+                style="width: 100%; margin-bottom: 1.5rem; text-align: center; display: none; padding: 0.75rem; border-radius: var(--radius-md);">
+                <i class="fas fa-exclamation-circle" style="margin-right: 0.5rem;"></i> Identity verification failed
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn btn-primary"
+                style="width: 100%; padding: 1rem; font-size: 1rem; margin-top: 1rem; justify-content: center;">
+                Initialize Dashboard
+            </button>
+        </form>
+
+        <div
+            style="margin-top: 2.5rem; text-align: center; border-top: 1px solid var(--glass-border); padding-top: 2rem;">
+            <a href="../index.html"
+                style="font-size: 0.9rem; color: var(--text-muted); text-decoration: none; transition: var(--transition);"
+                onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-muted)'">
+                <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i> Return to Terminal
+            </a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, collectionGroup, getDocs, query, where, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        window.handleOrgLogin = async function (e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('loginError');
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            btn.disabled = true;
+            errorDiv.style.display = 'none';
+
+            try {
+                const q = query(collectionGroup(db, "org_admins"));
+                const snapshot = await getDocs(q);
+
+                let foundUser = null;
+                let foundOrgId = null;
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.email && data.email.toLowerCase() === email.toLowerCase()) {
+                        if (data.password === password && data.status === 'ACTIVE') {
+                            foundUser = { ...data, id: doc.id };
+                            const pathSegments = doc.ref.path.split('/');
+                            if (pathSegments.length >= 4 && pathSegments[0] === 'organizations') {
+                                foundOrgId = pathSegments[1];
+                            }
+                        }
+                    }
+                });
+
+                if (foundUser) {
+                    // Check Subscription Status
+                    const orgDocSnap = await getDocs(query(collection(db, "organizations"), where("__name__", "==", foundOrgId || foundUser.orgId)));
+                    if (!orgDocSnap.empty) {
+                        const orgData = orgDocSnap.docs[0].data();
+                        const now = new Date().toISOString().split('T')[0];
+                        if (orgData.subscriptionEndDate && orgData.subscriptionEndDate < now) {
+                            throw new Error('SUBSCRIPTION_EXPIRED');
+                        }
+                    }
+
+                    sessionStorage.setItem('orgUser', JSON.stringify({
+                        email: foundUser.email,
+                        orgId: foundOrgId || foundUser.orgId,
+                        orgName: foundUser.orgName,
+                        role: foundUser.role
+                    }));
+
+                    btn.innerHTML = '<i class="fas fa-shield-check"></i> ACCESS GRANTED';
+                    setTimeout(() => window.location.href = 'dashboard.html', 500);
+                } else {
+                    throw new Error('Invalid credentials');
+                }
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                btn.innerHTML = 'Initialize Dashboard';
+                btn.disabled = false;
+
+                if (error.message === 'SUBSCRIPTION_EXPIRED') {
+                    errorDiv.innerHTML = '<i class="fas fa-clock"></i> Subscription expired. Contact Gridify Support.';
+                } else {
+                    errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Identity verification failed';
+                }
+                errorDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+
+</html>

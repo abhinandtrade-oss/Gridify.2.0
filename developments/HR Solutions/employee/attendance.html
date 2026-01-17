@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - Employee Portal</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-layout">
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 2.5rem; text-align: left; padding: 0.5rem;">
+                <div class="logo" style="margin-bottom: 0.25rem;">Gridify</div>
+                <p
+                    style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">
+                    Employee Hub</p>
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="attendance.html" class="nav-item active">
+                    <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+                <a href="leave-requests.html" class="nav-item">
+                    <i class="fas fa-envelope-open-text"></i> Leave Requests
+                </a>
+                <a href="profile.html" class="nav-item">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+                <a href="payslips.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i> Payslips
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <div class="nav-item" style="cursor: pointer; color: var(--error-color);" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+        <main class="main-content">
+            <header
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Attendance Protocol</h1>
+                    <p style="color: var(--text-secondary);">Initialize and finalize your daily operational sessions.
+                    </p>
+                </div>
+                <div class="mobile-nav-toggle" onclick="document.getElementById('sidebar').classList.toggle('active')">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </header>
+
+            <div class="stack-on-mobile"
+                style="display: grid; grid-template-columns: 1fr 350px; gap: 2.5rem; align-items: start;">
+                <!-- Verification Console -->
+                <div class="glass-panel" style="padding: 2.5rem; border: 1px solid var(--glass-border);">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+                        <div>
+                            <h3 id="currentDate" style="font-size: 1.25rem; font-weight: 800; color: white;">
+                                Synchronizing...</h3>
+                            <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem;">
+                                <span id="statusBadge" class="badge"
+                                    style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;">Status:
+                                    Scanning</span>
+                                <span id="locationBadge" class="badge badge-info"
+                                    style="font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;"><i
+                                        class="fas fa-satellite"></i> GPS SEARCHING</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stack-on-mobile"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                        <!-- Neural Recognition Module -->
+                        <div>
+                            <div class="glass-panel"
+                                style="position: relative; width: 100%; aspect-ratio: 1; background: #000; border-radius: 20px; overflow: hidden; margin-bottom: 1.5rem; border: 1px solid var(--glass-border);">
+                                <video id="cameraFeed" autoplay playsinline
+                                    style="width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);"></video>
+                                <canvas id="photoCanvas" style="display: none;"></canvas>
+                                <div id="cameraStatus"
+                                    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); color: white;">
+                                    <i class="fas fa-eye-slash fa-3x" style="margin-bottom: 1.5rem; opacity: 0.3;"></i>
+                                    <p
+                                        style="font-weight: 700; font-size: 0.9rem; letter-spacing: 0.05em; text-transform: uppercase;">
+                                        Optical Sensors Offline</p>
+                                </div>
+                            </div>
+                            <button id="cameraBtn" class="btn btn-primary"
+                                style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--glass-border);"
+                                onclick="toggleCamera()">
+                                <i class="fas fa-power-off" style="margin-right: 0.75rem;"></i> Initializing Optical
+                                Link
+                            </button>
+                        </div>
+
+                        <!-- Session Controls -->
+                        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                            <div class="glass-panel"
+                                style="padding: 1.5rem; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 1.25rem;">
+                                    <span
+                                        style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Initialize
+                                        In</span>
+                                    <span id="punchInTime"
+                                        style="font-weight: 800; color: var(--success-color); font-size: 1rem;">--:--</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span
+                                        style="color: var(--text-muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase;">Finalize
+                                        Out</span>
+                                    <span id="punchOutTime"
+                                        style="font-weight: 800; color: var(--error-color); font-size: 1rem;">--:--</span>
+                                </div>
+                            </div>
+
+                            <button id="punchInBtn" class="btn btn-primary"
+                                style="height: 65px; font-size: 1.1rem; font-weight: 800; background: var(--success-color); border: none; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);"
+                                onclick="handlePunch('IN')" disabled>
+                                <i class="fas fa-lock" style="margin-right: 0.75rem;"></i> INITIALIZE SESSION
+                            </button>
+
+                            <button id="punchOutBtn" class="btn btn-primary"
+                                style="height: 65px; font-size: 1.1rem; font-weight: 800; background: var(--error-color); border: none; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);"
+                                onclick="handlePunch('OUT')" disabled>
+                                <i class="fas fa-sign-out-alt" style="margin-right: 0.75rem;"></i> FINALIZE SESSION
+                            </button>
+
+                            <div
+                                style="margin-top: 1rem; padding: 1.25rem; border-radius: 12px; background: rgba(14, 165, 233, 0.05); border: 1px solid rgba(14, 165, 233, 0.1);">
+                                <p style="font-size: 0.8rem; color: var(--info-color); line-height: 1.6;">
+                                    <i class="fas fa-shield-halved" style="margin-right: 0.5rem;"></i> <strong>Biometric
+                                        Protocol 2.4</strong> enabled. Identity, telemetry, and geolocation are
+                                    visualized and encrypted.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intelligence Flow -->
+                <div style="display: flex; flex-direction: column; gap: 2.5rem;">
+                    <div>
+                        <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 700;">Operational History</h3>
+                        <div id="attendanceList" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <div class="glass-panel" style="padding: 3rem 1.5rem; text-align: center; opacity: 0.5;">
+                                <i class="fas fa-circle-notch fa-spin fa-lg" style="margin-bottom: 1rem;"></i>
+                                <p>Accessing data logs...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel" style="padding: 1.75rem; border: 1px solid var(--glass-border);">
+                        <h4
+                            style="margin-bottom: 1.25rem; font-size: 0.95rem; font-weight: 800; text-transform: uppercase; color: var(--warning-color);">
+                            <i class="fas fa-terminal" style="margin-right: 0.75rem;"></i> Diagnostic Support
+                        </h4>
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <a href="#" onclick="showCorrectionModal()"
+                                style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; transition: var(--transition);"
+                                onmouseover="this.style.color='white'"><i class="fas fa-angle-right"
+                                    style="margin-right: 1rem; color: var(--primary-color);"></i> Failed Telemetry
+                                Lock</a>
+                            <a href="#" onclick="showCorrectionModal()"
+                                style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; transition: var(--transition);"
+                                onmouseover="this.style.color='white'"><i class="fas fa-angle-right"
+                                    style="margin-right: 1rem; color: var(--primary-color);"></i> Sensor Interface
+                                Glitch</a>
+                            <a href="#" onclick="showCorrectionModal()"
+                                style="font-size: 0.85rem; color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; transition: var(--transition);"
+                                onmouseover="this.style.color='white'"><i class="fas fa-angle-right"
+                                    style="margin-right: 1rem; color: var(--primary-color);"></i> Session Timeout
+                                Correction</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Attendance Correction Modal -->
+    <div id="correctionModal" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; backdrop-filter: blur(12px);">
+        <div class="glass-panel"
+            style="width: 95%; max-width: 500px; padding: 2.5rem; border: 1px solid var(--glass-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h3 style="font-size: 1.5rem; font-weight: 800;">Log Override</h3>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Initialize a secondary verification
+                        request.</p>
+                </div>
+                <button onclick="closeCorrectionModal()" class="btn btn-outline"
+                    style="min-width: unset; padding: 0.5rem 0.75rem; border-radius: 50%;"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <form id="correctionForm">
+                <div class="form-group">
+                    <label class="form-label">Protocol Date</label>
+                    <input type="date" id="corrDate" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Classification</label>
+                    <select id="corrType" class="form-input" required>
+                        <option value="Missed Punch">Incomplete Session</option>
+                        <option value="Wrong Location">Geo-tag Mismatch</option>
+                        <option value="Technical Error">Neural Link Error</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Diagnostic Rationale</label>
+                    <textarea id="corrReason" class="form-input" style="height: 100px; resize: none;"
+                        placeholder="Provide a detailed verification rationale..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Authorize
+                    Transmission</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast"
+        style="visibility: hidden; min-width: 300px; background-color: #0f172a; color: #fff; text-align: center; border-radius: 12px; padding: 1rem 1.5rem; position: fixed; z-index: 4000; left: 50%; bottom: 40px; transform: translateX(-50%); border: 1px solid var(--glass-border); font-weight: 600; font-size: 0.9rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4);">
+    </div>
+
+    <!-- Photo Viewer Modal -->
+    <div id="photoViewer" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; backdrop-filter: blur(15px);"
+        onclick="this.style.display='none'">
+        <img id="enlargedPhoto" src=""
+            style="max-width: 90%; max-height: 90%; border-radius: 20px; border: 2px solid var(--glass-border); box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+        <div style="position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer;"><i
+                class="fas fa-times"></i></div>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, addDoc, query, where, getDocs, updateDoc, doc, getDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const userData = JSON.parse(sessionStorage.getItem('empUser'));
+        if (!userData) window.location.href = 'index.html';
+
+        let stream = null;
+        let isCameraActive = false;
+        let todayDocId = null;
+        let todayData = null;
+        let currentLocation = null;
+
+        window.logout = () => { sessionStorage.removeItem('empUser'); window.location.href = 'index.html'; };
+
+        window.toggleCamera = async () => {
+            const video = document.getElementById('cameraFeed');
+            const btn = document.getElementById('cameraBtn');
+            const status = document.getElementById('cameraStatus');
+
+            if (isCameraActive) {
+                if (stream) stream.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+                isCameraActive = false;
+                btn.innerHTML = '<i class="fas fa-power-off"></i> Initializing Optical Link';
+                status.style.display = 'flex';
+                updateActionButtons(false);
+            } else {
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    video.srcObject = stream;
+                    isCameraActive = true;
+                    btn.innerHTML = '<i class="fas fa-circle-stop"></i> Deactivate Link';
+                    status.style.display = 'none';
+                    updateActionButtons(true);
+                    initGeoLocation();
+                } catch (err) { showToast("Optical sensors access denied."); }
+            }
+        };
+
+        function initGeoLocation() {
+            const badge = document.getElementById('locationBadge');
+            if (!navigator.geolocation) {
+                badge.className = 'badge badge-error';
+                badge.innerHTML = '<i class="fas fa-times-circle"></i> Telemetry Unsupported';
+                return;
+            }
+            navigator.geolocation.getCurrentPosition((pos) => {
+                currentLocation = pos.coords;
+                badge.className = 'badge badge-success';
+                badge.innerHTML = `<i class="fas fa-check-circle"></i> GPS Locked`;
+            }, (err) => {
+                badge.className = 'badge badge-warning';
+                badge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> GPS Required';
+            });
+        }
+
+        async function initAttendance() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Normalize todayStr to local date
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const searchEmail = userData.email.toLowerCase().trim();
+
+            const q = query(
+                collection(db, "organizations", userData.orgId, "attendance"),
+                where("userId", "==", searchEmail),
+                where("date", "==", todayStr)
+            );
+
+            onSnapshot(q, (snapshot) => {
+                const sBadge = document.getElementById('statusBadge');
+                const pIn = document.getElementById('punchInTime');
+                const pOut = document.getElementById('punchOutTime');
+
+                if (!snapshot.empty) {
+                    todayDocId = snapshot.docs[0].id;
+                    todayData = snapshot.docs[0].data();
+                    sBadge.textContent = `Status: ${todayData.status.toUpperCase()}`;
+                    sBadge.className = todayData.status === 'Running' ? 'badge badge-warning' : 'badge badge-success';
+                    if (todayData.checkInTime) pIn.textContent = formatTime(todayData.checkInTime.seconds);
+                    if (todayData.checkOutTime) pOut.textContent = formatTime(todayData.checkOutTime.seconds);
+                } else {
+                    todayData = null;
+                    sBadge.textContent = 'Status: PRE-OPERATIONAL';
+                    sBadge.className = 'badge';
+                }
+                updateActionButtons(isCameraActive);
+            });
+            loadHistory();
+        }
+
+        function updateActionButtons(ready) {
+            const bIn = document.getElementById('punchInBtn');
+            const bOut = document.getElementById('punchOutBtn');
+            const canPunchIn = ready && !todayData;
+            const canPunchOut = ready && todayData && todayData.status === 'Running';
+            bIn.disabled = !canPunchIn; bIn.style.opacity = canPunchIn ? 1 : 0.3;
+            bOut.disabled = !canPunchOut; bOut.style.opacity = canPunchOut ? 1 : 0.3;
+        }
+
+        window.handlePunch = async (type) => {
+            if (!isCameraActive) return;
+            const btn = type === 'IN' ? document.getElementById('punchInBtn') : document.getElementById('punchOutBtn');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> TRANSMITTING...';
+            btn.disabled = true;
+
+            try {
+                let ip = 'Unknown';
+                try { const res = await fetch('https://api.ipify.org?format=json'); ip = (await res.json()).ip; } catch (e) { }
+                const video = document.getElementById('cameraFeed');
+                const canvas = document.getElementById('photoCanvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0);
+                const timestamp = new Date().toLocaleString();
+                const loc = currentLocation ? `${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}` : "No GPS";
+                ctx.fillStyle = "rgba(0,0,0,0.7)";
+                ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+                ctx.fillStyle = "#fff";
+                ctx.font = "bold 16px Inter";
+                ctx.fillText(`${timestamp} | ${ip} | ${loc}`, 25, canvas.height - 18);
+                const photo = canvas.toDataURL('image/jpeg', 0.8);
+
+                const now = new Date();
+                const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+                const userEmailNormalized = userData.email.toLowerCase().trim();
+
+                if (type === 'IN') {
+                    // Fetch organization work time settings
+                    const orgDoc = await getDoc(doc(db, "organizations", userData.orgId));
+                    const orgData = orgDoc.exists() ? orgDoc.data() : {};
+                    const workStartTime = orgData.workStartTime || '09:00';
+                    const gracePeriod = orgData.gracePeriod || 15;
+
+                    // Calculate if employee is late
+                    const punchInTime = now.toTimeString().slice(0, 5); // HH:MM format
+
+                    // Parse work start time and add grace period
+                    const [startHour, startMin] = workStartTime.split(':').map(Number);
+                    const graceTime = new Date();
+                    graceTime.setHours(startHour, startMin + gracePeriod, 0, 0);
+
+                    const isLate = now > graceTime;
+                    let lateMinutes = 0;
+                    let attendanceStatus = 'Present';
+                    let attendanceType = 'Full Day';
+
+                    if (isLate) {
+                        lateMinutes = Math.floor((now - graceTime) / 60000);
+                        attendanceStatus = 'Late';
+                        attendanceType = 'Half Day';
+                    }
+
+                    await addDoc(collection(db, "organizations", userData.orgId, "attendance"), {
+                        userId: userEmailNormalized,
+                        userName: userData.name || userData.email,
+                        date: todayStr,
+                        checkInTime: serverTimestamp(),
+                        checkInPhoto: photo,
+                        status: 'Running',
+                        attendanceStatus: attendanceStatus,
+                        attendanceType: attendanceType,
+                        lateMinutes: lateMinutes,
+                        isLate: isLate,
+                        orgId: userData.orgId,
+                        ip,
+                        location: loc
+                    });
+
+                    if (isLate) {
+                        showToast(`⚠️ Late arrival detected. ${lateMinutes} minutes late. Marked as Half Day.`);
+                    } else {
+                        showToast("✓ Session initialized. On Time - Full Day.");
+                    }
+                } else {
+                    const start = new Date(todayData.checkInTime.seconds * 1000);
+                    const hours = ((new Date() - start) / 3600000).toFixed(2);
+                    await updateDoc(doc(db, "organizations", userData.orgId, "attendance", todayDocId), {
+                        checkOutTime: serverTimestamp(), checkOutPhoto: photo,
+                        status: 'Completed', workingHours: hours
+                    });
+                    showToast("Session finalized. Safe travels.");
+                }
+                toggleCamera();
+            } catch (err) { showToast("Protocol Fail: " + err.message); btn.innerHTML = original; btn.disabled = false; }
+        };
+
+        async function loadHistory() {
+            const list = document.getElementById('attendanceList');
+            const searchEmail = userData.email.toLowerCase().trim();
+            const q = query(collection(db, "organizations", userData.orgId, "attendance"), where("userId", "==", searchEmail));
+            const snap = await getDocs(q);
+            const docs = snap.docs.map(d => d.data()).sort((a, b) => b.date.localeCompare(a.date));
+            list.innerHTML = docs.length ? '' : '<p style="text-align: center; color: var(--text-muted); padding: 2.5rem;">Zero active logs found.</p>';
+            docs.slice(0, 5).forEach(data => {
+                const item = document.createElement('div');
+                item.className = 'glass-panel';
+                item.style.padding = '1.25rem';
+                item.style.border = '1px solid var(--glass-border)';
+                item.innerHTML = `
+                    <div style="display: flex; gap: 1.25rem; align-items: center;">
+                        <div style="display: flex; gap: -10px; position: relative;">
+                            ${data.checkInPhoto ? `<img src="${data.checkInPhoto}" onclick="viewAttendancePhoto('${data.checkInPhoto}')" style="width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 2px solid var(--success-color); cursor: pointer; background: var(--surface-color);">` : ''}
+                            ${data.checkOutPhoto ? `<img src="${data.checkOutPhoto}" onclick="viewAttendancePhoto('${data.checkOutPhoto}')" style="width: 56px; height: 56px; border-radius: 12px; object-fit: cover; border: 2px solid var(--error-color); cursor: pointer; background: var(--surface-color); margin-left: -20px; box-shadow: -4px 0 10px rgba(0,0,0,0.3);">` : ''}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 800; font-size: 0.95rem; color: white;">${new Date(data.date).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">${data.workingHours || 0} Hours Operational</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="color: var(--success-color); font-size: 0.85rem; font-weight: 800;">${formatTime(data.checkInTime?.seconds)}</div>
+                            <div style="color: var(--error-color); font-size: 0.85rem; font-weight: 800;">${data.checkOutTime ? formatTime(data.checkOutTime.seconds) : '...'}</div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        document.getElementById('correctionForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> TRANSMITTING...';
+            try {
+                await addDoc(collection(db, "organizations", userData.orgId, "attendance_requests"), {
+                    userId: userData.email,
+                    userName: (userData.firstName && userData.lastName) ? (userData.firstName + ' ' + userData.lastName) : (userData.name || userData.email),
+                    date: document.getElementById('corrDate').value,
+                    type: document.getElementById('corrType').value,
+                    reason: document.getElementById('corrReason').value,
+                    status: 'Pending',
+                    submittedAt: serverTimestamp(),
+                    orgId: userData.orgId
+                });
+                showToast("Override request transmitted.");
+                closeCorrectionModal();
+            } catch (e) { alert("Error: " + e.message); showToast("Transmission Failed."); }
+            btn.disabled = false;
+            btn.innerHTML = 'Authorize Transmission';
+        };
+
+        window.viewAttendancePhoto = (url) => {
+            document.getElementById('enlargedPhoto').src = url;
+            document.getElementById('photoViewer').style.display = 'flex';
+        };
+
+        function formatTime(s) { return s ? new Date(s * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'; }
+        function showToast(m) { const t = document.getElementById("toast"); t.textContent = m; t.style.visibility = "visible"; setTimeout(() => { t.style.visibility = "hidden"; }, 3000); }
+        initAttendance();
+    </script>
+</body>
+
+</html>
+</body>
+
+</html>

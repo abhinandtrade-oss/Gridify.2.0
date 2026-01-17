@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - Gridify Organization</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-layout">
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 2.5rem; text-align: left; padding: 0.5rem;">
+                <div class="logo" style="margin-bottom: 0.25rem;">Gridify</div>
+                <p
+                    style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">
+                    Organization Console</p>
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="employees.html" class="nav-item">
+                    <i class="fas fa-users"></i> Employees
+                </a>
+                <a href="departments.html" class="nav-item">
+                    <i class="fas fa-layer-group"></i> Departments
+                </a>
+                <a href="approvals.html" class="nav-item">
+                    <i class="fas fa-inbox"></i> Approval Hub
+                </a>
+                <a href="attendance.html" class="nav-item active">
+                    <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+                <a href="leave-requests.html" class="nav-item">
+                    <i class="fas fa-envelope-open-text"></i> Leave Requests
+                </a>
+                <a href="payroll.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i> Payroll
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <div class="nav-item" style="cursor: pointer; color: var(--error-color);" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+        <main class="main-content">
+            <header
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Workforce Activity</h1>
+                    <p style="color: var(--text-secondary);">Monitor real-time presence and historical records.</p>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="glass-panel"
+                        style="padding: 0.6rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fas fa-search" style="color: var(--text-muted);"></i>
+                        <input type="text" id="empSearch" placeholder="Filter by name/email..."
+                            style="background: transparent; border: none; color: white; outline: none; font-size: 0.9rem;">
+                    </div>
+                    <div class="mobile-nav-toggle"
+                        onclick="document.getElementById('sidebar').classList.toggle('active')">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div id="employeeGrid" class="card-grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                <div style="grid-column: 1/-1; text-align: center; padding: 5rem; opacity: 0.5;">
+                    <i class="fas fa-circle-notch fa-spin fa-2x" style="margin-bottom: 1rem;"></i>
+                    <p>Securing work streams...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Record Detail Modal -->
+    <div id="detailModal" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2500; backdrop-filter: blur(10px);">
+        <div class="glass-panel"
+            style="width: 95%; max-width: 1000px; height: 90vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--glass-border);">
+
+            <div
+                style="padding: 2rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02);">
+                <div style="display: flex; align-items: center; gap: 1.5rem;">
+                    <div id="modalAvatar"
+                        style="width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem;">
+                        --</div>
+                    <div>
+                        <h3 id="modalName" style="font-size: 1.5rem; margin-bottom: 0.25rem;">Employee Name</h3>
+                        <p id="modalDesignation" style="font-size: 0.9rem; color: var(--text-muted); font-weight: 500;">
+                            Designation</p>
+                    </div>
+                </div>
+                <button onclick="closeDetailModal()" class="btn btn-outline"
+                    style="min-width: unset; padding: 0.5rem 0.75rem; border-radius: 50%;"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <div class="tab-container"
+                style="display: flex; gap: 2rem; padding: 0 2rem; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.01);">
+                <div class="tab-item active" onclick="switchTab('attendance')"
+                    style="padding: 1rem 0; font-weight: 600; cursor: pointer; transition: var(--transition);">
+                    Monitoring Log</div>
+                <div class="tab-item" onclick="switchTab('leaves')"
+                    style="padding: 1rem 0; font-weight: 600; cursor: pointer; transition: var(--transition);">Leave
+                    Archive</div>
+            </div>
+
+            <div style="flex: 1; overflow-y: auto; padding: 2rem;">
+                <!-- Attendance Tab -->
+                <div id="tab-attendance" class="tab-content">
+                    <div class="stack-on-mobile"
+                        style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="glass-panel" style="padding: 1.5rem; background: rgba(99, 102, 241, 0.05);">
+                            <label
+                                style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Weekly
+                                Utilization</label>
+                            <div id="modStatWeek"
+                                style="font-size: 1.75rem; font-weight: 700; color: var(--primary-color);">0h 0m</div>
+                        </div>
+                        <div class="glass-panel" style="padding: 1.5rem; background: rgba(236, 72, 153, 0.05);">
+                            <label
+                                style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Monthly
+                                Utilization</label>
+                            <div id="modStatMonth"
+                                style="font-size: 1.75rem; font-weight: 700; color: var(--secondary-color);">0h 0m</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem; display: flex; justify-content: flex-end;">
+                        <input type="month" id="attnMonthFilter" class="form-input" style="width: auto; height: 40px;"
+                            onchange="loadUserAttendance()">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr
+                                    style="border-bottom: 1px solid var(--glass-border); text-align: left; background: rgba(255,255,255,0.02);">
+                                    <th style="padding: 1rem;">Timeline</th>
+                                    <th style="padding: 1rem;">Verification</th>
+                                    <th style="padding: 1rem;">Check In</th>
+                                    <th style="padding: 1rem;">Check Out</th>
+                                    <th style="padding: 1rem;">Duration</th>
+                                    <th style="padding: 1rem; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modalAttnList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Leaves Tab -->
+                <div id="tab-leaves" class="tab-content" style="display: none;">
+                    <div class="stack-on-mobile"
+                        style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                        <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                            <label style="font-size: 0.75rem; color: var(--text-muted);">WEEKLY</label>
+                            <div id="statLeaveWeek" style="font-size: 1.5rem; font-weight: 700;">0</div>
+                        </div>
+                        <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                            <label style="font-size: 0.75rem; color: var(--text-muted);">MONTHLY</label>
+                            <div id="statLeaveMonth" style="font-size: 1.5rem; font-weight: 700;">0</div>
+                        </div>
+                        <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                            <label style="font-size: 0.75rem; color: var(--text-muted);">YEARLY</label>
+                            <div id="statLeaveYear" style="font-size: 1.5rem; font-weight: 700;">0</div>
+                        </div>
+                    </div>
+                    <div id="modalLeavesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Photo Viewer Modal -->
+    <div id="photoViewer" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; backdrop-filter: blur(15px);"
+        onclick="this.style.display='none'">
+        <img id="enlargedPhoto" src=""
+            style="max-width: 90%; max-height: 90%; border-radius: 20px; border: 2px solid var(--glass-border); box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+        <div style="position: absolute; top: 20px; right: 20px; color: white; font-size: 2rem; cursor: pointer;"><i
+                class="fas fa-times"></i></div>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, query, where, getDocs, orderBy, onSnapshot, addDoc, updateDoc, doc, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const userData = JSON.parse(sessionStorage.getItem('orgUser'));
+        if (!userData) window.location.href = 'index.html';
+        window.logout = () => { sessionStorage.removeItem('orgUser'); window.location.href = 'index.html'; };
+
+        let allEmployees = [];
+        let selectedUserEmail = null;
+        let selectedJoiningDate = null;
+        let timerInterval = null;
+
+        async function loadEmployees() {
+            try {
+                const q = query(collection(db, "organizations", userData.orgId, "employees"));
+                const snap = await getDocs(q);
+                allEmployees = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderEmployeeGrid(allEmployees);
+            } catch (err) {
+                document.getElementById('employeeGrid').innerHTML = 'Directory sync failed.';
+            }
+        }
+
+        function renderEmployeeGrid(employees) {
+            const grid = document.getElementById('employeeGrid');
+            grid.innerHTML = employees.length === 0 ? '<div style="grid-column: 1/-1; text-align: center; opacity: 0.5;">No staff configured.</div>' : '';
+            employees.forEach(emp => {
+                const initials = (emp.firstName?.[0] || '') + (emp.lastName?.[0] || '');
+                const card = document.createElement('div');
+                card.className = 'glass-panel stat-card';
+                card.style.cursor = 'pointer';
+                card.style.padding = '1.75rem';
+                card.onclick = () => openDetailModal(emp);
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem;">
+                        <div style="width: 54px; height: 54px; background: linear-gradient(135deg, var(--surface-color), var(--glass-border)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.25rem; border: 1px solid var(--glass-border);">
+                             ${emp.photoUrl ? `<img src="${emp.photoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">` : initials}
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.15rem; margin-bottom: 0.15rem;">${emp.firstName} ${emp.lastName}</div>
+                            <div style="font-size: 0.8rem; color: var(--primary-color); font-weight: 600; letter-spacing: 0.02em;">${emp.designation || 'STAFF'}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); padding-top: 1rem; border-top: 1px solid var(--glass-border); align-items: center;">
+                        <span><i class="fas fa-layer-group" style="margin-right: 0.4rem;"></i>${emp.department || 'General'}</span>
+                        <span class="badge" style="font-size: 0.65rem; background: rgba(99, 102, 241, 0.1); color: var(--primary-color); border: 1px solid rgba(99, 102, 241, 0.2);">LOGS <i class="fas fa-chevron-right" style="margin-left: 0.3rem;"></i></span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        document.getElementById('empSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allEmployees.filter(emp => (emp.firstName + ' ' + emp.lastName + ' ' + emp.email).toLowerCase().includes(term));
+            renderEmployeeGrid(filtered);
+        });
+
+        window.viewAttendancePhoto = (url) => {
+            document.getElementById('enlargedPhoto').src = url;
+            document.getElementById('photoViewer').style.display = 'flex';
+        };
+
+        window.openDetailModal = (emp) => {
+            selectedUserEmail = emp.email;
+            selectedJoiningDate = emp.joiningDate || null;
+            document.getElementById('modalName').textContent = `${emp.firstName} ${emp.lastName}`;
+            document.getElementById('modalDesignation').textContent = emp.email;
+            const initials = (emp.firstName?.[0] || '') + (emp.lastName?.[0] || '');
+            document.getElementById('modalAvatar').innerHTML = emp.photoUrl ? `<img src="${emp.photoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:16px;">` : initials;
+            switchTab('attendance');
+            document.getElementById('attnMonthFilter').value = new Date().toISOString().slice(0, 7);
+            loadUserAttendance();
+            document.getElementById('detailModal').style.display = 'flex';
+        };
+
+        window.closeDetailModal = () => {
+            document.getElementById('detailModal').style.display = 'none';
+            if (timerInterval) clearInterval(timerInterval);
+            if (attendanceUnsubscribe) {
+                attendanceUnsubscribe();
+                attendanceUnsubscribe = null;
+            }
+        };
+
+        window.switchTab = (tabName) => {
+            document.querySelectorAll('.tab-item').forEach(b => {
+                b.classList.remove('active');
+                if (b.onclick.toString().includes(tabName)) b.classList.add('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.getElementById(`tab-${tabName}`).style.display = 'block';
+            if (tabName === 'leaves') loadUserLeaves();
+        };
+
+        let attendanceUnsubscribe = null;
+
+        window.loadUserAttendance = async () => {
+            if (!selectedUserEmail) return;
+            if (timerInterval) clearInterval(timerInterval);
+            if (attendanceUnsubscribe) attendanceUnsubscribe();
+
+            const tbody = document.getElementById('modalAttnList');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 3rem;"><i class="fas fa-sync fa-spin"></i> Synchronizing ledger...</td></tr>';
+
+            const monthVal = document.getElementById('attnMonthFilter').value;
+            if (!monthVal) return;
+
+            // Normalize for case-sensitive DB lookups
+            const searchEmail = selectedUserEmail.toLowerCase().trim();
+            const rawEmail = selectedUserEmail;
+            const rawTrimmed = selectedUserEmail.trim();
+
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+            console.log(`[Sync] Loading ${selectedUserEmail}. OrgId: ${userData.orgId}, SearchEmail: ${searchEmail}, Today: ${todayStr}`);
+
+            // Parallel fetch for leaves
+            const leavePromise = getDocs(query(collection(db, "organizations", userData.orgId, "leave_requests"),
+                where("userId", "in", [searchEmail, rawEmail, rawTrimmed, searchEmail.trim()])))
+                .then(snap => {
+                    console.log(`[Sync] Leaves fetch success: ${snap.size}`);
+                    return snap.docs.map(d => d.data());
+                })
+                .catch(err => { console.warn("Leave fetch fail", err); return []; });
+
+            const attnQ = query(
+                collection(db, "organizations", userData.orgId, "attendance"),
+                where("userId", "in", [searchEmail, rawEmail, rawTrimmed, searchEmail.trim()])
+            );
+
+            attendanceUnsubscribe = onSnapshot(attnQ, async (attnSnap) => {
+                const leaves = await leavePromise;
+                console.log(`[Sync] Records received: ${attnSnap.size} for ${searchEmail} in ${userData.orgId}`);
+
+                if (attnSnap.empty) {
+                    console.warn(`[Sync] No records found for ${searchEmail}. Checking for any records in this org...`);
+                    const anyQ = query(collection(db, "organizations", userData.orgId, "attendance"), limit(5));
+                    const anySnap = await getDocs(anyQ);
+                    if (anySnap.empty) {
+                        console.warn("[Sync] The attendance collection is completely empty for this org.");
+                    } else {
+                        console.log(`[Sync] Found ${anySnap.size} total records in org. Sample UserIDs:`, anySnap.docs.map(d => d.data().userId));
+                    }
+                }
+
+                const attnMap = {};
+                const allAttn = [];
+
+                attnSnap.forEach(doc => {
+                    const d = doc.data();
+                    const dateKey = d.date;
+                    // Prefer Running records or just store the one we have
+                    if (!attnMap[dateKey] || d.status === 'Running') attnMap[dateKey] = { id: doc.id, ...d };
+                    allAttn.push({ id: doc.id, ...d });
+                });
+
+                calculateStats(allAttn);
+                const [year, month] = monthVal.split('-').map(Number);
+                const daysInMonth = new Date(year, month, 0).getDate();
+
+                // Get local today string YYYY-MM-DD
+                const nowLocal = new Date();
+                const todayStr = `${nowLocal.getFullYear()}-${String(nowLocal.getMonth() + 1).padStart(2, '0')}-${String(nowLocal.getDate()).padStart(2, '0')}`;
+
+                const calendarRows = [];
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    if (dateStr > todayStr) continue;
+
+                    if (attnMap[dateStr]) {
+                        calendarRows.push(attnMap[dateStr]);
+                    } else {
+                        const leave = leaves.find(l => dateStr >= l.startDate && dateStr <= l.endDate);
+                        let status = "Absent", color = "var(--error-color)";
+                        if (selectedJoiningDate && dateStr < selectedJoiningDate) { status = "Pre-Onboarding"; color = "var(--text-muted)"; }
+                        if (leave) {
+                            status = `Leave (${leave.status})`;
+                            if (leave.status === 'Approved') status = 'Leave Approved';
+                            color = leave.status === 'Approved' ? 'var(--success-color)' : 'var(--warning-color)';
+                        }
+                        calendarRows.push({ date: dateStr, status: status, displayColor: color, isSimulated: true });
+                    }
+                }
+
+                calendarRows.sort((a, b) => new Date(b.date) - new Date(a.date));
+                tbody.innerHTML = calendarRows.length === 0 ? '<tr><td colspan="6" style="text-align: center; padding: 3rem;">Empty log.</td></tr>' : '';
+
+                if (timerInterval) clearInterval(timerInterval);
+                const runningRows = [];
+
+                calendarRows.forEach(data => {
+                    const row = document.createElement('tr');
+                    row.style.borderBottom = '1px solid var(--glass-border)';
+
+                    let inTime = '--', outTime = '--', color = data.displayColor || 'inherit', hours = data.workingHours || '--';
+
+                    if (!data.isSimulated) {
+                        inTime = (data.checkInTime && data.checkInTime.seconds) ? new Date(data.checkInTime.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (data.checkInTime ? 'Syncing...' : '--');
+                        outTime = (data.checkOutTime && data.checkOutTime.seconds) ? new Date(data.checkOutTime.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (data.checkOutTime ? 'Syncing...' : '--');
+
+                        if (data.status === 'Running') {
+                            color = 'var(--warning-color)';
+                            if (data.checkInTime && data.checkInTime.seconds) {
+                                hours = `<span id="rt-${data.id}" class="badge badge-info">Calculating</span>`;
+                                runningRows.push({ id: `rt-${data.id}`, start: data.checkInTime.seconds });
+                            } else {
+                                hours = '<span class="badge badge-info">Syncing...</span>';
+                            }
+                        } else if (data.status === 'Completed' || data.status === 'Present') {
+                            color = 'var(--success-color)';
+                        }
+                    }
+
+                    const opts = ['Present', 'Absent', 'Comp Off', 'Unpaid Leave', 'Leave Approved', 'Holiday'];
+                    let cur = data.status === 'Completed' ? 'Present' : data.status;
+                    if (data.status.includes('Leave (Approved)')) cur = 'Leave Approved';
+                    else if (data.status.includes('Leave (Rejected)')) cur = 'Absent';
+                    else if (data.status.includes('Leave (Pending)')) cur = 'Pending Approval';
+
+                    if (!opts.includes(cur)) opts.push(cur);
+
+                    let lateInfo = '';
+                    if (!data.isSimulated && data.isLate) {
+                        lateInfo = `<div style="font-size: 0.7rem; color: var(--warning-color); margin-top: 0.25rem;">
+                            <i class="fas fa-exclamation-triangle"></i> Late by ${data.lateMinutes || 0} min - ${data.attendanceType || 'Half Day'}
+                        </div>`;
+                    } else if (!data.isSimulated && (data.status === 'Running' || data.status === 'Completed' || data.status === 'Present')) {
+                        if (data.attendanceStatus === 'Present' || !data.isLate) {
+                            lateInfo = `<div style="font-size: 0.7rem; color: var(--success-color); margin-top: 0.25rem;">
+                                <i class="fas fa-check-circle"></i> On Time - ${data.attendanceType || 'Full Day'}
+                            </div>`;
+                        }
+                    }
+                    row.innerHTML = `
+                         <td style="padding: 1rem;">
+                            <div style="font-weight: 600;">${data.date}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">${new Date(data.date).toLocaleDateString('en-US', { weekday: 'short' })}</div>
+                         </td>
+                         <td style="padding: 1rem;"><span class="badge" style="background: ${color}20; color: ${color}; border: 1px solid ${color}40;">${data.status}</span>${lateInfo}</td>
+                         <td style="padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                ${!data.isSimulated && data.checkInPhoto ? `
+                                    <div style="cursor: pointer;" onclick="viewAttendancePhoto('${data.checkInPhoto}')" title="View Check-in Photo">
+                                        <img src="${data.checkInPhoto}" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; border: 1px solid var(--glass-border);">
+                                    </div>
+                                ` : ''}
+                                <span style="font-weight: 500;">${inTime}</span>
+                            </div>
+                         </td>
+                         <td style="padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                ${!data.isSimulated && data.checkOutPhoto ? `
+                                    <div style="cursor: pointer;" onclick="viewAttendancePhoto('${data.checkOutPhoto}')" title="View Check-out Photo">
+                                        <img src="${data.checkOutPhoto}" style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; border: 1px solid var(--glass-border);">
+                                    </div>
+                                ` : ''}
+                                <span style="font-weight: 500; color: var(--text-secondary);">${outTime}</span>
+                            </div>
+                         </td>
+                         <td style="padding: 1rem;">${hours}</td>
+                         <td style="padding: 1rem; text-align: right;">
+                             ${data.status !== 'Running' ? `
+                             <div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem;">
+                                 <select id="sel-${data.date}" class="form-input" style="width: auto; min-width: 130px; padding: 0.4rem; font-size: 0.8rem; background: rgba(255,255,255,0.05); color: white; height: auto;">
+                                     ${opts.map(o => `<option value="${o}" ${o === cur ? 'selected' : ''} style="color: black;">${o}</option>`).join('')}
+                                 </select>
+                                 <button class="btn btn-sm btn-outline" onclick="updateDailyStatus(document.getElementById('sel-${data.date}'), '${data.isSimulated ? '' : data.id}', '${data.date}')" title="Sync Status">
+                                    <i class="fas fa-sync-alt"></i>
+                                 </button>
+                             </div>
+                             ` : ''}
+                         </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                if (runningRows.length > 0) {
+                    timerInterval = setInterval(() => {
+                        const now = Date.now();
+                        runningRows.forEach(item => {
+                            const el = document.getElementById(item.id);
+                            if (el) {
+                                const d = now - (item.start * 1000);
+                                const h = Math.floor(d / 36e5), m = Math.floor((d % 36e5) / 6e4), s = Math.floor((d % 6e4) / 1000);
+                                el.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')} `;
+                            }
+                        });
+                    }, 1000);
+                }
+            }, (error) => {
+                console.error("Attendance Stream Error:", error);
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--error-color);">Live sync interrupted.</td></tr>';
+            });
+        };
+
+        window.updateDailyStatus = async (sel, docId, date) => {
+            const val = sel.value;
+            sel.disabled = true;
+            try {
+                if (docId) {
+                    await updateDoc(doc(db, "organizations", userData.orgId, "attendance", docId), { status: val });
+                } else {
+                    await addDoc(collection(db, "organizations", userData.orgId, "attendance"), {
+                        date,
+                        userId: selectedUserEmail.toLowerCase().trim(),
+                        userName: document.getElementById('modalName').textContent,
+                        status: val,
+                        workingHours: "0",
+                        orgId: userData.orgId,
+                        manualUpdate: true
+                    });
+                }
+            } catch (e) {
+                alert("Status sync error: " + e.message);
+            } finally {
+                sel.disabled = false;
+            }
+        };
+
+        function calculateStats(recs) {
+            const now = new Date();
+            // Start of week (Sunday)
+            const sow = new Date(now); sow.setDate(now.getDate() - now.getDay()); sow.setHours(0, 0, 0, 0);
+            // Start of month
+            const som = new Date(now.getFullYear(), now.getMonth(), 1); som.setHours(0, 0, 0, 0);
+
+            let wt = 0, mt = 0;
+            recs.forEach(r => {
+                const h = parseFloat(r.workingHours) || 0;
+                // Parse date string (YYYY-MM-DD) to local midnight
+                const [y, m, day] = r.date.split('-').map(Number);
+                const d = new Date(y, m - 1, day);
+
+                if (d >= sow) wt += h;
+                if (d >= som) mt += h;
+            });
+            const fmt = (h) => `${Math.floor(h)}h ${Math.round((h % 1) * 60)} m`;
+            document.getElementById('modStatWeek').textContent = fmt(wt);
+            document.getElementById('modStatMonth').textContent = fmt(mt);
+        }
+
+        window.loadUserLeaves = async () => {
+            if (!selectedUserEmail) return;
+            const list = document.getElementById('modalLeavesList');
+            list.innerHTML = '<div style="text-align:center; padding:3rem;">Syncing archive...</div>';
+            try {
+                const q = query(collection(db, "organizations", userData.orgId, "leave_requests"), where("userId", "==", selectedUserEmail));
+                const snap = await getDocs(q);
+                if (snap.empty) { list.innerHTML = '<div style="text-align:center; padding:3rem; opacity:0.5;">Empty archive.</div>'; return; }
+                const docs = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.appliedAt?.seconds || 0) - (a.appliedAt?.seconds || 0));
+                calculateLeaveStats(docs);
+                list.innerHTML = `
+                        < table style = "width: 100%; border-collapse: collapse;" >
+                        <thead>
+                            <tr style="border-bottom: 1px solid var(--glass-border); text-align: left; background: rgba(255,255,255,0.02);">
+                                <th style="padding: 1rem;">Protocol</th>
+                                <th style="padding: 1rem;">Window</th>
+                                <th style="padding: 1rem;">Classification</th>
+                                <th style="padding: 1rem;">State</th>
+                                <th style="padding: 1rem; text-align:right;">Control</th>
+                            </tr>
+                        </thead>
+                        <tbody>${docs.map(l => `
+                            <tr style="border-bottom: 1px solid var(--glass-border);">
+                                <td style="padding: 1rem; font-weight: 600;">${l.type}</td>
+                                <td style="padding: 1rem; font-size: 0.85rem;">${l.startDate} &rarr; ${l.endDate}<br><span style="color:var(--text-muted);">${l.days} Units</span></td>
+                                <td style="padding: 1rem; font-size: 0.8rem; color: var(--text-muted); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${l.reason}</td>
+                                <td style="padding: 1rem;"><span class="badge ${l.status === 'Approved' ? 'badge-success' : (l.status === 'Pending' ? 'badge-warning' : 'badge-error')}" style="font-size: 0.75rem;">${l.status}</span></td>
+                                <td style="padding: 1rem; text-align:right;">
+                                    ${l.status === 'Pending' ? `
+                                    <button onclick="updateLeaveStatus('${l.id}', 'Approved')" class="btn btn-sm btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.7rem;">ACCEPT</button>
+                                    <button onclick="updateLeaveStatus('${l.id}', 'Rejected')" class="btn btn-sm" style="padding: 0.3rem 0.6rem; font-size: 0.7rem; background: rgba(239, 68, 68, 0.1); color: var(--error-color);">REJECT</button>
+                                    ` : '<span style="font-size:0.7rem; opacity:0.5;">FINALIZED</span>'}
+                                </td>
+                            </tr>`).join('')}</tbody>
+                    </table > `;
+            } catch (e) { list.innerHTML = 'Archive break.'; }
+        };
+
+        window.updateLeaveStatus = async (id, status) => {
+            if (confirm(`Authorize state change to ${status}?`)) {
+                await updateDoc(doc(db, "organizations", userData.orgId, "leave_requests", id), { status });
+                loadUserLeaves();
+            }
+        };
+
+        function calculateLeaveStats(leaves) {
+            const now = new Date(), sow = new Date(now), som = new Date(now.getFullYear(), now.getMonth(), 1), soy = new Date(now.getFullYear(), 0, 1);
+            sow.setDate(now.getDate() - now.getDay()); sow.setHours(0, 0, 0, 0);
+            let wc = 0, mc = 0, yc = 0;
+            leaves.forEach(l => {
+                if (l.status !== 'Approved') return;
+                const d = new Date(l.startDate), u = parseFloat(l.days) || 0;
+                if (d >= sow) wc += u; if (d >= som) mc += u; if (d >= soy) yc += u;
+            });
+            document.getElementById('statLeaveWeek').textContent = wc;
+            document.getElementById('statLeaveMonth').textContent = mc;
+            document.getElementById('statLeaveYear').textContent = yc;
+        }
+
+        loadEmployees();
+    </script>
+</body>
+
+</html>

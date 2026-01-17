@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employees - Gridify Organization</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="portal-layout">
+        <aside class="sidebar" id="sidebar">
+            <div style="margin-bottom: 2.5rem; text-align: left; padding: 0.5rem;">
+                <div class="logo" style="margin-bottom: 0.25rem;">Gridify</div>
+                <p
+                    style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">
+                    Organization Console</p>
+            </div>
+
+            <nav>
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-th-large"></i> Overview
+                </a>
+                <a href="employees.html" class="nav-item active">
+                    <i class="fas fa-users"></i> Employees
+                </a>
+                <a href="departments.html" class="nav-item">
+                    <i class="fas fa-layer-group"></i> Departments
+                </a>
+                <a href="approvals.html" class="nav-item">
+                    <i class="fas fa-inbox"></i> Approval Hub
+                </a>
+                <a href="attendance.html" class="nav-item">
+                    <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+                <a href="leave-requests.html" class="nav-item">
+                    <i class="fas fa-envelope-open-text"></i> Leave Requests
+                </a>
+                <a href="payroll.html" class="nav-item">
+                    <i class="fas fa-file-invoice-dollar"></i> Payroll
+                </a>
+                <a href="settings.html" class="nav-item">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+
+            <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <div class="nav-item" style="cursor: pointer; color: var(--error-color);" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </div>
+            </div>
+        </aside>
+        <div class="sidebar-overlay" onclick="document.getElementById('sidebar').classList.remove('active')"></div>
+
+        <main class="main-content">
+            <header
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
+                <div>
+                    <h1 style="font-size: 2rem; margin-bottom: 0.25rem;">Workforce Directory</h1>
+                    <p style="color: var(--text-secondary);">Manage employee profiles, roles, and access.</p>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="openModal()">
+                        <i class="fas fa-plus"></i> Onboard Employee
+                    </button>
+                    <div class="mobile-nav-toggle"
+                        onclick="document.getElementById('sidebar').classList.toggle('active')">
+                        <i class="fas fa-bars"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div id="employeeList" class="card-grid"
+                style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));">
+                <div style="grid-column: 1/-1; text-align: center; padding: 5rem; color: var(--text-muted);">
+                    <i class="fas fa-circle-notch fa-spin fa-2x" style="margin-bottom: 1rem;"></i>
+                    <p>Securing connection to directory...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div id="createModal" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; backdrop-filter: blur(8px);">
+        <div class="glass-panel"
+            style="width: 90%; max-width: 550px; padding: 2.5rem; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h3 id="modalTitle">Add New Employee</h3>
+                <button onclick="closeModal()"
+                    style="background: none; border: none; color: var(--text-muted); cursor: pointer;"><i
+                        class="fas fa-times fa-lg"></i></button>
+            </div>
+
+            <form id="createEmployeeForm" onsubmit="handleFormSubmit(event)">
+                <div class="stack-on-mobile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">First Name</label>
+                        <input type="text" id="firstName" class="form-input" placeholder="e.g. John" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" id="lastName" class="form-input" placeholder="e.g. Doe" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Work Email</label>
+                    <input type="email" id="email" class="form-input" placeholder="john.doe@company.com" required>
+                </div>
+
+                <div class="stack-on-mobile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select id="department" class="form-input" required>
+                            <!-- Auto-populated -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Designation</label>
+                        <input type="text" id="designation" class="form-input" placeholder="e.g. Senior Lead" required>
+                    </div>
+                </div>
+
+                <div class="stack-on-mobile" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label">Joining Date</label>
+                        <input type="date" id="joiningDate" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Terminal Password</label>
+                        <input type="text" id="password" class="form-input" placeholder="Set default" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Daily Duration (Hrs)</label>
+                    <input type="number" id="workingHours" class="form-input" placeholder="Default: 9" min="1" max="24"
+                        step="0.5">
+                </div>
+
+                <h4
+                    style="margin: 1.5rem 0 1rem; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase;">
+                    Statutory Details</h4>
+                <div class="stack-on-mobile" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">PAN Number</label>
+                        <input type="text" id="empPan" class="form-input" placeholder="ABCDE1234F"
+                            style="text-transform:uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">UAN / PF</label>
+                        <input type="text" id="empUan" class="form-input" placeholder="Optional">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ESI Number</label>
+                        <input type="text" id="empEsi" class="form-input" placeholder="Optional">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label class="form-label">Bank Account Number</label>
+                    <input type="text" id="empBank" class="form-input" placeholder="For salary credit"
+                        style="font-family: monospace;">
+                </div>
+
+                <h4
+                    style="margin: 1.5rem 0 1rem; color: var(--text-secondary); font-size: 0.9rem; text-transform: uppercase;">
+                    Leave Quota (Annual)</h4>
+                <div class="stack-on-mobile"
+                    style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Casual</label>
+                        <input type="number" id="quotaCasual" class="form-input" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Sick</label>
+                        <input type="number" id="quotaSick" class="form-input" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Earned</label>
+                        <input type="number" id="quotaEarned" class="form-input" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Comp Off</label>
+                        <input type="number" id="quotaComp" class="form-input" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem;">Personal</label>
+                        <input type="number" id="quotaPersonal" class="form-input" placeholder="0">
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary"
+                    style="width: 100%; margin-top: 1rem; justify-content: center;">
+                    Complete Onboarding
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from '../js/firebase-config.js';
+        import { collection, addDoc, getDocs, query, where, orderBy, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const userData = JSON.parse(sessionStorage.getItem('orgUser'));
+        if (!userData) window.location.href = 'index.html';
+
+        window.logout = () => { sessionStorage.removeItem('orgUser'); window.location.href = 'index.html'; };
+
+        let isEditMode = false;
+        let currentEditId = null;
+        let currentSetupId = null;
+
+        // Load Depts functionality
+        async function loadDepts() {
+            const q = query(collection(db, "organizations", userData.orgId, "departments"), orderBy("name"));
+            const snap = await getDocs(q);
+            const select = document.getElementById('department');
+            if (snap.empty) {
+                select.innerHTML = '<option disabled>Please create departments in Settings first</option>';
+            } else {
+                select.innerHTML = snap.docs.map(d => `<option value="${d.data().name}">${d.data().name}</option>`).join('');
+            }
+        }
+
+        window.openModal = async (mode = 'create', data = null) => {
+            await loadDepts();
+            document.getElementById('createModal').style.display = 'flex';
+            isEditMode = mode === 'edit';
+            if (isEditMode && data) {
+                currentEditId = data.id;
+                document.getElementById('modalTitle').textContent = 'Modify Profile';
+                document.getElementById('submitBtn').textContent = 'Apply Changes';
+                document.getElementById('firstName').value = data.firstName;
+                document.getElementById('lastName').value = data.lastName;
+                document.getElementById('email').value = data.email;
+                document.getElementById('department').value = data.department;
+                document.getElementById('designation').value = data.designation;
+                document.getElementById('joiningDate').value = data.joiningDate;
+                document.getElementById('password').value = data.password;
+                document.getElementById('workingHours').value = data.workingHours || 9;
+                // New Fields
+                document.getElementById('empPan').value = data.pan || '';
+                document.getElementById('empUan').value = data.uan || '';
+                document.getElementById('empEsi').value = data.esi || '';
+                document.getElementById('empBank').value = data.accountNumber || '';
+                // Quota
+                const q = data.leaveQuota || {};
+                document.getElementById('quotaCasual').value = q['Casual Leave'] || 0;
+                document.getElementById('quotaSick').value = q['Sick Leave'] || 0;
+                document.getElementById('quotaEarned').value = q['Earned Leave'] || 0;
+                document.getElementById('quotaComp').value = q['Comp Off'] || 0;
+                document.getElementById('quotaPersonal').value = q['Personal Duty'] || 0;
+            } else {
+                currentEditId = null;
+                document.getElementById('modalTitle').textContent = 'Onboard Staff';
+                document.getElementById('submitBtn').textContent = 'Finalize Onboarding';
+                document.getElementById('createEmployeeForm').reset();
+            }
+        };
+
+        window.closeModal = () => document.getElementById('createModal').style.display = 'none';
+
+        window.handleFormSubmit = async function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            try {
+                if (!isEditMode) {
+                    // Check Employee Limit
+                    const orgDocSnap = await getDocs(query(collection(db, "organizations"), where("__name__", "==", userData.orgId)));
+                    const orgData = orgDocSnap.docs[0].data();
+
+                    if (orgData.subscriptionPlanId) {
+                        const planDocSnap = await getDocs(query(collection(db, "subscription_plans"), where("__name__", "==", orgData.subscriptionPlanId)));
+                        if (!planDocSnap.empty) {
+                            const planData = planDocSnap.docs[0].data();
+
+                            // Get current active employees count
+                            const employeesSnap = await getDocs(collection(db, "organizations", userData.orgId, "employees"));
+                            const currentCount = employeesSnap.size;
+
+                            if (currentCount >= planData.maxEmployees) {
+                                throw new Error(`LIMIT_REACHED: Your plan allows max ${planData.maxEmployees} employees.`);
+                            }
+                        }
+                    }
+                }
+
+                const leaveQuota = {
+                    'Casual Leave': parseInt(document.getElementById('quotaCasual').value) || 0,
+                    'Sick Leave': parseInt(document.getElementById('quotaSick').value) || 0,
+                    'Earned Leave': parseInt(document.getElementById('quotaEarned').value) || 0,
+                    'Comp Off': parseInt(document.getElementById('quotaComp').value) || 0,
+                    'Personal Duty': parseInt(document.getElementById('quotaPersonal').value) || 0
+                };
+
+                const empData = {
+                    firstName: document.getElementById('firstName').value.trim(),
+                    lastName: document.getElementById('lastName').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    department: document.getElementById('department').value,
+                    designation: document.getElementById('designation').value,
+                    joiningDate: document.getElementById('joiningDate').value,
+                    password: document.getElementById('password').value,
+                    workingHours: parseFloat(document.getElementById('workingHours').value) || 9,
+                    pan: document.getElementById('empPan').value.trim().toUpperCase(),
+                    uan: document.getElementById('empUan').value.trim(),
+                    esi: document.getElementById('empEsi').value.trim(),
+                    accountNumber: document.getElementById('empBank').value.trim(),
+                    leaveQuota: leaveQuota,
+                    orgId: userData.orgId,
+                };
+
+                if (isEditMode && currentEditId) {
+                    await updateDoc(doc(db, "organizations", userData.orgId, "employees", currentEditId), empData);
+                } else {
+                    empData.status = 'ACTIVE';
+                    empData.createdAt = serverTimestamp();
+                    await addDoc(collection(db, "organizations", userData.orgId, "employees"), empData);
+                }
+                closeModal();
+                loadEmployees();
+            } catch (error) {
+                console.error(error);
+                alert(error.message.startsWith('LIMIT_REACHED') ? error.message.split(': ')[1] : 'Terminal Error: ' + error.message);
+            } finally {
+                btn.innerHTML = original;
+                btn.disabled = false;
+            }
+        };
+
+        window.editEmp = (dataJson) => openModal('edit', JSON.parse(decodeURIComponent(dataJson)));
+
+        window.toggleSuspend = async (id, status) => {
+            const next = status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE';
+            if (confirm(`Set status to ${next}?`)) {
+                await updateDoc(doc(db, "organizations", userData.orgId, "employees", id), { status: next });
+                loadEmployees();
+            }
+        };
+
+        window.deleteEmp = async (id) => {
+            if (confirm("DANGER: Permanently delete this records?")) {
+                if (prompt("Type 'CONFIRM' to execute:") === 'CONFIRM') {
+                    await deleteDoc(doc(db, "organizations", userData.orgId, "employees", id));
+                    loadEmployees();
+                }
+            }
+        };
+
+        async function loadEmployees() {
+            const list = document.getElementById('employeeList');
+            try {
+                const q = query(collection(db, "organizations", userData.orgId, "employees"), orderBy("firstName"));
+                const snap = await getDocs(q);
+                list.innerHTML = snap.empty ? '<div style="grid-column: 1/-1; text-align: center; padding: 5rem; opacity: 0.5;">Empty directory.</div>' : '';
+
+                snap.forEach(doc => {
+                    const data = { id: doc.id, ...doc.data() };
+                    const card = document.createElement('div');
+                    card.className = 'glass-panel stat-card';
+                    card.style.padding = '1.75rem';
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+                            <div style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.2rem; transform: rotate(-3deg);">
+                                ${data.firstName[0]}${data.lastName[0]}
+                            </div>
+                            <span class="badge ${data.status === 'ACTIVE' ? 'badge-success' : 'badge-error'}" style="font-size: 0.7rem;">${data.status}</span>
+                        </div>
+                         <h3 style="font-size: 1.2rem; margin-bottom: 0.15rem;">${data.firstName} ${data.lastName}</h3>
+                        <p style="color: var(--primary-color); font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">${data.designation}</p>
+                        
+                        <div style="font-size: 0.7rem; font-family: monospace; color: var(--text-muted); background: rgba(255,255,255,0.03); padding: 0.4rem 0.6rem; border-radius: 6px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border);">
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">ID: ${data.id}</span>
+                            <i class="fas fa-copy" style="cursor: pointer; opacity: 0.5;" onclick="navigator.clipboard.writeText('${data.id}'); alert('ID Copied!');" title="Copy ID"></i>
+                        </div>
+                        
+                        <div style="font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--glass-border); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; justify-content: space-between;"><span>Dept</span><span style="color: var(--text-primary);">${data.department}</span></div>
+                            <div style="display: flex; justify-content: space-between;"><span>Email</span><span style="color: var(--text-primary); font-size: 0.8rem;">${data.email}</span></div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--glass-border); display: flex; gap: 0.5rem; justify-content: flex-end;">
+                            <button class="btn btn-sm btn-outline" title="Financial Setup" onclick="openSetupModal('${data.id}', '${data.firstName} ${data.lastName}', ${data.salary || 0}, '${data.salaryStructure ? encodeURIComponent(JSON.stringify(data.salaryStructure)) : 'null'}')"><i class="fas fa-coins"></i></button>
+                            <button class="btn btn-sm btn-outline" onclick="editEmp('${encodeURIComponent(JSON.stringify(data))}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline" onclick="toggleSuspend('${data.id}', '${data.status}')" style="color: ${data.status === 'ACTIVE' ? 'var(--warning-color)' : 'var(--success-color)'}; border-color: currentColor;"><i class="fas fa-${data.status === 'ACTIVE' ? 'ban' : 'check'}"></i></button>
+                            <button class="btn btn-sm" onclick="deleteEmp('${data.id}')" style="background: rgba(239, 68, 68, 0.1); color: var(--error-color);"><i class="fas fa-trash"></i></button>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (e) {
+                list.innerHTML = 'Directory sync error.';
+            }
+        }
+
+
+        window.openSetupModal = (id, name, currentSalary, structure = null) => {
+            currentSetupId = id;
+            document.getElementById('setupModal').style.display = 'flex';
+            document.getElementById('setupTitle').textContent = `Financial Config: ${name}`;
+
+            // Analyze incoming structure
+            let s = structure;
+            if (typeof s === 'string') {
+                try { s = JSON.parse(decodeURIComponent(s)); } catch (e) { s = null; }
+            }
+            s = s || { base: currentSalary || 0, allowances: [], deductions: [] };
+
+            document.getElementById('setupBase').value = s.base || 0;
+
+            // Clear lists
+            document.getElementById('allowanceList').innerHTML = '';
+            document.getElementById('deductionList').innerHTML = '';
+
+            // Populate Allowances
+            if (s.allowances) s.allowances.forEach(a => addFinanceRow('allowanceList', a.name, a.amount));
+
+            // Populate Deductions
+            if (s.deductions) s.deductions.forEach(d => addFinanceRow('deductionList', d.name, d.amount));
+
+            calculateNet();
+        };
+
+        window.addFinanceRow = (listId, name = '', amount = 0) => {
+            const container = document.getElementById(listId);
+            const div = document.createElement('div');
+            div.className = 'finance-row';
+            div.style.display = 'grid';
+            div.style.gridTemplateColumns = '1fr 100px 30px';
+            div.style.gap = '0.5rem';
+            div.style.marginBottom = '0.5rem';
+
+            div.innerHTML = `
+                <input type="text" class="form-input finance-name" placeholder="Label" value="${name}" required>
+                <input type="number" class="form-input finance-amount" placeholder="0" value="${amount}" oninput="calculateNet()" required>
+                <button type="button" class="btn btn-sm btn-outline" style="color:var(--error-color); border:none;" onclick="this.parentElement.remove(); calculateNet();"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(div);
+        };
+
+        window.calculateNet = () => {
+            const base = parseFloat(document.getElementById('setupBase').value) || 0;
+            let totalAllow = 0;
+            document.querySelectorAll('#allowanceList .finance-amount').forEach(i => totalAllow += parseFloat(i.value) || 0);
+            let totalDeduct = 0;
+            document.querySelectorAll('#deductionList .finance-amount').forEach(i => totalDeduct += parseFloat(i.value) || 0);
+
+            document.getElementById('previewNet').textContent = `₹ ${(base + totalAllow - totalDeduct).toLocaleString()}`;
+        };
+
+        window.handleSetupSubmit = async (e) => {
+            e.preventDefault();
+            const base = parseFloat(document.getElementById('setupBase').value) || 0;
+
+            const allowances = [];
+            document.querySelectorAll('#allowanceList .finance-row').forEach(row => {
+                allowances.push({
+                    name: row.querySelector('.finance-name').value,
+                    amount: parseFloat(row.querySelector('.finance-amount').value) || 0
+                });
+            });
+
+            const deductions = [];
+            document.querySelectorAll('#deductionList .finance-row').forEach(row => {
+                deductions.push({
+                    name: row.querySelector('.finance-name').value,
+                    amount: parseFloat(row.querySelector('.finance-amount').value) || 0
+                });
+            });
+
+            await updateDoc(doc(db, "organizations", userData.orgId, "employees", currentSetupId), {
+                salary: base, // Keeping simple base for backward compat if needed, or total cost
+                salaryStructure: { base, allowances, deductions, updatedAt: new Date().toISOString() }
+            });
+            alert('Financial protocols updated.');
+            document.getElementById('setupModal').style.display = 'none';
+            loadEmployees();
+        };
+
+        loadEmployees();
+    </script>
+
+    <!-- Setup Modal -->
+    <div id="setupModal" class="flex-center"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; backdrop-filter: blur(8px);">
+        <div class="glass-panel"
+            style="width: 90%; max-width: 500px; padding: 2.5rem; max-height: 90vh; overflow-y: auto;">
+            <h3 id="setupTitle" style="margin-bottom: 2rem;">Financial Configuration</h3>
+            <form onsubmit="handleSetupSubmit(event)">
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label class="form-label">Monthly Basic Salary</label>
+                    <input type="number" id="setupBase" class="form-input" required oninput="calculateNet()"
+                        style="font-size: 1.2rem; font-weight: 700;">
+                </div>
+
+                <!-- Allowances -->
+                <div style="margin-bottom: 1.5rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label class="form-label" style="color: var(--success-color);">Allowances (+)</label>
+                        <button type="button" class="btn btn-sm btn-outline"
+                            style="padding: 0.2rem 0.5rem; font-size: 0.7rem;"
+                            onclick="addFinanceRow('allowanceList')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <div id="allowanceList"></div>
+                </div>
+
+                <!-- Deductions -->
+                <div style="margin-bottom: 2rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <label class="form-label" style="color: var(--error-color);">Deductions (-)</label>
+                        <button type="button" class="btn btn-sm btn-outline"
+                            style="padding: 0.2rem 0.5rem; font-size: 0.7rem;"
+                            onclick="addFinanceRow('deductionList')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <div id="deductionList"></div>
+                </div>
+
+                <div
+                    style="background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Net Monthly Preview</span>
+                    <span id="previewNet" style="font-family: 'Outfit'; font-size: 1.5rem; font-weight: 700;">₹ 0</span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Configuration</button>
+                <button type="button" class="btn btn-outline" style="width: 100%; margin-top: 0.75rem;"
+                    onclick="document.getElementById('setupModal').style.display='none'">Cancel</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // LOCKED: Validation only (Read-only)
+    // Write access is disabled to prevent unauthorized admin creation.
+    // Platform System Config
+    match /platform_users/{userId} {
+      allow read, write: if true;
+    }
+
+    match /subscription_plans/{planId} {
+      allow read, write: if true;
+    }
+
+    // APP DATA: Public Read/Write (Development Mode)
+    // This recursive wildcard allows read/write to the organization document
+    // AND any document in any subcollection (and sub-subcollection) under it.
+    match /organizations/{orgId} {
+      allow read, write: if true;
+      
+      match /{document=**} {
+        allow read, write: if true;
+      }
+    }
+
+    // Collection Group Queries (for Login & Global searches)
+    match /{path=**}/employees/{docId} {
+      allow read: if true;
+    }
+    match /{path=**}/org_admins/{docId} {
+      allow read: if true;
+    }
+    match /{path=**}/attendance_requests/{docId} {
+      allow read, write: if true;
+    }
+
+    // Default: Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

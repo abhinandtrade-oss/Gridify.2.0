@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gridify HR - Enterprise SaaS Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo">
+                <img src="https://www.gridify.in/assets/images/logos/logo.png" alt="Gridify" style="height: 48px;">
+            </a>
+            <div>
+                <a href="#portals" class="btn btn-primary">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="container" style="padding-top: 150px; padding-bottom: 100px; text-align: center;">
+            <div class="fade-in">
+                <h1 style="font-size: 3.5rem; margin-bottom: 1.5rem; line-height: 1.1;">
+                    The Future of <span
+                        style="background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Workforce
+                        Management</span>
+                </h1>
+                <p style="font-size: 1.25rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto 3rem;">
+                    A multi-tenant, cloud-based HR SaaS platform designed for speed, security, and scale.
+                    Manage payroll, attendance, and operations with strict isolation and enterprise-grade control.
+                </p>
+                <div class="flex-center" style="gap: 1.5rem;">
+                    <a href="#portals" class="btn btn-primary">Get Started</a>
+                    <a href="https://www.gridify.in" class="btn btn-outline">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portals Section -->
+        <section id="portals" class="container" style="padding-bottom: 100px;">
+            <div class="grid-cols-3">
+                <!-- Employee Portal -->
+                <div class="glass-panel stat-card fade-in" style="animation-delay: 0.1s;">
+                    <div class="flex-center"
+                        style="width: 60px; height: 60px; background: rgba(99, 102, 241, 0.1); border-radius: 50%; margin-bottom: 1.5rem; color: var(--primary-color);">
+                        <i class="fas fa-user-circle fa-2x"></i>
+                    </div>
+                    <h3>Employee Portal</h3>
+                    <p style="color: var(--text-secondary); margin: 1rem 0;">
+                        Access your profile, mark attendance, request leave, and view payslips.
+                        Secure and isolated personal data access.
+                    </p>
+                    <a href="employee/index.html" class="btn btn-outline" style="width: 100%;">Employee Login</a>
+                </div>
+
+                <!-- Organization Portal -->
+                <div class="glass-panel stat-card fade-in" style="animation-delay: 0.2s;">
+                    <div class="flex-center"
+                        style="width: 60px; height: 60px; background: rgba(236, 72, 153, 0.1); border-radius: 50%; margin-bottom: 1.5rem; color: var(--secondary-color);">
+                        <i class="fas fa-building fa-2x"></i>
+                    </div>
+                    <h3>Organization Admin</h3>
+                    <p style="color: var(--text-secondary); margin: 1rem 0;">
+                        Manage your workforce, payroll, and operations.
+                        For Super Admins and HR Managers of registered organizations.
+                    </p>
+                    <a href="org/index.html" class="btn btn-outline" style="width: 100%;">Admin Login</a>
+                </div>
+
+                <!-- Gridify Platform -->
+                <!--div class="glass-panel stat-card fade-in"
+                    style="animation-delay: 0.3s; border-color: rgba(99, 102, 241, 0.3);">
+                    <div class="flex-center"
+                        style="width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; margin-bottom: 1.5rem; color: var(--success-color);">
+                        <i class="fas fa-server fa-2x"></i>
+                    </div>
+                    <h3>Gridify Platform</h3>
+                    <p style="color: var(--text-secondary); margin: 1rem 0;">
+                        Internal control layer for Gridify Team.
+                        Manage tenants, subscriptions, and platform security.
+                    </p>
+                    <a href="platform/index.html" class="btn btn-outline" style="width: 100%;">Platform Access</a>
+                </div-->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" style="background: transparent; border: none; padding: 2rem 0;">
+        <div class="container" style="text-align: center;">
+            <span style="color: #94a3b8; font-family: var(--font-body); font-size: 1.1rem;">powered by </span>
+            <a href="https://www.gridify.in"
+                style="color: #818cf8; font-family: var(--font-body); font-weight: 500; text-decoration: none; font-size: 1.1rem; margin-left: 4px;">GRIDIFY</a>
+
+
+        </div>
+    </footer>
+</body>
+
+</html>
