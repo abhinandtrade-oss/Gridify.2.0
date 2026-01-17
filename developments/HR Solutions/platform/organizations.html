@@ -54,7 +54,7 @@
                     <h1 style="font-size: 1.75rem;">Organizations</h1>
                     <p style="color: var(--text-secondary);">Manage tenant accounts and resource limits</p>
                 </div>
-                <button class="btn btn-primary" onclick="window.location.href='../org/index.html'">
+                <button class="btn btn-primary" onclick="window.openOnboardModal()">
                     <i class="fas fa-plus"></i> Manual Onboard
                 </button>
             </header>
@@ -65,6 +65,75 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Manual Onboard Modal -->
+    <div id="onboardModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="glass-panel"
+            style="width: 90%; max-width: 600px; padding: 2.5rem; position: relative; max-height: 90vh; overflow-y: auto;">
+            <button onclick="document.getElementById('onboardModal').style.display='none'"
+                style="position: absolute; right: 1.5rem; top: 1.5rem; background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem;">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h2 style="margin-bottom: 2rem; font-size: 1.5rem;">Manual Organization Onboarding</h2>
+
+            <form id="onboardForm" onsubmit="window.handleOnboardSubmit(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                    <div class="form-group">
+                        <label class="form-label">Organization Name</label>
+                        <input type="text" id="onboardName" class="form-input" placeholder="e.g. Acme Corp" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Industry</label>
+                        <input type="text" id="onboardIndustry" class="form-input" placeholder="e.g. Technology"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Organization ID (Slug)</label>
+                        <input type="text" id="onboardOrgId" class="form-input" placeholder="e.g. acme-corp" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subscription Plan</label>
+                        <select id="onboardPlanSelect" class="form-input" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subscription Start</label>
+                        <input type="date" id="onboardStart" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Subscription End</label>
+                        <input type="date" id="onboardEnd" class="form-input" required>
+                    </div>
+                </div>
+
+                <div
+                    style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <h4
+                        style="margin-bottom: 1rem; color: var(--primary-color); font-size: 0.9rem; text-transform: uppercase;">
+                        Super Admin Credentials</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Admin Email</label>
+                            <input type="email" id="onboardAdminEmail" class="form-input" placeholder="admin@acme.com"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Admin Password</label>
+                            <input type="text" id="onboardAdminPass" class="form-input" placeholder="Strong password"
+                                required>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                    <button type="button" class="btn btn-outline"
+                        onclick="document.getElementById('onboardModal').style.display='none'">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="onboardSubmitBtn">Complete Onboarding</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Organization Details Modal -->
@@ -137,9 +206,74 @@
 
     <script type="module">
         import { db } from '../js/firebase-config.js';
-        import { collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { collection, getDocs, query, orderBy, doc, updateDoc, deleteDoc, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         let planRegistry = [];
+
+        window.openOnboardModal = () => {
+            const modal = document.getElementById('onboardModal');
+            document.getElementById('onboardForm').reset();
+            const sel = document.getElementById('onboardPlanSelect');
+            sel.innerHTML = '<option value="">Select Plan...</option>' +
+                planRegistry.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('');
+
+            // Set default dates
+            const today = new Date().toISOString().split('T')[0];
+            const nextYear = new Date();
+            nextYear.setFullYear(nextYear.getFullYear() + 1);
+            const expiry = nextYear.toISOString().split('T')[0];
+
+            document.getElementById('onboardStart').value = today;
+            document.getElementById('onboardEnd').value = expiry;
+
+            modal.style.display = 'flex';
+        };
+
+        window.handleOnboardSubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('onboardSubmitBtn');
+            const orig = btn.textContent;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Onboarding...';
+
+            try {
+                const orgData = {
+                    name: document.getElementById('onboardName').value,
+                    industry: document.getElementById('onboardIndustry').value,
+                    orgId: document.getElementById('onboardOrgId').value,
+                    subscriptionPlanId: document.getElementById('onboardPlanSelect').value,
+                    subscriptionStartDate: document.getElementById('onboardStart').value,
+                    subscriptionEndDate: document.getElementById('onboardEnd').value,
+                    status: 'ACTIVE',
+                    createdAt: serverTimestamp()
+                };
+
+                // 1. Create Organization
+                const orgRef = await addDoc(collection(db, "organizations"), orgData);
+
+                // 2. Create Super Admin
+                await addDoc(collection(db, "organizations", orgRef.id, "org_admins"), {
+                    email: document.getElementById('onboardAdminEmail').value,
+                    password: document.getElementById('onboardAdminPass').value,
+                    role: 'SUPER_ADMIN',
+                    status: 'ACTIVE',
+                    orgName: orgData.name,
+                    orgId: orgData.orgId,
+                    createdAt: serverTimestamp()
+                });
+
+                alert("Organization onboarded successfully!");
+                document.getElementById('onboardModal').style.display = 'none';
+                loadOrgs();
+            } catch (err) {
+                console.error("Onboarding Error:", err);
+                alert("Error during onboarding: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = orig;
+            }
+        };
 
         async function loadOrgs() {
             const list = document.getElementById('orgList');
