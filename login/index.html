@@ -1305,7 +1305,7 @@
                     </div>
 
                     <!-- API Management Card -->
-                    <!--div class="col-md-6 col-lg-3" id="cardApiManagement">
+                    <div class="col-md-6 col-lg-3" id="cardApiManagement">
                         <div class="admin-card feature-card animate-up"
                             onclick="const apiModal = new bootstrap.Modal(document.getElementById('apiManagementModal')); apiModal.show(); window.loadApiSettings();">
                             <div class="icon-box-large bg-primary-soft"
@@ -1317,7 +1317,7 @@
                             <button class="btn btn-sm text-white rounded-pill w-100 mt-2"
                                 style="background-color: #4f46e5;">Manage APIs</button>
                         </div>
-                </div-->
+                    </div>
 
                     <!-- Script Dashboard Card -->
                     <div class="col-md-6 col-lg-3">
@@ -2358,6 +2358,24 @@
                         container.append(card);
                     }
                 });
+
+                // Add HR management tool Platform Management Card
+                visibleCount++;
+                const hrColors = getBrandColors('info');
+                const hrCard = `
+                    <div class="col-md-6 col-lg-4 col-xl-3">
+                        <article class="workspace-card">
+                            <div class="icon-box" style="background: ${hrColors.bg}; color: ${hrColors.text};">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <h3 class="ws-card-title">HR management tool Platform Management</h3>
+                            <p class="ws-card-desc">Strategic HR solutions and Enterprise Platform management tools.</p>
+                            <a href="https://www.gridify.in/developments/HR%20Solutions/platform/index" class="ws-action-btn ws-btn-outline">
+                                Launch Tool <i class="fas fa-external-link-alt ms-1" style="font-size: 0.8em;"></i>
+                            </a>
+                        </article>
+                    </div>`;
+                container.append(hrCard);
 
                 if (visibleCount === 0 && session.role !== 'admin') {
                     container.append(`
