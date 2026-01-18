@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | SSV ADMIN</title>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+    <link rel="shortcut icon" href="../favicon.png?v=2" type="image/png">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .settings-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .script-container {
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            position: relative;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #333;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .instruction-box {
+            background: #e7f3ff;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .instruction-box ol {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .instruction-box li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body class="app-container">
+    <header>
+        <div class="header-left">
+            <a href="dashboard.html" style="text-decoration: none; display: flex; align-items: center;">
+                <i class="fas fa-arrow-left" style="color: white; margin-right: 15px;"></i>
+                <img src="../assets/logo.png" alt="Logo" class="header-logo">
+                <span class="portal-title">SSV ADMIN</span>
+            </a>
+        </div>
+        <div class="header-center">
+            <div class="contact-item">
+                <i class="fas fa-phone-circle contact-icon"></i>
+                <div class="contact-info">
+                    <span class="contact-label">CALL NOW !</span>
+                    <span class="contact-value">0484 – 2657338</span>
+                </div>
+            </div>
+            <div class="header-divider"></div>
+            <div class="contact-item">
+                <i class="fas fa-envelope-open-text contact-icon"></i>
+                <div class="contact-info">
+                    <span class="contact-label">EMAIL NOW</span>
+                    <span class="contact-value">ssvidyapeetom@gmail.com</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <nav>
+                <ul style="align-items: center;">
+                    <li><span id="user-display-name" style="font-weight: 600; color: white;">Loading...</span></li>
+                    <li><button id="logout-btn" class="btn"
+                            style="background: rgba(255,255,255,0.2); color: white; padding: 5px 12px; font-size: 0.8rem;">Logout</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main style="display: none;" id="main-content">
+        <div class="dashboard-header">
+            <h2>System Settings</h2>
+        </div>
+
+        <div class="admin-nav">
+            <a href="dashboard.html" class="btn btn-primary">Newspapers</a>
+            <a href="manage-profiles.html" class="btn btn-primary admin-only">Publisher Profiles</a>
+            <a href="manage-users.html" class="btn btn-primary admin-only">Reporters</a>
+            <a href="settings.html" class="btn btn-secondary admin-only">Drive Setup</a>
+        </div>
+
+        <div class="settings-card">
+            <h3>Google Drive Integration</h3>
+            <p style="color: #666; margin-bottom: 20px;">Follow these steps to enable file saving to Google Drive.</p>
+
+            <div class="instruction-box">
+                <strong>How to setup:</strong>
+                <ol>
+                    <li>Copy the script provided below.</li>
+                    <li>Go to <a href="https://script.google.com/" target="_blank">Google Apps Script</a>.</li>
+                    <li>Create a new project and paste the script.</li>
+                    <li>Click <b>Deploy</b> > <b>New Deployment</b>.</li>
+                    <li>Select type <b>Web App</b>.</li>
+                    <li>Set "Who has access" to <b>Anyone</b>.</li>
+                    <li>Copy the <b>Web App URL</b> and paste it in the field below.</li>
+                </ol>
+            </div>
+
+            <label class="form-label">Google Apps Script Code</label>
+            <div class="script-container">
+                <button class="copy-btn" id="copy-script-btn"><i class="fas fa-copy"></i> Copy Code</button>
+                <pre id="google-script-code">// Google Apps Script - SSV News Upload Bridge
+const DRAFT_FOLDER_ID = '1_GKHlr20kAN340Dmf4Hhqk7sGnP_4D0J';
+const PUBLISHED_FOLDER_ID = '165DnJEi9jCcd-FirUpIgdCkzHKfY36w3';
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const draftFolder = DriveApp.getFolderById(DRAFT_FOLDER_ID);
+    const publishedFolder = DriveApp.getFolderById(PUBLISHED_FOLDER_ID);
+    
+    // Handle Delete Actions
+    if (data.action === 'delete' || data.action === 'deleteDrafts') {
+      const searchPattern = data.pattern;
+      
+      // Cleaner helper
+      const cleanFolder = (folder) => {
+        const files = folder.getFiles();
+        let count = 0;
+        while (files.hasNext()) {
+          const file = files.next();
+          if (file.getName().includes(searchPattern)) {
+             file.setTrashed(true);
+             count++;
+          }
+        }
+        return count;
+      };
+
+      let removed = cleanFolder(draftFolder);
+      if (data.action === 'delete') {
+        removed += cleanFolder(publishedFolder);
+      }
+      
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        message: `Removed ${removed} files for pattern ${searchPattern}`
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Default: Handle Upload Action
+    const targetFolder = data.status === 'published' ? publishedFolder : draftFolder;
+    
+    const contentType = data.mimetype;
+    const bytes = Utilities.base64Decode(data.base64);
+    const blob = Utilities.newBlob(bytes, contentType, data.filename);
+    
+    const file = targetFolder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    
+    const fileUrl = `https://drive.google.com/thumbnail?id=${file.getId()}&sz=w1000`;
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      success: true,
+      fileId: file.getId(),
+      url: fileUrl
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (f) {
+    return ContentService.createTextOutput(JSON.stringify({
+      success: false,
+      error: f.message
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doOptions(e) {
+  return ContentService.createTextOutput("")
+    .setMimeType(ContentService.MimeType.TEXT);
+}</pre>
+            </div>
+
+            <label class="form-label">Google Script Web App URL</label>
+            <input type="text" id="drive-script-url" class="form-input"
+                placeholder="https://script.google.com/macros/s/.../exec">
+
+            <button id="save-settings-btn" class="btn btn-secondary">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
+        </div>
+        </div>
+    </main>
+
+    <!-- Password Confirmation Modal -->
+    <div id="auth-modal" style="
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.8); z-index: 9999; display: flex; 
+        justify-content: center; align-items: center; backdrop-filter: blur(5px);
+    ">
+        <div
+            style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center;">
+            <i class="fas fa-lock" style="font-size: 3rem; color: var(--primary-color); margin-bottom: 20px;"></i>
+            <h3 style="margin-bottom: 10px;">Security Check</h3>
+            <p style="color: #666; margin-bottom: 20px;">Please confirm your admin credentials to access Drive Settings.
+            </p>
+
+            <input type="password" id="auth-password" class="form-input" placeholder="Enter Admin Password"
+                style="margin-bottom: 20px;">
+
+            <div style="display: flex; gap: 10px;">
+                <button id="auth-cancel-btn" class="btn" style="flex: 1; background: #eee;">Cancel</button>
+                <button id="auth-confirm-btn" class="btn btn-primary" style="flex: 1;">Confirm Access</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Powered by <a href="https://www.gridify.in" target="_blank">GRIDIFY</a></p>
+    </footer>
+
+    <script src="../js/loader.js"></script>
+    <script type="module" src="../js/settings.js"></script>
+</body>
+
+</html>
