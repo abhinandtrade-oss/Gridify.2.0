@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +10,10 @@
     <style>
         :root {
             --primary: #2563eb;
-            --bg: #0f172a;
-            --text: #f8fafc;
+            --bg: #ffffff;
+            --text: #000000;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -40,8 +41,13 @@
         }
 
         @keyframes rotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         h1 {
@@ -78,6 +84,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <span class="loader"></span>
@@ -90,4 +97,5 @@
         window.location.href = "https://ssv.chronicles.gridify.in";
     </script>
 </body>
+
 </html>
