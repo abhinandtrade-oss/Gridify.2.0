@@ -1,6 +1,7 @@
 /* Griddy Chatbot Styles */
 :root {
     --griddy-primary: #007bff;
+    --griddy-primary-dark: #0056b3;
     --griddy-bg: #ffffff;
     --griddy-text: #333333;
     --griddy-user-msg: #007bff;
@@ -60,6 +61,64 @@
     object-fit: contain;
 }
 
+.griddy-bubble {
+    position: absolute;
+    bottom: 90px;
+    right: 10px;
+    background: var(--griddy-primary);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 18px;
+    border-bottom-right-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+    pointer-events: auto;
+    animation: bubbleFloat 3s ease-in-out infinite;
+    z-index: 2147483648;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.griddy-bubble-close {
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    line-height: 1;
+}
+
+.griddy-bubble-close:hover {
+    opacity: 1;
+}
+
+.griddy-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid var(--griddy-primary);
+}
+
+@keyframes bubbleFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
 #griddy-window {
     position: absolute;
     bottom: 95px;
@@ -96,7 +155,7 @@
 }
 
 #griddy-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: linear-gradient(135deg, var(--griddy-primary), var(--griddy-primary-dark));
     color: white;
     padding: 25px 20px;
     display: flex;
@@ -187,7 +246,7 @@
 
 .griddy-message.user {
     align-self: flex-end;
-    background: #007bff;
+    background: var(--griddy-primary);
     color: white;
     border-bottom-right-radius: 5px;
     box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
@@ -213,13 +272,13 @@
 }
 
 #griddy-input:focus {
-    border-color: #007bff;
+    border-color: var(--griddy-primary);
     background: white;
     box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.05);
 }
 
 #griddy-send {
-    background: #007bff;
+    background: var(--griddy-primary);
     color: white;
     border: none;
     width: 45px;
@@ -233,7 +292,7 @@
 }
 
 #griddy-send:hover {
-    background: #0056b3;
+    background: var(--griddy-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 86, 179, 0.3);
 }
@@ -260,8 +319,8 @@
 
 .griddy-chip:hover {
     background: #f0f7ff;
-    color: #007bff;
-    border-color: #007bff;
+    color: var(--griddy-primary);
+    border-color: var(--griddy-primary);
     transform: translateY(-1px);
 }
 
