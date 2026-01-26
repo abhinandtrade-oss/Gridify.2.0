@@ -3,6 +3,10 @@
     const chatbotHTML = `
     <div id="griddy-chatbot-container">
         <div id="griddy-toggle">
+            <div class="griddy-bubble">
+                <span>Hi, Im Griddy, Ask me something...</span>
+                <div class="griddy-bubble-close">&times;</div>
+            </div>
             <img src="assets/chat-bot/Griddy.gif" alt="Griddy Logo">
         </div>
         <div id="griddy-window">
@@ -15,16 +19,17 @@
                 <div class="close-btn">&times;</div>
             </div>
             <div id="griddy-messages">
-                <div class="griddy-message bot">Hello! I'm Griddy. How can I help you with our digital solutions today?</div>
+                <div class="griddy-message bot">Hi, Im Griddy, Ask me something...</div>
             </div>
             <div id="griddy-quick-replies">
-                <div class="griddy-chip">Web Development</div>
-                <div class="griddy-chip">SEO Services</div>
-                <div class="griddy-chip">UI/UX Design</div>
-                <div class="griddy-chip">Pricing</div>
+                <div class="griddy-chip">Service List</div>
+                <div class="griddy-chip">About</div>
+                <div class="griddy-chip">Website</div>
+                <div class="griddy-chip">Help</div>
+                <div class="griddy-chip">Customer care</div>
             </div>
             <div id="griddy-input-area">
-                <input type="text" id="griddy-input" placeholder="Type a message...">
+                <input type="text" id="griddy-input" placeholder="Ask me something...">
                 <button id="griddy-send"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -53,14 +58,14 @@
 
     // Default Knowledge Base
     const defaultKnowledge = {
-        "web development": "We offer premium web development using modern technologies like React, Node.js, and Cloudflare. Check our Web Design section for more!",
-        "seo": "Our SEO services help you rank #1 on Google. We optimize content, speed, and backlinks.",
-        "ui": "Our UI/UX design team focuses on user-centric interfaces that 'wow' your customers.",
-        "ux": "Our UI/UX design team focuses on user-centric interfaces that 'wow' your customers.",
-        "pricing": "Our pricing is competitive and depends on the project scope. Contact us for a custom quote!",
+        "service list": "We provide Web Development, SEO Services, UI/UX Design, and digital marketing solutions.",
+        "about": "Gridify is a digital agency focused on building premium web experiences and growing brands online.",
+        "website": "You're currently visiting gridify.in. We build high-performance websites for businesses.",
+        "help": "How can I help you? You can ask about our services, pricing, or how to contact us.",
+        "customer care": "You can reach our customer care at info@gridify.in or call +91 81295 66053.",
         "contact": "You can contact us via email at info@gridify.in or call +91 81295 66053.",
-        "hello": "Hi there! I'm Griddy. I'm here to help you grow your digital presence.",
-        "hi": "Hi there! I'm Griddy. I'm here to help you grow your digital presence.",
+        "hello": "Hi, Im Griddy, Ask me something...",
+        "hi": "Hi, Im Griddy, Ask me something...",
     };
 
     let activeKnowledge = { ...defaultKnowledge };
@@ -109,12 +114,33 @@
         return activeKnowledge;
     }
 
+    let bubbleClosedByUser = false;
+
+    const bubble = document.querySelector('.griddy-bubble');
+    const bubbleClose = document.querySelector('.griddy-bubble-close');
+
+    if (bubbleClose) {
+        bubbleClose.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevents opening the chat
+            bubble.style.display = 'none';
+            bubbleClosedByUser = true;
+        });
+    }
+
     toggle.addEventListener('click', () => {
-        chatbotWindow.classList.toggle('active');
+        const isActive = chatbotWindow.classList.toggle('active');
+        if (bubble) {
+            if (isActive) {
+                bubble.style.display = 'none';
+            } else if (!bubbleClosedByUser) {
+                bubble.style.display = 'block';
+            }
+        }
     });
 
     closeBtn.addEventListener('click', () => {
         chatbotWindow.classList.remove('active');
+        if (bubble && !bubbleClosedByUser) bubble.style.display = 'block';
     });
 
     let chatHistory = [];
