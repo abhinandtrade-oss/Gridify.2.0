@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Griddy - Knowledge Base Manager</title>
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" href="assets/images/logos/favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/fontawesome-5.14.0.min.css">
+    <style>
+        :root {
+            --primary: #007bff;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .entry {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        input,
+        textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .keyword {
+            flex: 1;
+        }
+
+        .answer {
+            flex: 2;
+            height: 60px;
+            resize: vertical;
+        }
+
+        .remove-btn {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .remove-btn:hover {
+            background: #cc0000;
+        }
+
+        .actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button.primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        button.primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        button.primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><img src="assets/chat-bot/Griddy.gif" width="45" alt="Griddy"> Griddy Knowledge Base</h1>
+        <p>Manage Griddy's brain. Changes are synced with Firebase and reflect live on the chatbot.</p>
+
+        <div id="loading">Connecting to Firebase...</div>
+        <div id="knowledge-list" style="display:none;">
+            <!-- Entries will be loaded here -->
+        </div>
+
+        <div class="actions">
+            <button class="primary" id="addBtn" onclick="addEntry()" disabled>Add New Keyword</button>
+            <button class="primary" id="saveBtn" onclick="saveKnowledge()" disabled>Save All Changes</button>
+            <a href="login/" style="text-decoration: none;"><button class="secondary">Back to Dashboard</button></a>
+        </div>
+        <div id="status" class="status"></div>
+    </div>
+
+    <!-- Firebase SDKs & Admin Check -->
+    <script type="module">
+        import { AdminManager } from "./assets/js/admin-manager.js";
+        import { db } from "./assets/js/firebase-config.js";
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Admin Access Check
+        const session = AdminManager.getSession();
+        if (!session || session.role !== 'admin') {
+            alert("Unauthorized access. Please login as an admin.");
+            window.location.href = "login/"; // Redirect to login page
+        }
+
+        const DOC_ID = "chatbot_knowledge";
+        const COLLECTION = "settings";
+
+        const knowledgeList = document.getElementById('knowledge-list');
+        const loading = document.getElementById('loading');
+        const status = document.getElementById('status');
+        const addBtn = document.getElementById('addBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        // Load Knowledge from Firebase
+        async function loadKnowledge() {
+            try {
+                const docRef = doc(db, COLLECTION, DOC_ID);
+                const docSnap = await getDoc(docRef);
+
+                let kv = {};
+                if (docSnap.exists()) {
+                    kv = docSnap.data().knowledge || {};
+                } else {
+                    // Default values if first time
+                    kv = {
+                        "web development": "We offer premium web development using modern technologies like React, Node.js, and Cloudflare. Check our Web Design section for more!",
+                        "seo": "Our SEO services help you rank #1 on Google. We optimize content, speed, and backlinks.",
+                        "ui": "Our UI/UX design team focuses on user-centric interfaces that 'wow' your customers.",
+                        "pricing": "Our pricing is competitive and depends on the project scope. Contact us for a custom quote!"
+                    };
+                }
+
+                knowledgeList.innerHTML = '';
+                for (let key in kv) {
+                    createEntryRow(key, kv[key]);
+                }
+
+                loading.style.display = 'none';
+                knowledgeList.style.display = 'block';
+                addBtn.disabled = false;
+                saveBtn.disabled = false;
+
+            } catch (error) {
+                console.error("Error loading knowledge:", error);
+                loading.textContent = "Error loading data. Check console.";
+                showStatus("Failed to connect to Firebase. Using local backup.", "error");
+            }
+        }
+
+        function createEntryRow(key = '', value = '') {
+            const div = document.createElement('div');
+            div.className = 'entry';
+            div.innerHTML = `
+                <input type="text" class="keyword" placeholder="Keyword (e.g. 'pricing')" value="${key}">
+                <textarea class="answer" placeholder="Bot's Answer">${value}</textarea>
+                <button class="remove-btn" onclick="this.parentElement.remove()">Delete</button>
+            `;
+            knowledgeList.appendChild(div);
+        }
+
+        window.addEntry = () => createEntryRow();
+
+        window.saveKnowledge = async () => {
+            saveBtn.disabled = true;
+            saveBtn.textContent = "Saving...";
+
+            const entries = document.querySelectorAll('.entry');
+            const newKV = {};
+            entries.forEach(entry => {
+                const k = entry.querySelector('.keyword').value.trim().toLowerCase();
+                const v = entry.querySelector('.answer').value.trim();
+                if (k && v) {
+                    newKV[k] = v;
+                }
+            });
+
+            try {
+                await setDoc(doc(db, COLLECTION, DOC_ID), {
+                    knowledge: newKV,
+                    lastUpdated: new Date().toISOString()
+                });
+
+                showStatus("Knowledge base synced with Firebase successfully!", "success");
+                // Also update local for redundancy
+                localStorage.setItem('griddy_knowledge', JSON.stringify(newKV));
+            } catch (error) {
+                console.error("Error saving knowledge:", error);
+                showStatus("Error syncing with Firebase. Saved to local storage only.", "error");
+                localStorage.setItem('griddy_knowledge', JSON.stringify(newKV));
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = "Save All Changes";
+            }
+        };
+
+        function showStatus(text, type) {
+            status.textContent = text;
+            status.className = `status ${type}`;
+            setTimeout(() => { status.className = "status"; }, 4000);
+        }
+
+        loadKnowledge();
+    </script>
+</body>
+
+</html>
