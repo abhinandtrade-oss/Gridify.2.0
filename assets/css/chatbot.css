@@ -1,0 +1,346 @@
+/* Griddy Chatbot Styles */
+:root {
+    --griddy-primary: #007bff;
+    --griddy-bg: #ffffff;
+    --griddy-text: #333333;
+    --griddy-user-msg: #007bff;
+    --griddy-bot-msg: #f1f1f1;
+    --griddy-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+#griddy-chatbot-container {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    z-index: 2147483647 !important;
+    font-family: 'Inter', sans-serif;
+    pointer-events: auto !important;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Align with site's vertical border line for wide screens */
+@media screen and (min-width: 1400px) {
+    #griddy-chatbot-container {
+        right: calc((100vw - 1320px) / 2 + 15px) !important;
+    }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1399px) {
+    #griddy-chatbot-container {
+        right: calc((100vw - 1140px) / 2 + 15px) !important;
+    }
+}
+
+#griddy-toggle {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 2px solid rgba(0, 123, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.1));
+}
+
+#griddy-toggle:hover {
+    transform: scale(1.1) rotate(5deg);
+    border-color: rgba(0, 123, 255, 0.8);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#griddy-toggle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#griddy-window {
+    position: absolute;
+    bottom: 95px;
+    right: 0;
+    width: 380px;
+    height: 600px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transform-origin: bottom right;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#griddy-window.active {
+    display: flex;
+    animation: griddyAppear 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes griddyAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+#griddy-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 25px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#griddy-header img {
+    width: 45px;
+    height: 45px;
+    background: white;
+    border-radius: 12px;
+    padding: 2px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+#griddy-header .info h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+#griddy-header .info p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.9;
+    color: #e0e0e0;
+}
+
+#griddy-header .close-btn {
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 24px;
+    opacity: 0.8;
+    transition: all 0.2s;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+#griddy-header .close-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+#griddy-messages {
+    flex: 1;
+    padding: 25px 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    background: #fcfcfc;
+}
+
+#griddy-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#griddy-messages::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 10px;
+}
+
+.griddy-message {
+    max-width: 85%;
+    padding: 12px 18px;
+    border-radius: 20px;
+    font-size: 14.5px;
+    line-height: 1.5;
+    position: relative;
+    word-wrap: break-word;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+.griddy-message.bot {
+    align-self: flex-start;
+    background: white;
+    color: #444;
+    border: 1px solid #efefef;
+    border-bottom-left-radius: 5px;
+}
+
+.griddy-message.user {
+    align-self: flex-end;
+    background: #007bff;
+    color: white;
+    border-bottom-right-radius: 5px;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+}
+
+#griddy-input-area {
+    padding: 20px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    gap: 12px;
+    background: white;
+}
+
+#griddy-input {
+    flex: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 15px;
+    padding: 12px 20px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #f9f9f9;
+}
+
+#griddy-input:focus {
+    border-color: #007bff;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.05);
+}
+
+#griddy-send {
+    background: #007bff;
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#griddy-send:hover {
+    background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 86, 179, 0.3);
+}
+
+#griddy-quick-replies {
+    padding: 0 20px 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: white;
+}
+
+.griddy-chip {
+    background: #fff;
+    border: 1.5px solid #eee;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #666;
+}
+
+.griddy-chip:hover {
+    background: #f0f7ff;
+    color: #007bff;
+    border-color: #007bff;
+    transform: translateY(-1px);
+}
+
+/* Animations */
+.typing {
+    display: flex;
+    gap: 5px;
+    padding: 12px 18px;
+    background: white !important;
+    border: 1px solid #efefef !important;
+}
+
+.typing span {
+    width: 8px;
+    height: 8px;
+    background: #d0d0d0;
+    border-radius: 50%;
+    animation: blink 1.4s infinite both;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+
+    0%,
+    80%,
+    100% {
+        opacity: 0.3;
+    }
+
+    40% {
+        opacity: 1;
+    }
+}
+
+/* WhatsApp Option Styling */
+.whatsapp-offer {
+    border-color: #25d366 !important;
+}
+
+.griddy-whatsapp-btn {
+    background: #25d366;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.griddy-whatsapp-btn:hover {
+    background: #128c7e;
+    transform: translateY(-2px);
+}
+
+/* Mobile Adjustments */
+@media screen and (max-width: 480px) {
+    #griddy-window {
+        width: calc(100vw - 30px);
+        height: 70vh;
+        right: -10px;
+        bottom: 100px;
+    }
+
+    #griddy-toggle {
+        width: 70px;
+        height: 70px;
+    }
+}
