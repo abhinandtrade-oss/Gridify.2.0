@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="description"
+        content="Choose the best plan for your business with Gridify. We offer competitive pricing for web design, development, and digital marketing services.">
+    <meta name="keywords"
+        content="Gridify Pricing, Web Design Plans, Web Development Cost, SEO Packages, Digital Marketing Pricing">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://gridify.in/pricing.html">
+    <meta property="og:title" content="Pricing Plans - Gridify">
+    <meta property="og:description"
+        content="Choose the best plan for your business with Gridify. We offer competitive pricing for web design, development, and digital marketing services.">
+    <meta property="og:image" content="https://gridify.in/assets/images/logos/logo.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://gridify.in/pricing.html">
+    <meta property="twitter:title" content="Pricing Plans - Gridify">
+    <meta property="twitter:description"
+        content="Choose the best plan for your business with Gridify. We offer competitive pricing for web design, development, and digital marketing services.">
+    <meta property="twitter:image" content="https://gridify.in/assets/images/logos/logo.png">
+
+    <!-- Title -->
+    <title>Gridify - Pricing Plans</title>
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" href="assets/images/logos/favicon.png" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&display=swap"
+        rel="stylesheet">
+
+    <!-- Flaticon -->
+    <link rel="stylesheet" href="assets/css/flaticon.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="assets/css/fontawesome-5.14.0.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <!-- Magnific Popup -->
+    <link rel="stylesheet" href="assets/css/magnific-popup.min.css">
+    <!-- Nice Select -->
+    <link rel="stylesheet" href="assets/css/nice-select.min.css">
+    <!-- Animate -->
+    <link rel="stylesheet" href="assets/css/aos.css">
+    <!-- Slick -->
+    <link rel="stylesheet" href="assets/css/slick.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.48/build/spline-viewer.js"></script>
+    <style>
+        /* Removed pointer-events: none as it was only for Spline viewer */
+        .main-header {
+            pointer-events: auto;
+        }
+
+        .pricing-section {
+            background-color: #fff;
+            padding: 100px 0;
+            color: #111;
+        }
+
+        .pricing-card {
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            padding: 40px 30px;
+            height: 100%;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-15px);
+            border-color: var(--ridda-primary-color);
+            background: #fff;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--ridda-primary-color);
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(255, 208, 67, 0.2);
+        }
+
+        .pricing-card .plan-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--ridda-primary-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .pricing-card .price-block {
+            margin-bottom: 30px;
+        }
+
+        .pricing-card .offer-price {
+            display: block;
+            font-size: 42px;
+            font-weight: 800;
+            color: #111;
+            line-height: 1;
+        }
+
+        .pricing-card .actual-price {
+            display: block;
+            font-size: 18px;
+            color: #777;
+            text-decoration: line-through;
+            margin-top: 5px;
+        }
+
+        .pricing-card .feature-group {
+            margin-bottom: 20px;
+        }
+
+        .pricing-card .feature-group-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: block;
+        }
+
+        .pricing-card .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .pricing-card .feature-list li {
+            padding: 8px 0;
+            font-size: 13px;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .pricing-card .feature-list li i {
+            margin-right: 12px;
+            margin-top: 3px;
+            font-size: 14px;
+        }
+
+        .pricing-card .feature-list li.included {
+            color: #444;
+        }
+
+        .pricing-card .feature-list li.included i {
+            color: #28a745;
+        }
+
+        .pricing-card .feature-list li.not-included {
+            color: #999;
+        }
+
+        .pricing-card .feature-list li.not-included i {
+            color: #dc3545;
+        }
+
+        .pricing-card .theme-btn {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ridda-primary-color);
+            color: #000;
+            padding: 5px 20px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(255, 208, 67, 0.3);
+        }
+
+        .pricing-footer-note {
+            margin-top: 40px;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .limited-offer-note {
+            display: inline-block;
+            background: rgba(255, 208, 67, 0.1);
+            color: var(--ridda-secondary-color);
+            padding: 8px 25px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 208, 67, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Glassmorphism effect in Hero */
+        .banner-inner {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 60px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body {
+            background-color: #fff !important;
+        }
+
+        .section-title h2 {
+            color: #111;
+        }
+
+        .section-title p {
+            color: #666;
+        }
+
+        .section-title .subtitle {
+            color: var(--ridda-primary-color);
+        }
+
+        /* Success Modal Styles */
+        .success-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-modal.show {
+            display: flex;
+        }
+
+        .success-modal-content {
+            background-color: #fff;
+            padding: 40px;
+            border: none;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            animation: modalFadeIn 0.3s;
+            text-align: center;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close-success-modal {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            line-height: 1;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="page-wrapper">
+
+        <!-- Preloader -->
+        <div class="preloader">
+            <div class="custom-loader"></div>
+        </div>
+
+        <!-- main header -->
+        <header class="main-header header-one white-menu menu-absolute">
+            <!--Header-Upper-->
+            <div class="header-upper">
+                <div class="container px-xxl-0 bordered-x clearfix">
+
+                    <div class="header-inner rel d-flex align-items-center">
+                        <div class="logo-outer">
+                            <div class="logo"><a href="index.html"><img src="assets/images/logos/logo.png" alt="Logo"
+                                        title="Logo" style="width: 100px; height: 100px; object-fit: contain;"></a>
+                            </div>
+                        </div>
+
+                        <div class="nav-outer mx-lg-auto ps-xxl-5 clearfix">
+                            <!-- Main Menu -->
+                            <nav class="main-menu navbar-expand-lg">
+                                <div class="navbar-header rpy-10">
+                                    <div class="mobile-logo">
+                                        <a href="index.html">
+                                            <img src="assets/images/logos/logo.png" alt="Logo" title="Logo"
+                                                style="width: 100px; height: 100px; object-fit: contain;">
+                                        </a>
+                                    </div>
+
+                                    <!-- Login button for mobile -->
+                                    <div class="menu-btns d-lg-none ms-auto me-3">
+                                        <a href="login.html" class="theme-btn btn-extra-small" data-hover="Login">
+                                            <span>Login</span>
+                                        </a>
+                                    </div>
+
+                                    <!-- Toggle Button -->
+                                    <button type="button" class="navbar-toggle" data-bs-toggle="collapse"
+                                        data-bs-target=".navbar-collapse">
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+
+                                <div class="navbar-collapse collapse clearfix">
+                                    <ul class="navigation clearfix">
+                                        <li class=""><a href="index.html">Home</a>
+                                            <ul>
+                                            </ul>
+                                        </li>
+                                        <li><a href="about.html">About</a></li>
+                                        <li><a href="services.html">Services</a></li>
+                                        <li><a href="shop.html">Shop</a></li>
+                                        <li><a href="fun.html">Tools</a></li>
+                                        <li><a href="contact.html">Contact</a></li>
+                                    </ul>
+                                </div>
+
+                            </nav>
+                            <!-- Main Menu End-->
+                        </div>
+
+                        <!-- Menu Button -->
+                        <div class="menu-btns d-none d-lg-block">
+                            <a href="shop.html" class="theme-btn btn-small" data-hover="Shop Now">
+                                <span>Shop Now</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--End Header Upper-->
+        </header>
+
+        <!-- Page Banner Start -->
+        <section class="page-banner-area bgc-black text-white rel z-1 overflow-hidden"
+            style="position: relative; overflow: hidden; background-color: #000000 !important; min-height: 50vh;">
+            <div class="container bordered-x py-200 rpt-100 rpb-120"
+                style="position: relative; z-index: 2; pointer-events: none;">
+                <div class="banner-inner px-xl-4 pt-90" style="pointer-events: auto;">
+                    <h1 class="page-title mb-20">Our Pricing</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                            <li class="breadcrumb-item active">Pricing</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="page-banner-shapes" style="z-index: 2; pointer-events: none;">
+                <span class="marquee-wrap">
+                    <span class="marquee-inner left">
+                        <span class="marquee-item">Transparent Pricing</span>
+                    </span>
+                    <span class="marquee-inner left">
+                        <span class="marquee-item">Best Value Plans</span>
+                    </span>
+                    <span class="marquee-inner left">
+                        <span class="marquee-item">Creative Web Solutions</span>
+                    </span>
+                </span>
+            </div>
+
+        </section>
+        <!-- Page Banner End -->
+
+        <!-- Pricing Area start -->
+        <section class="pricing-section rel z-1">
+            <div class="container bordered-x px-xl-5">
+                <div class="row justify-content-center mb-60">
+                    <div class="col-xl-8 col-lg-10">
+                        <div class="section-title text-center">
+                            <span class="limited-offer-note"><i class="fas fa-clock mr-10"></i> Limited Time
+                                Offer</span>
+                            <span class="subtitle mb-15">Pricing Plans</span>
+                            <h2>Find the Perfect Plan for Your Journey</h2>
+                            <p>Special offer prices are available until <b>March 31st, 2026</b>. Secure your plan today
+                                at the best rates!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <!-- Very Basic Plan -->
+                    <div class="col-xl-3 col-lg-6 col-md-6 mb-30">
+                        <div class="pricing-card">
+                            <h4 class="plan-name">Very Basic</h4>
+                            <div class="price-block">
+                                <span class="offer-price">₹ 9,999</span>
+                                <span class="actual-price">₹ 14,999</span>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">AVAILABLE</span>
+                                <ul class="feature-list">
+                                    <li class="included"><i class="fas fa-check-circle"></i> 1 Page</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Responsive Design (Mobile
+                                        Friendly)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Animated Header</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Contact Form</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Social Media Integration
+                                    </li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Support for 1 month
+                                        (from launch)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Domain for 30 days
+                                        (gridify.in subdomain)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Basic Chat Support</li>
+                                </ul>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">NOT INCLUDED</span>
+                                <ul class="feature-list">
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Content Updation After
+                                        launching (Paid)</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> SEO</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Content Management
+                                        System</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Media Gallery</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Chat Bot integration
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Priority Call Support
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain Email
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> AMC</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> WhatsApp integration
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <a href="javascript:void(0)" class="theme-btn choose-plan-btn" data-plan="Very Basic"
+                                data-price="₹ 9,999" data-hover="Choose Plan">
+                                <span>Choose Plan</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-6 col-md-6 mb-30">
+                        <div class="pricing-card">
+                            <h4 class="plan-name">Basic</h4>
+                            <div class="price-block">
+                                <span class="offer-price">₹ 14,999</span>
+                                <span class="actual-price">₹ 19,999</span>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">AVAILABLE</span>
+                                <ul class="feature-list">
+                                    <li class="included"><i class="fas fa-check-circle"></i> Upto 5 Pages</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Responsive Design (Mobile
+                                        Friendly)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Animated Header</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Contact Form</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Social Media Integration
+                                    </li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Support for 1 month
+                                        (from launch)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Domain for 60 days
+                                        (gridify.in subdomain)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> WhatsApp integration</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Chat Support</li>
+                                </ul>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">NOT INCLUDED</span>
+                                <ul class="feature-list">
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Content Updation After
+                                        launching (Paid)</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> SEO</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Content Management
+                                        System</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Media Gallery</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Chat Bot integration
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Priority Call Support
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain Email
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> AMC</li>
+                                </ul>
+                            </div>
+
+                            <a href="javascript:void(0)" class="theme-btn choose-plan-btn" data-plan="Basic"
+                                data-price="₹ 14,999" data-hover="Choose Plan">
+                                <span>Choose Plan</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-6 col-md-6 mb-30">
+                        <div class="pricing-card featured">
+                            <div class="popular-badge">RECOMMENDED</div>
+                            <h4 class="plan-name">Standard</h4>
+                            <div class="price-block">
+                                <span class="offer-price">₹ 21,999</span>
+                                <span class="actual-price">₹ 27,999</span>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">AVAILABLE</span>
+                                <ul class="feature-list">
+                                    <li class="included"><i class="fas fa-check-circle"></i> Upto 7 Pages</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Responsive Design (Mobile
+                                        Friendly)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Animated Header</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Contact Form</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Social Media Integration
+                                    </li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Support for 1 month
+                                        (from launch)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Domain for 90 days
+                                        (gridify.in sub domain (subjected to availability))*</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Content Management System
+                                        (Basic)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> WhatsApp integration</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Priority Call Support</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Chat Support</li>
+                                </ul>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">NOT INCLUDED</span>
+                                <ul class="feature-list">
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Content Updation After
+                                        launching (Paid)</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> SEO</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Media Gallery</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Chat Bot integration
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain Email
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> AMC</li>
+                                </ul>
+                            </div>
+
+                            <a href="javascript:void(0)" class="theme-btn choose-plan-btn" data-plan="Standard"
+                                data-price="₹ 21,999" data-hover="Choose Plan">
+                                <span>Choose Plan</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-lg-6 col-md-6 mb-30">
+                        <div class="pricing-card">
+                            <h4 class="plan-name">Premium</h4>
+                            <div class="price-block">
+                                <span class="offer-price">₹ 34,999</span>
+                                <span class="actual-price">₹ 40,999</span>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">AVAILABLE</span>
+                                <ul class="feature-list">
+                                    <li class="included"><i class="fas fa-check-circle"></i> 1 Page</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Responsive Design (Mobile
+                                        Friendly)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Animated Header</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Contact Form</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Social Media Integration
+                                    </li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Support for 1 month
+                                        (from launch)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Free Domain for 120 days
+                                        (gridify.in subdomain)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Basic SEO</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Media Gallery</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Priority Call Support</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> WhatsApp integration</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Chat Bot integration</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Content Management System
+                                        (Advanced)</li>
+                                    <li class="included"><i class="fas fa-check-circle"></i> Chat Support</li>
+                                </ul>
+                            </div>
+
+                            <div class="feature-group">
+                                <span class="feature-group-title">NOT INCLUDED</span>
+                                <ul class="feature-list">
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Content Updation After
+                                        launching (Paid)</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain</li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> Custom Domain Email
+                                    </li>
+                                    <li class="not-included"><i class="fas fa-times-circle"></i> AMC</li>
+                                </ul>
+                            </div>
+
+                            <a href="javascript:void(0)" class="theme-btn choose-plan-btn" data-plan="Premium"
+                                data-price="₹ 34,999" data-hover="Choose Plan">
+                                <span>Choose Plan</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-40">
+                    <div class="col-12 text-center">
+                        <p class="pricing-footer-note">* Offer valid until March 31st, 2026. Gridify.in subdomain is
+                            subjected to availability. Other T&C may apply.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Pricing Area end -->
+
+
+
+
+        <!-- footer area start -->
+        <footer class="main-footer bgc-black text-white rel z-1">
+            <div class="footer-marquee pt-60 pb-75 rpy-90 rel">
+                <div class="container blank-container bordered-x"></div>
+                <span class="marquee-wrap">
+                    <span class="marquee-inner left">
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                    </span>
+                    <span class="marquee-inner left">
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                    </span>
+                    <span class="marquee-inner left">
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                        <span class="marquee-item"></span>
+                    </span>
+                </span>
+            </div>
+            <div class="container bordered-x pb-50">
+                <div class="row justify-content-between">
+                    <div class="col-lg-4 col-sm-8">
+                        <div class="footer-widget footer-newsletter">
+                            <div class="footer-logo mb-20">
+                                <a href="index.html"><img src="assets/images/logos/logo-footer.png" alt="Logo"></a>
+                            </div>
+                            <p>We are fully committed to delivering an experience that keeps our customers satisfied
+                                every step of the way.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="row justify-content-between">
+                            <div class="col-md-4 col-sm-6">
+                            </div>
+                            <div class="col-xl-3 col-md-4 col-sm-6">
+                                <div class="footer-widget footer-text">
+                                    <div class="footer-title">
+                                        <h6>Contact Us</h6>
+                                    </div>
+                                    <div class="text">
+                                        <a href="mailto:info@gridify.com">info@gridify.com</a><br>
+                                        <a href="callto:+918129566053">+91 81295 66053</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <div class="footer-widget footer-contact">
+                                    <div class="footer-title">
+                                        <h6>Follow Us on</h6>
+                                    </div>
+                                    <div class="social-style-two mt-15">
+                                        <a href="www.facebook.com"><i class="fab fa-facebook-f"></i></a>
+                                        <a href="www.instagram.com"><i class="fab fa-instagram"></i></a>
+                                        <a href="https://wa.me/918129566053"><i class="fab fa-whatsapp"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="container bordered-x bordered-top pt-25 pb-10">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="copyright-text text-center text-lg-start">
+                                <p>Copyright 2025 © <a href="index.html">Gridify</a>, all rights reserved.</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-7 text-center text-lg-end">
+                            <ul class="footer-bottom-nav">
+                                <li><a href="faqs.html">FAQ</a></li>
+                                <li><a href="404.html">Privacy Policy</a></li>
+                                <li><a href="404.html">Terms & Conditions</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- Scroll Top Button -->
+                    <button class="scroll-top scroll-to-target" data-target="html"><i
+                            class="far fa-arrow-up"></i></button>
+                </div>
+            </div>
+            <div class="footer-shapes">
+            </div>
+        </footer>
+        <!-- footer area end -->
+
+    </div>
+    <!--End pagewrapper-->
+
+    <!-- Plan Inquiry Modal -->
+    <div class="modal fade" id="planInquiryModal" tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="border-radius: 20px; border: none; overflow: hidden; box-shadow: 0 15px 50px rgba(0,0,0,0.2);">
+                <div class="modal-header bg-light border-0 py-4 px-4">
+                    <h4 class="modal-title" style="color: #111; font-weight: 700;">Get Started: <span id="modalPlanName"
+                            style="color: var(--ridda-primary-color);"></span></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-4 text-muted">Please provide your details below to proceed with the inquiry. We will
+                        contact you shortly.</p>
+                    <form id="planInquiryForm">
+                        <input type="hidden" id="selectedPlan" name="selectedPlan">
+                        <input type="hidden" id="selectedPrice" name="selectedPrice">
+
+                        <div class="form-group mb-3">
+                            <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px;">Full Name *</label>
+                            <input type="text" class="form-control" id="clientName" placeholder="Enter your full name"
+                                required style="height: 50px; border-radius: 10px;">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px;">Phone Number *</label>
+                            <input type="tel" class="form-control" id="clientPhone"
+                                placeholder="Enter your phone number" required
+                                style="height: 50px; border-radius: 10px;">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px;">Email Address
+                                *</label>
+                            <input type="email" class="form-control" id="clientEmail" placeholder="Enter your email"
+                                required style="height: 50px; border-radius: 10px;">
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label style="font-weight: 600; font-size: 14px; margin-bottom: 8px;">Message
+                                (Optional)</label>
+                            <textarea class="form-control" id="clientMessage" rows="3"
+                                placeholder="Tell us about your project" style="border-radius: 10px;"></textarea>
+                        </div>
+
+                        <button type="submit" class="theme-btn w-100" data-hover="Send Inquiry via Email">
+                            <span>Send Inquiry via Email</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="success-modal">
+        <div class="success-modal-content">
+            <span class="close-success-modal">&times;</span>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 style="color: #111; margin-bottom: 10px;">Inquiry Sent Successfully!</h3>
+            <p style="color: #666; margin-bottom: 25px;">Thank you for your interest. Our sales team will get back to
+                you shortly regarding the <span id="confirmPlan"
+                    style="font-weight: 700; color: var(--ridda-primary-color);"></span> plan.</p>
+            <button type="button" class="theme-btn close-success-btn" data-hover="Close">
+                <span>Close</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Jquery -->
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <!-- Appear Js -->
+    <script src="assets/js/appear.min.js"></script>
+    <!-- Slick -->
+    <script src="assets/js/slick.min.js"></script>
+    <!-- Magnific Popup -->
+    <script src="assets/js/jquery.magnific-popup.min.js"></script>
+    <!-- Nice Select -->
+    <script src="assets/js/jquery.nice-select.min.js"></script>
+    <!-- Image Loader -->
+    <script src="assets/js/imagesloaded.pkgd.min.js"></script>
+    <!-- AOS -->
+    <script src="assets/js/aos.js"></script>
+    <!-- Custom script -->
+    <script src="assets/js/script.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Handle Choose Plan Button Click
+            $('.choose-plan-btn').on('click', function () {
+                const planName = $(this).data('plan');
+                const planPrice = $(this).data('price');
+
+                $('#modalPlanName').text(planName);
+                $('#selectedPlan').val(planName);
+                $('#selectedPrice').val(planPrice);
+
+                $('#planInquiryModal').modal('show');
+            });
+
+            // Handle Form Submission
+            $('#planInquiryForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalBtnText = submitBtn.html();
+
+                // Show loading state
+                submitBtn.html('<span>Sending...</span>');
+                submitBtn.prop('disabled', true);
+                submitBtn.css('opacity', '0.7');
+
+                const plan = $('#selectedPlan').val();
+                const price = $('#selectedPrice').val();
+                const name = $('#clientName').val();
+                const phone = $('#clientPhone').val();
+                const email = $('#clientEmail').val();
+                const message = $('#clientMessage').val();
+
+                // Format data for Google Script
+                const formData = new FormData();
+                formData.append('Plan', plan);
+                formData.append('Price', price);
+                formData.append('Name', name);
+                formData.append('Phone', phone);
+                formData.append('Email', email);
+                formData.append('Message', message);
+                formData.append('Source', 'Pricing Page Inquiry');
+
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbxMaIqBo7sc_Wu_hQFMeWKrGaGWjEvPqOYno5xPVqj_oHEm6ayVcB49jE_DxHvd9gTc/exec';
+
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors', // Google Scripts require no-cors for direct POST from forms
+                    body: formData
+                })
+                    .then(() => {
+                        // Success Path
+                        $('#planInquiryModal').modal('hide');
+                        $('#confirmPlan').text(plan);
+                        $('#successModal').addClass('show');
+                        this.reset();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Open mailto as fallback if script fails
+                        const subject = `Inquiry for ${plan} Plan - Gridify`;
+                        const body = `Hello Gridify Sales Team,\n\nI am interested in the ${plan} plan.\n\nDetails:\nName: ${name}\nPhone: ${phone}\nEmail: ${email}\nMessage: ${message}`;
+                        window.location.href = `mailto:sales@gridify.in?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    })
+                    .finally(() => {
+                        submitBtn.html(originalBtnText);
+                        submitBtn.prop('disabled', false);
+                        submitBtn.css('opacity', '1');
+                    });
+            });
+
+            // Close Success Modal
+            $('.close-success-modal, .close-success-btn').on('click', function () {
+                $('#successModal').removeClass('show');
+            });
+
+            $(window).on('click', function (e) {
+                if ($(e.target).is('#successModal')) {
+                    $('#successModal').removeClass('show');
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
