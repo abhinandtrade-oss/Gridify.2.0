@@ -1360,6 +1360,21 @@
                                 style="background-color: #7c3aed;">Manage Bot</button>
                         </div>
                     </div>
+
+                    <!-- Image-URL Manager Card -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="admin-card feature-card animate-up"
+                            onclick="new bootstrap.Modal(document.getElementById('imageManagerModal')).show()">
+                            <div class="icon-box-large bg-info-soft"
+                                style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">
+                                <i class="fas fa-images fa-2x"></i>
+                            </div>
+                            <h5 class="fw-700">Image-URL Manager</h5>
+                            <p class="text-muted small px-2">Manage and upload images via URL.</p>
+                            <button class="btn btn-sm text-white rounded-pill w-100 mt-2"
+                                style="background-color: #38bdf8;">Open Manager</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1577,6 +1592,32 @@
                     style="overflow: hidden; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
                     <iframe
                         src="https://script.google.com/macros/s/AKfycbzmvkZnRol2p5N2UPyCULHygXhz_x6PTMBUDX44iUsRYy4I8a6yzOse8auiDir4fun-SQ/exec"
+                        style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image-URL Manager Modal -->
+    <div class="modal fade" id="imageManagerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content border-0">
+                <div class="modal-header custom-modal-header border-0 shadow-sm py-3 px-4 bg-white"
+                    style="position: relative; z-index: 1050;">
+                    <div class="d-flex align-items-center gap-3">
+                        <button type="button" class="btn btn-light rounded-circle shadow-sm" data-bs-dismiss="modal"
+                            title="Back to Dashboard">
+                            <i class="fas fa-arrow-left text-dark"></i>
+                        </button>
+                        <div>
+                            <h5 class="modal-title fw-800 mb-0">Image-URL Manager</h5>
+                            <p class="text-muted small mb-0">External Image Management Dashboard</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 bg-light" style="overflow: hidden;">
+                    <iframe src="https://gridify-image-uploader.sabhinand5.workers.dev/asdfghjkl%3Bpoiuytrewqwsdcvb/"
                         style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
                 </div>
             </div>
