@@ -11,18 +11,18 @@
     <!-- Title -->
     <title>Gridify - Login</title>
     <!-- Favicon Icon -->
-    <link rel="shortcut icon" href="../assets/images/logos/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="assets/images/logos/favicon.png" type="image/x-icon">
     <!-- Google Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="../assets/css/fontawesome-5.14.0.min.css">
+    <link rel="stylesheet" href="assets/css/fontawesome-5.14.0.min.css">
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
     <!-- Main Style -->
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 
     <style>
         body {
@@ -309,7 +309,7 @@
             <div class="auth-sidebar">
                 <div class="sidebar-content">
                     <div class="brand">
-                        <img src="../assets/images/logos/logo.png" alt="Gridify" class="brand-logo"
+                        <img src="assets/images/logos/logo.png" alt="Gridify" class="brand-logo"
                             style="width:150px; height:auto;">
                         <span class="brand-name">Gridify.in</span>
                     </div>
@@ -481,11 +481,11 @@
     </div>
 
     <!-- Jquery -->
-    <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap -->
-    <script src="../assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
     <script type="module">
-        import { AdminManager } from '../assets/js/admin-manager.js';
+        import { AdminManager } from './assets/js/admin-manager.js';
 
         $(document).ready(function () {
             let registrationData = {};
@@ -495,7 +495,7 @@
             // Redirect if already logged in
             const session = AdminManager.getSession();
             if (session) {
-                window.location.href = 'index.html';
+                window.location.href = 'login/index.html';
                 return;
             }
 
@@ -522,7 +522,7 @@
                 try {
                     const result = await AdminManager.googleLogin();
                     if (result.success) {
-                        window.location.href = 'index.html';
+                        window.location.href = 'login/index.html';
                     } else {
                         $('#loginError').removeClass('d-none').text(result.message);
                         $('#signupError').removeClass('d-none').text(result.message);
@@ -543,7 +543,7 @@
                 btn.text("Verifying...").prop('disabled', true);
                 const result = await AdminManager.login(u, p);
                 if (result.success) {
-                    window.location.href = 'index.html';
+                    window.location.href = 'login/index.html';
                 } else {
                     $('#loginError').removeClass('d-none').text(result.message);
                 }
