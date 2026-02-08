@@ -67,6 +67,81 @@
         .main-header .navbar-toggle {
             pointer-events: auto;
         }
+
+        /* Neo Gridify Title Styling */
+        .neo-gridify-title {
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+            margin-bottom: 60px;
+        }
+
+        .neo-gridify-title h1 {
+            margin-bottom: 0 !important;
+            color: white !important;
+            position: relative;
+            z-index: 2;
+        }
+
+        .neo-gridify-title .neo-text {
+            color: white !important;
+            font-size: 30px;
+            font-weight: 700;
+            position: absolute;
+            top: -25px;
+            left: 0;
+            z-index: 1;
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+        }
+
+        .neo-gridify-title .digital-solutions-text {
+            color: white !important;
+            font-size: 30px;
+            font-weight: 700;
+            position: absolute;
+            bottom: -35px;
+            right: 0px;
+            z-index: 3;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: nowrap;
+        }
+
+        @media only screen and (max-width: 1599px) {
+
+            .neo-gridify-title .neo-text,
+            .neo-gridify-title .digital-solutions-text {
+                font-size: 24px;
+            }
+
+            .neo-gridify-title .digital-solutions-text {
+                bottom: -30px;
+            }
+        }
+
+        @media only screen and (max-width: 991px) {
+            .neo-gridify-title .neo-text {
+                top: -20px;
+                font-size: 18px;
+            }
+
+            .neo-gridify-title .digital-solutions-text {
+                bottom: -25px;
+                font-size: 18px;
+            }
+        }
+
+        @media only screen and (max-width: 767px) {
+            .neo-gridify-title .neo-text {
+                top: -15px;
+                font-size: 14px;
+            }
+
+            .neo-gridify-title .digital-solutions-text {
+                bottom: -20px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 
@@ -215,7 +290,11 @@
                 <div class="row pt-50">
                     <div class="col-xl-10">
                         <div class="hero-content-four" data-aos="fade-up" data-aos-duration="1500" data-aos-offset="50">
-                            <h1>Gridify</h1>
+                            <div class="neo-gridify-title">
+                                <span class="neo-text">Neo</span>
+                                <h1>Gridify</h1>
+                                <span class="digital-solutions-text">Digital Solutions</span>
+                            </div>
                             <p>Every morning in our company begins with hot coffee and a stand-up. Discussion is an
                                 important thing in the development process. Thus new ideas and ingenious solutions are
                                 born. Then we get to work with renewed vigor and inspiration. We are never bored.</p>
