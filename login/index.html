@@ -1565,8 +1565,6 @@
             }
 
             // Modals
-            const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
-            const fpModal = new bootstrap.Modal(document.getElementById('forgotPassModal'));
             const manageUserModal = new bootstrap.Modal(document.getElementById('manageUserModal'));
             const userChangePasswordModal = new bootstrap.Modal(document.getElementById('userChangePasswordModal'));
 
@@ -1710,380 +1708,289 @@
                 container.append(hrCard);
             }
 
-            const container = $('#dynamicProgramCards');
-            container.empty();
 
-            // Brand Color Helper
-            const getBrandColors = (color) => {
-                const palette = {
-                    'primary': { bg: 'rgba(67, 97, 238, 0.1)', text: '#4361ee' },
-                    'success': { bg: 'rgba(16, 185, 129, 0.1)', text: '#10b981' },
-                    'warning': { bg: 'rgba(245, 158, 11, 0.1)', text: '#f59e0b' },
-                    'danger': { bg: 'rgba(239, 68, 68, 0.1)', text: '#ef4444' },
-                    'info': { bg: 'rgba(6, 182, 212, 0.1)', text: '#06b6d4' },
-                    'secondary': { bg: 'rgba(100, 116, 139, 0.1)', text: '#64748b' }
-                };
-                return palette[color] || palette['primary'];
-            };
-
-            // 1. Admin Card
-            if (session.role === 'admin') {
-                const adminCard = `
-                        <div class="col-md-6 col-lg-4 col-xl-3" id="cardAdminPanel">
-                            <article class="workspace-card">
-                                <div class="icon-box" style="background: rgba(67, 97, 238, 0.1); color: #4361ee;">
-                                    <i class="fas fa-user-shield"></i>
-                                </div>
-                                <h3 class="ws-card-title">Admin Control</h3>
-                                <p class="ws-card-desc">Comprehensive oversight of products, orders, users, and system analytics.</p>
-                                <button class="ws-action-btn ws-btn-primary" id="btnGoAdmin">
-                                    Access Panel <i class="fas fa-chevron-right ms-1" style="font-size: 0.8em;"></i>
-                                </button>
-                            </article>
-                        </div>`;
-                container.append(adminCard);
-            }
-
-            // 2. Beta Programs
-            const allPrograms = await AdminManager.getAvailablePrograms();
-            const allowed = session.allowedPrograms || [];
-            let visibleCount = 0;
-
-            allPrograms.forEach(p => {
-                const hasAccess = session.role === 'admin' || allowed.includes(p.id);
-                if (hasAccess) {
-                    visibleCount++;
-                    const colors = getBrandColors(p.color || 'primary');
-                    const card = `
-                            <div class="col-md-6 col-lg-4 col-xl-3">
-                                <article class="workspace-card">
-                                    <div class="icon-box" style="background: ${colors.bg}; color: ${colors.text};">
-                                        <i class="fas ${p.icon || 'fa-rocket'}"></i>
-                                    </div>
-                                    <h3 class="ws-card-title">${p.name}</h3>
-                                    <p class="ws-card-desc">Professional tools for ${p.name.toLowerCase()}. Securely managed beta environment.</p>
-                                    <a href="../developments/${p.path}/index.html" class="ws-action-btn ws-btn-outline">
-                                        Launch Tool <i class="fas fa-external-link-alt ms-1" style="font-size: 0.8em;"></i>
-                                    </a>
-                                </article>
-                            </div>`;
-                    container.append(card);
+            $('#btnGoAdmin').click(function () {
+                const session = AdminManager.getSession();
+                if (session && session.role === 'admin') {
+                    initAdminUI(session);
+                } else {
+                    alert("Unauthorized Access");
+                    window.location.reload();
                 }
             });
 
-            // Add HR management tool Platform Management Card
-            visibleCount++;
-            const hrColors = getBrandColors('info');
-            const hrCard = `
-                    <div class="col-md-6 col-lg-4 col-xl-3">
-                        <article class="workspace-card">
-                            <div class="icon-box" style="background: ${hrColors.bg}; color: ${hrColors.text};">
-                                <i class="fas fa-user-check"></i>
-                            </div>
-                            <h3 class="ws-card-title">HR management tool Platform Management</h3>
-                            <p class="ws-card-desc">Strategic HR solutions and Enterprise Platform management tools.</p>
-                            <a href="https://www.gridify.in/developments/HR%20Solutions/platform/index" class="ws-action-btn ws-btn-outline">
-                                Launch Tool <i class="fas fa-external-link-alt ms-1" style="font-size: 0.8em;"></i>
-                            </a>
-                        </article>
-                    </div>`;
-            container.append(hrCard);
+            function initAdminUI(session) {
+                $('#loginSection').addClass('d-none');
+                $('#dashboardSelection').addClass('d-none').removeClass('d-flex');
+                $('#adminSection').removeClass('d-none');
+                $('#adminUserSpan').text(session.fullName || session.username);
+                AdminManager.initAutoLogout();
 
-            if (visibleCount === 0 && session.role !== 'admin') {
-                container.append(`
-                        <div class="col-12 text-center py-5">
-                            <div class="mb-4 opacity-25">
-                                <i class="fas fa-lock fa-5x"></i>
-                            </div>
-                            <h3 class="fw-bold">No Active Workspaces</h3>
-                            <p class="text-muted">Your account hasn't been assigned any workspaces yet.<br>Please contact system administration for access.</p>
-                        </div>`);
-            }
-        }
+                showAdminLanding(); // Show Landing by default
 
-
-            $('#btnGoAdmin').click(function () {
-            const session = AdminManager.getSession();
-            if (session && session.role === 'admin') {
-                initAdminUI(session);
-            } else {
-                alert("Unauthorized Access");
-                window.location.reload();
-            }
-        });
-
-        function initAdminUI(session) {
-            $('#loginSection').addClass('d-none');
-            $('#dashboardSelection').addClass('d-none').removeClass('d-flex');
-            $('#adminSection').removeClass('d-none');
-            $('#adminUserSpan').text(session.fullName || session.username);
-            AdminManager.initAutoLogout();
-
-            showAdminLanding(); // Show Landing by default
-
-            if (session.role === 'admin') {
-                $('#users-tab-li').show();
-                $('#programs-tab').parent().show();
-                $('#dashBtnUsers').removeClass('d-none');
-                $('#cardManageSub').removeClass('d-none');
-                $('#cardApiManagement').removeClass('d-none');
-            } else {
-                $('#programs-tab').parent().hide();
-                $('#dashBtnUsers').addClass('d-none');
-                $('#cardManageSub').addClass('d-none');
-                $('#cardApiManagement').addClass('d-none');
-            }
-        }
-
-        window.showAdminLanding = function () {
-            $('#adminLandingView').removeClass('d-none');
-            $('#btnBackToHome').addClass('d-none');
-            updateAdminStats();
-        };
-
-        window.switchAdminSubView = function (view) {
-            const modalEl = document.getElementById('inventoryModal');
-            let modal = bootstrap.Modal.getInstance(modalEl);
-            if (!modal) modal = new bootstrap.Modal(modalEl);
-            modal.show();
-
-            // Set the correct tab
-            $(`#mainAdminTabs button[data-view="${view}"]`).click();
-
-            if (view === 'products') {
-                renderProducts();
-                populateFilters();
-            } else if (view === 'orders') {
-                renderOrders();
-            }
-        };
-
-        window.openSystemSettings = function (tabId) {
-            const modalEl = document.getElementById('managementModal');
-            if (modalEl) {
-                if (!managementModalObj) {
-                    try {
-                        managementModalObj = new bootstrap.Modal(modalEl);
-                    } catch (e) { console.error("Modal Init Error", e); }
+                if (session.role === 'admin') {
+                    $('#users-tab-li').show();
+                    $('#programs-tab').parent().show();
+                    $('#dashBtnUsers').removeClass('d-none');
+                    $('#cardManageSub').removeClass('d-none');
+                    $('#cardApiManagement').removeClass('d-none');
+                } else {
+                    $('#programs-tab').parent().hide();
+                    $('#dashBtnUsers').addClass('d-none');
+                    $('#cardManageSub').addClass('d-none');
+                    $('#cardApiManagement').addClass('d-none');
                 }
-                if (managementModalObj) managementModalObj.show();
-
-                // Switch to specific tab inside modal
-                $(`#${tabId}`).click();
-
-                if (tabId === 'coupons-tab') loadCoupons();
-                if (tabId === 'users-tab') loadUsers();
             }
-        };
 
-        async function updateAdminStats() {
-            try {
-                // Fetch all data in parallel for better performance
-                const [products, orders, users, coupons] = await Promise.all([
-                    ProductManager.getAllProducts().catch(() => []),
-                    AdminManager.getOrders().catch(() => []),
-                    AdminManager.getUsers().catch(() => []),
-                    AdminManager.getCoupons().catch(() => [])
-                ]);
+            window.showAdminLanding = function () {
+                $('#adminLandingView').removeClass('d-none');
+                $('#btnBackToHome').addClass('d-none');
+                updateAdminStats();
+            };
 
-                $('#dashCountProducts').text(products.length || 0);
-                $('#dashCountOrders').text(orders.length || 0);
-                $('#dashCountUsers').text(users.length || 0);
-                $('#dashCountCoupons').text(coupons.length || 0);
-            } catch (e) {
-                console.error("Stats Update Error", e);
+            window.switchAdminSubView = function (view) {
+                const modalEl = document.getElementById('inventoryModal');
+                let modal = bootstrap.Modal.getInstance(modalEl);
+                if (!modal) modal = new bootstrap.Modal(modalEl);
+                modal.show();
+
+                // Set the correct tab
+                $(`#mainAdminTabs button[data-view="${view}"]`).click();
+
+                if (view === 'products') {
+                    renderProducts();
+                    populateFilters();
+                } else if (view === 'orders') {
+                    renderOrders();
+                }
+            };
+
+            window.openSystemSettings = function (tabId) {
+                const modalEl = document.getElementById('managementModal');
+                if (modalEl) {
+                    if (!managementModalObj) {
+                        try {
+                            managementModalObj = new bootstrap.Modal(modalEl);
+                        } catch (e) { console.error("Modal Init Error", e); }
+                    }
+                    if (managementModalObj) managementModalObj.show();
+
+                    // Switch to specific tab inside modal
+                    $(`#${tabId}`).click();
+
+                    if (tabId === 'coupons-tab') loadCoupons();
+                    if (tabId === 'users-tab') loadUsers();
+                }
+            };
+
+            async function updateAdminStats() {
+                try {
+                    // Fetch all data in parallel for better performance
+                    const [products, orders, users, coupons] = await Promise.all([
+                        ProductManager.getAllProducts().catch(() => []),
+                        AdminManager.getOrders().catch(() => []),
+                        AdminManager.getUsers().catch(() => []),
+                        AdminManager.getCoupons().catch(() => [])
+                    ]);
+
+                    $('#dashCountProducts').text(products.length || 0);
+                    $('#dashCountOrders').text(orders.length || 0);
+                    $('#dashCountUsers').text(users.length || 0);
+                    $('#dashCountCoupons').text(coupons.length || 0);
+                } catch (e) {
+                    console.error("Stats Update Error", e);
+                }
             }
-        }
 
-        // --- Program Registry Logic ---
-        let programRegistryCache = [];
+            // --- Program Registry Logic ---
+            let programRegistryCache = [];
 
-        async function loadProgramRegistry() {
-            programRegistryCache = await AdminManager.getAvailablePrograms();
-            const tbody = $('#program-registry-body');
-            tbody.empty();
+            async function loadProgramRegistry() {
+                programRegistryCache = await AdminManager.getAvailablePrograms();
+                const tbody = $('#program-registry-body');
+                tbody.empty();
 
-            programRegistryCache.forEach((p, idx) => {
-                const row = `<tr>
+                programRegistryCache.forEach((p, idx) => {
+                    const row = `<tr>
                         <td><input type="text" class="form-control admin-input form-control-sm prog-id" value="${p.id}" data-idx="${idx}"></td>
                         <td><input type="text" class="form-control admin-input form-control-sm prog-name" value="${p.name}" data-idx="${idx}"></td>
                         <td><input type="text" class="form-control admin-input form-control-sm prog-path" value="${p.path}" data-idx="${idx}"></td>
                         <td><input type="text" class="form-control admin-input form-control-sm prog-icon" value="${p.icon}" data-idx="${idx}"></td>
                         <td class="text-end"><button class="action-btn btn-delete btn-remove-prog" data-idx="${idx}" title="Remove"><i class="fas fa-trash"></i></button></td>
                     </tr>`;
-                tbody.append(row);
-            });
-        }
+                    tbody.append(row);
+                });
+            }
 
-        $('#btn-add-program-row').click(function () {
-            const tbody = $('#program-registry-body');
-            const idx = tbody.children().length;
-            const row = `<tr>
+            $('#btn-add-program-row').click(function () {
+                const tbody = $('#program-registry-body');
+                const idx = tbody.children().length;
+                const row = `<tr>
                     <td><input type="text" class="form-control form-control-sm prog-id" placeholder="e.g. builder" data-idx="${idx}"></td>
                     <td><input type="text" class="form-control form-control-sm prog-name" placeholder="Name" data-idx="${idx}"></td>
                     <td><input type="text" class="form-control form-control-sm prog-path" placeholder="Folder Name" data-idx="${idx}"></td>
                     <td><input type="text" class="form-control form-control-sm prog-icon" placeholder="fa-icon" data-idx="${idx}"></td>
                     <td><button class="btn btn-sm btn-danger btn-remove-prog" data-idx="${idx}"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
-            tbody.append(row);
-        });
-
-        $(document).on('click', '.btn-remove-prog', function () {
-            $(this).closest('tr').remove();
-        });
-
-        $('#btn-save-programs').click(async function () {
-            const programs = [];
-            $('#program-registry-body tr').each(function () {
-                const id = $(this).find('.prog-id').val();
-                const name = $(this).find('.prog-name').val();
-                const path = $(this).find('.prog-path').val();
-                const icon = $(this).find('.prog-icon').val();
-                if (id && name && path) {
-                    programs.push({ id, name, path, icon: icon || 'fa-external-link-alt', color: 'primary' });
-                }
+                tbody.append(row);
             });
 
-            const btn = $(this);
-            btn.prop('disabled', true).text('Saving...');
-            try {
-                await AdminManager.updateAvailablePrograms(programs);
-                alert("Program Registry Updated!");
-                await loadProgramRegistry();
-                await renderProgramCheckboxes(); // Refresh other UI parts
-            } catch (e) { alert("Error: " + AdminManager.sanitizeMessage(e.message)); }
-            btn.prop('disabled', false).text('Save Program Registry');
-        });
+            $(document).on('click', '.btn-remove-prog', function () {
+                $(this).closest('tr').remove();
+            });
 
-        $('#programs-tab').on('click', loadProgramRegistry);
+            $('#btn-save-programs').click(async function () {
+                const programs = [];
+                $('#program-registry-body tr').each(function () {
+                    const id = $(this).find('.prog-id').val();
+                    const name = $(this).find('.prog-name').val();
+                    const path = $(this).find('.prog-path').val();
+                    const icon = $(this).find('.prog-icon').val();
+                    if (id && name && path) {
+                        programs.push({ id, name, path, icon: icon || 'fa-external-link-alt', color: 'primary' });
+                    }
+                });
 
-        async function renderProgramCheckboxes() {
-            const programs = await AdminManager.getAvailablePrograms();
-            const defaultContainer = $('#defaultAccessContainer');
-            const manageContainer = $('#manageUserProgramsContainer');
+                const btn = $(this);
+                btn.prop('disabled', true).text('Saving...');
+                try {
+                    await AdminManager.updateAvailablePrograms(programs);
+                    alert("Program Registry Updated!");
+                    await loadProgramRegistry();
+                    await renderProgramCheckboxes(); // Refresh other UI parts
+                } catch (e) { alert("Error: " + AdminManager.sanitizeMessage(e.message)); }
+                btn.prop('disabled', false).text('Save Program Registry');
+            });
 
-            defaultContainer.empty();
-            manageContainer.empty();
+            $('#programs-tab').on('click', loadProgramRegistry);
 
-            programs.forEach(p => {
-                const defHtml = `<div class="form-check">
+            async function renderProgramCheckboxes() {
+                const programs = await AdminManager.getAvailablePrograms();
+                const defaultContainer = $('#defaultAccessContainer');
+                const manageContainer = $('#manageUserProgramsContainer');
+
+                defaultContainer.empty();
+                manageContainer.empty();
+
+                programs.forEach(p => {
+                    const defHtml = `<div class="form-check">
                         <input class="form-check-input def-prog-check" type="checkbox" id="def-${p.id}" data-id="${p.id}">
                         <label class="form-check-label" for="def-${p.id}">${p.name}</label>
                     </div>`;
-                defaultContainer.append(defHtml);
+                    defaultContainer.append(defHtml);
 
-                const manageHtml = `<div class="form-check">
+                    const manageHtml = `<div class="form-check">
                         <input class="form-check-input manage-user-prog-check" type="checkbox" id="check-${p.id}" data-id="${p.id}">
                         <label class="form-check-label" for="check-${p.id}">${p.name}</label>
                     </div>`;
-                manageContainer.append(manageHtml);
-            });
-        }
-
-        // --- Management Modal Logic ---
-        var managementModalObj = null;
-
-        $('#btn-management').on('click', function () {
-            const modalEl = document.getElementById('managementModal');
-            if (modalEl) {
-                if (!managementModalObj) {
-                    try {
-                        managementModalObj = new bootstrap.Modal(modalEl);
-                    } catch (e) { console.error("Modal Init Error", e); }
-                }
-                if (managementModalObj) managementModalObj.show();
-                loadCoupons();
+                    manageContainer.append(manageHtml);
+                });
             }
-        });
 
-        $('#coupons-tab').on('click', loadCoupons);
-        $('#users-tab').on('click', loadUsers);
+            // --- Management Modal Logic ---
+            var managementModalObj = null;
 
-        async function loadCoupons() {
-            try {
-                const coupons = await AdminManager.getCoupons();
-                const tbody = $('#coupon-list-body');
-                tbody.empty();
-                if (!Array.isArray(coupons)) return;
+            $('#btn-management').on('click', function () {
+                const modalEl = document.getElementById('managementModal');
+                if (modalEl) {
+                    if (!managementModalObj) {
+                        try {
+                            managementModalObj = new bootstrap.Modal(modalEl);
+                        } catch (e) { console.error("Modal Init Error", e); }
+                    }
+                    if (managementModalObj) managementModalObj.show();
+                    loadCoupons();
+                }
+            });
 
-                coupons.forEach(c => {
-                    const row = `<tr>
+            $('#coupons-tab').on('click', loadCoupons);
+            $('#users-tab').on('click', loadUsers);
+
+            async function loadCoupons() {
+                try {
+                    const coupons = await AdminManager.getCoupons();
+                    const tbody = $('#coupon-list-body');
+                    tbody.empty();
+                    if (!Array.isArray(coupons)) return;
+
+                    coupons.forEach(c => {
+                        const row = `<tr>
                             <td>${c.code}</td>
                             <td>${c.type}</td>
                             <td>${c.value}</td>
                             <td><button class="btn btn-sm btn-danger" onclick="deleteCoupon('${c.code}')">Delete</button></td>
                         </tr>`;
-                    tbody.append(row);
-                });
-            } catch (e) {
-                console.error("Error in loadCoupons:", e);
+                        tbody.append(row);
+                    });
+                } catch (e) {
+                    console.error("Error in loadCoupons:", e);
+                }
             }
-        }
 
-        $('#btn-add-coupon').on('click', async function () {
-            const code = $('#new-coupon-code').val();
-            const type = $('#new-coupon-type').val();
-            const value = $('#new-coupon-value').val();
-            if (!code || !value) return;
+            $('#btn-add-coupon').on('click', async function () {
+                const code = $('#new-coupon-code').val();
+                const type = $('#new-coupon-type').val();
+                const value = $('#new-coupon-value').val();
+                if (!code || !value) return;
 
-            const btn = $(this);
-            btn.prop('disabled', true).text('Adding...');
+                const btn = $(this);
+                btn.prop('disabled', true).text('Adding...');
 
-            try {
-                await AdminManager.addCoupon(code, type, value);
-                $('#new-coupon-code').val('');
-                $('#new-coupon-value').val('');
-                await loadCoupons();
-            } catch (e) {
-                alert("Error adding coupon: " + AdminManager.sanitizeMessage(e.message));
-            } finally {
-                btn.prop('disabled', false).text('Add Coupon');
-            }
-        });
-
-        window.deleteCoupon = async function (code) {
-            if (confirm("Delete this coupon?")) {
-                await AdminManager.deleteCoupon(code);
-                loadCoupons();
-            }
-        }
-
-        // --- USER MANAGEMENT (Improved) ---
-        let usersCache = [];
-
-        async function loadUsers() {
-            usersCache = await AdminManager.getUsers();
-            renderUserList();
-            // Load Defaults for Settings Tab
-            loadDefaults();
-        }
-
-        function renderUserList() {
-            const tbody = $('#user-list-body');
-            const search = $('#userSearchInput').val()?.toLowerCase() || '';
-            const sort = $('#userSortSelect').val() || 'none';
-
-            tbody.empty();
-
-            let filtered = usersCache.filter(u => {
-                return (u.username?.toLowerCase() || '').includes(search) ||
-                    (u.fullName?.toLowerCase() || '').includes(search);
+                try {
+                    await AdminManager.addCoupon(code, type, value);
+                    $('#new-coupon-code').val('');
+                    $('#new-coupon-value').val('');
+                    await loadCoupons();
+                } catch (e) {
+                    alert("Error adding coupon: " + AdminManager.sanitizeMessage(e.message));
+                } finally {
+                    btn.prop('disabled', false).text('Add Coupon');
+                }
             });
 
-            if (sort === 'role-asc') {
-                filtered.sort((a, b) => a.role.localeCompare(b.role));
-            } else if (sort === 'role-desc') {
-                filtered.sort((a, b) => b.role.localeCompare(a.role));
-            } else if (sort === 'name-asc') {
-                filtered.sort((a, b) => a.username.localeCompare(b.username));
+            window.deleteCoupon = async function (code) {
+                if (confirm("Delete this coupon?")) {
+                    await AdminManager.deleteCoupon(code);
+                    loadCoupons();
+                }
             }
 
-            filtered.forEach(u => {
-                const roleClass = u.role === 'admin' ? 'role-admin' : 'role-user';
-                const roleBadge = `<span class="role-badge ${roleClass}">${u.role}</span>`;
-                const statusClass = u.status === 'active' ? 'text-success' : 'text-danger';
+            // --- USER MANAGEMENT (Improved) ---
+            let usersCache = [];
 
-                const row = `<tr>
+            async function loadUsers() {
+                usersCache = await AdminManager.getUsers();
+                renderUserList();
+                // Load Defaults for Settings Tab
+                loadDefaults();
+            }
+
+            function renderUserList() {
+                const tbody = $('#user-list-body');
+                const search = $('#userSearchInput').val()?.toLowerCase() || '';
+                const sort = $('#userSortSelect').val() || 'none';
+
+                tbody.empty();
+
+                let filtered = usersCache.filter(u => {
+                    return (u.username?.toLowerCase() || '').includes(search) ||
+                        (u.fullName?.toLowerCase() || '').includes(search);
+                });
+
+                if (sort === 'role-asc') {
+                    filtered.sort((a, b) => a.role.localeCompare(b.role));
+                } else if (sort === 'role-desc') {
+                    filtered.sort((a, b) => b.role.localeCompare(a.role));
+                } else if (sort === 'name-asc') {
+                    filtered.sort((a, b) => a.username.localeCompare(b.username));
+                }
+
+                filtered.forEach(u => {
+                    const roleClass = u.role === 'admin' ? 'role-admin' : 'role-user';
+                    const roleBadge = `<span class="role-badge ${roleClass}">${u.role}</span>`;
+                    const statusClass = u.status === 'active' ? 'text-success' : 'text-danger';
+
+                    const row = `<tr>
                         <td>
                             <div class="fw-bold text-dark">${u.username}</div>
                             <div class="small text-muted">Created: ${u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</div>
@@ -2094,192 +2001,192 @@
                             ${u.username !== 'abhinand' ? `<button class="action-btn btn-manage-user" data-user="${u.username}" title="Manage"><i class="fas fa-user-edit"></i></button>` : '<span class="badge bg-light text-muted fw-normal">Super Admin</span>'}
                         </td>
                     </tr>`;
-                tbody.append(row);
-            });
-        }
-
-        // Listeners for User Search & Sort
-        $(document).on('keyup', '#userSearchInput', renderUserList);
-        $(document).on('change', '#userSortSelect', renderUserList);
-
-        // Defaults Logic
-        async function loadDefaults() {
-            await renderProgramCheckboxes(); // Ensure checkboxes are there
-            const defs = await AdminManager.getDefaultPrograms();
-            $('.def-prog-check').each(function () {
-                const id = $(this).data('id');
-                $(this).prop('checked', defs.includes(id));
-            });
-        }
-
-        $('#btn-save-defaults').click(async function () {
-            const defaults = [];
-            $('.def-prog-check:checked').each(function () {
-                defaults.push($(this).data('id'));
-            });
-
-            const btn = $(this);
-            btn.prop('disabled', true).text('Saving...');
-            try {
-                await AdminManager.saveDefaultPrograms(defaults);
-                alert("Default settings saved!");
-            } catch (e) { alert("Error: " + AdminManager.sanitizeMessage(e.message)); }
-            btn.prop('disabled', false).text('Save Default Settings');
-        });
-
-        // Manage User Modal Logic
-        $(document).on('click', '.btn-manage-user', async function () {
-            const username = $(this).data('user');
-            const user = usersCache.find(u => u.username === username);
-            if (!user) return;
-
-            $('#manageUserTitle').text(`Manage User: ${username}`);
-            $('#manageUserUsername').val(username);
-            $('#manageUserRole').val(user.role);
-
-            // Ensure checkboxes are rendered first
-            await renderProgramCheckboxes();
-
-            // Programs
-            const progs = user.allowedPrograms || [];
-            $('.manage-user-prog-check').each(function () {
-                const id = $(this).data('id');
-                $(this).prop('checked', progs.includes(id));
-            });
-
-            // Status Button
-            const statusBtnText = user.status === 'active' ? 'Suspend Account' : 'Activate Account';
-            const statusBtnClass = user.status === 'active' ? 'btn-warning' : 'btn-success';
-            $('#statusControlArea').html(`<button class="btn ${statusBtnClass} w-100" id="btnToggleUserStatus">${statusBtnText}</button>`);
-
-            manageUserModal.show();
-        });
-
-        // Save Changes in Manage Modal
-        $('#btnSaveUserChanges').click(async function () {
-            const username = $('#manageUserUsername').val();
-            const newRole = $('#manageUserRole').val();
-            const updatedPrograms = [];
-
-            $('.manage-user-prog-check:checked').each(function () {
-                updatedPrograms.push($(this).data('id'));
-            });
-
-
-            const btn = $(this);
-            btn.prop('disabled', true).text('Saving...');
-
-            try {
-                await AdminManager.updateUserDetails(username, newRole, updatedPrograms);
-                alert("User Updated Successfully!");
-                manageUserModal.hide();
-                loadUsers();
-            } catch (e) {
-                alert("Error updating user: " + AdminManager.sanitizeMessage(e.message));
+                    tbody.append(row);
+                });
             }
-            btn.prop('disabled', false).text('Save Changes');
-        });
 
-        // Toggle Status Modal
-        $(document).on('click', '#btnToggleUserStatus', async function () {
-            const username = $('#manageUserUsername').val();
-            if (confirm("Change user status?")) {
-                await AdminManager.toggleUserStatus(username);
-                manageUserModal.hide();
-                loadUsers();
+            // Listeners for User Search & Sort
+            $(document).on('keyup', '#userSearchInput', renderUserList);
+            $(document).on('change', '#userSortSelect', renderUserList);
+
+            // Defaults Logic
+            async function loadDefaults() {
+                await renderProgramCheckboxes(); // Ensure checkboxes are there
+                const defs = await AdminManager.getDefaultPrograms();
+                $('.def-prog-check').each(function () {
+                    const id = $(this).data('id');
+                    $(this).prop('checked', defs.includes(id));
+                });
             }
-        });
 
-        // Delete User Modal
-        $('#btnDeleteUserModal').click(async function () {
-            const username = $('#manageUserUsername').val();
-            if (confirm(`Are you sure you want to PERMANENTLY delete ${username}?`)) {
-                await AdminManager.deleteUser(username);
-                manageUserModal.hide();
-                loadUsers();
-            }
-        });
+            $('#btn-save-defaults').click(async function () {
+                const defaults = [];
+                $('.def-prog-check:checked').each(function () {
+                    defaults.push($(this).data('id'));
+                });
+
+                const btn = $(this);
+                btn.prop('disabled', true).text('Saving...');
+                try {
+                    await AdminManager.saveDefaultPrograms(defaults);
+                    alert("Default settings saved!");
+                } catch (e) { alert("Error: " + AdminManager.sanitizeMessage(e.message)); }
+                btn.prop('disabled', false).text('Save Default Settings');
+            });
+
+            // Manage User Modal Logic
+            $(document).on('click', '.btn-manage-user', async function () {
+                const username = $(this).data('user');
+                const user = usersCache.find(u => u.username === username);
+                if (!user) return;
+
+                $('#manageUserTitle').text(`Manage User: ${username}`);
+                $('#manageUserUsername').val(username);
+                $('#manageUserRole').val(user.role);
+
+                // Ensure checkboxes are rendered first
+                await renderProgramCheckboxes();
+
+                // Programs
+                const progs = user.allowedPrograms || [];
+                $('.manage-user-prog-check').each(function () {
+                    const id = $(this).data('id');
+                    $(this).prop('checked', progs.includes(id));
+                });
+
+                // Status Button
+                const statusBtnText = user.status === 'active' ? 'Suspend Account' : 'Activate Account';
+                const statusBtnClass = user.status === 'active' ? 'btn-warning' : 'btn-success';
+                $('#statusControlArea').html(`<button class="btn ${statusBtnClass} w-100" id="btnToggleUserStatus">${statusBtnText}</button>`);
+
+                manageUserModal.show();
+            });
+
+            // Save Changes in Manage Modal
+            $('#btnSaveUserChanges').click(async function () {
+                const username = $('#manageUserUsername').val();
+                const newRole = $('#manageUserRole').val();
+                const updatedPrograms = [];
+
+                $('.manage-user-prog-check:checked').each(function () {
+                    updatedPrograms.push($(this).data('id'));
+                });
 
 
-        // Create User (Manual)
-        $('#btn-add-user').on('click', async function () {
-            const newUser = $('#new-user-name').val().toLowerCase().trim();
-            const newRole = $('#new-user-role').val();
-            if (!newUser) return;
+                const btn = $(this);
+                btn.prop('disabled', true).text('Saving...');
 
-            const btn = $(this);
-            btn.prop('disabled', true).text('Creating...');
-
-            try {
-                const pass = Math.random().toString(36).slice(-8);
-
-                // Fetch defaults if creating a standard user
-                let programs = [];
-                if (newRole === 'user') {
-                    programs = await AdminManager.getDefaultPrograms();
+                try {
+                    await AdminManager.updateUserDetails(username, newRole, updatedPrograms);
+                    alert("User Updated Successfully!");
+                    manageUserModal.hide();
+                    loadUsers();
+                } catch (e) {
+                    alert("Error updating user: " + AdminManager.sanitizeMessage(e.message));
                 }
+                btn.prop('disabled', false).text('Save Changes');
+            });
 
-                await AdminManager.addUser(newUser, pass, newRole, programs);
-
-                alert(`User Created!\nUsername: ${newUser}\nPassword: ${pass}\n(Configure programs in 'Manage' if needed)`);
-                $('#new-user-name').val('');
-                loadUsers();
-            } catch (e) {
-                alert("Error: " + AdminManager.sanitizeMessage(e.message));
-            } finally {
-                btn.prop('disabled', false).text('Create User');
-            }
-        });
-
-
-        // --- Product Management Logic ---
-        let productModal;
-        try {
-            productModal = new bootstrap.Modal(document.getElementById('productModal'));
-        } catch (e) { console.log('Bootstrap modal init error', e); }
-
-        async function renderProducts(isBackgroundSync = false) {
-            const tbody = $('#productTableBody');
-            const syncBadge = $('#syncStatus');
-            if (!isBackgroundSync) {
-                const localData = ProductManager.getLocalProducts();
-                if (localData.length > 0) {
-                    renderTableRows(localData);
-                    if (syncBadge.length) syncBadge.removeClass('d-none').text('Syncing with cloud...');
-                } else {
-                    tbody.html('<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">Loading products from cloud...</div></td></tr>');
+            // Toggle Status Modal
+            $(document).on('click', '#btnToggleUserStatus', async function () {
+                const username = $('#manageUserUsername').val();
+                if (confirm("Change user status?")) {
+                    await AdminManager.toggleUserStatus(username);
+                    manageUserModal.hide();
+                    loadUsers();
                 }
-            }
+            });
+
+            // Delete User Modal
+            $('#btnDeleteUserModal').click(async function () {
+                const username = $('#manageUserUsername').val();
+                if (confirm(`Are you sure you want to PERMANENTLY delete ${username}?`)) {
+                    await AdminManager.deleteUser(username);
+                    manageUserModal.hide();
+                    loadUsers();
+                }
+            });
+
+
+            // Create User (Manual)
+            $('#btn-add-user').on('click', async function () {
+                const newUser = $('#new-user-name').val().toLowerCase().trim();
+                const newRole = $('#new-user-role').val();
+                if (!newUser) return;
+
+                const btn = $(this);
+                btn.prop('disabled', true).text('Creating...');
+
+                try {
+                    const pass = Math.random().toString(36).slice(-8);
+
+                    // Fetch defaults if creating a standard user
+                    let programs = [];
+                    if (newRole === 'user') {
+                        programs = await AdminManager.getDefaultPrograms();
+                    }
+
+                    await AdminManager.addUser(newUser, pass, newRole, programs);
+
+                    alert(`User Created!\nUsername: ${newUser}\nPassword: ${pass}\n(Configure programs in 'Manage' if needed)`);
+                    $('#new-user-name').val('');
+                    loadUsers();
+                } catch (e) {
+                    alert("Error: " + AdminManager.sanitizeMessage(e.message));
+                } finally {
+                    btn.prop('disabled', false).text('Create User');
+                }
+            });
+
+
+            // --- Product Management Logic ---
+            let productModal;
             try {
-                const cloudProducts = await ProductManager.getAllProducts();
-                renderTableRows(cloudProducts);
-                if (syncBadge.length) syncBadge.addClass('d-none');
-            } catch (e) {
-                console.error("Cloud Error", e);
-                if (tbody.children().length === 0 || tbody.text().includes('Loading')) {
-                    tbody.html('<tr><td colspan="6" class="text-center text-danger py-4">Error loading products. Please check your internet connection.</td></tr>');
+                productModal = new bootstrap.Modal(document.getElementById('productModal'));
+            } catch (e) { console.log('Bootstrap modal init error', e); }
+
+            async function renderProducts(isBackgroundSync = false) {
+                const tbody = $('#productTableBody');
+                const syncBadge = $('#syncStatus');
+                if (!isBackgroundSync) {
+                    const localData = ProductManager.getLocalProducts();
+                    if (localData.length > 0) {
+                        renderTableRows(localData);
+                        if (syncBadge.length) syncBadge.removeClass('d-none').text('Syncing with cloud...');
+                    } else {
+                        tbody.html('<tr><td colspan="6" class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><div class="mt-2 text-muted">Loading products from cloud...</div></td></tr>');
+                    }
+                }
+                try {
+                    const cloudProducts = await ProductManager.getAllProducts();
+                    renderTableRows(cloudProducts);
+                    if (syncBadge.length) syncBadge.addClass('d-none');
+                } catch (e) {
+                    console.error("Cloud Error", e);
+                    if (tbody.children().length === 0 || tbody.text().includes('Loading')) {
+                        tbody.html('<tr><td colspan="6" class="text-center text-danger py-4">Error loading products. Please check your internet connection.</td></tr>');
+                    }
                 }
             }
-        }
 
-        function renderTableRows(products) {
-            const tbody = $('#productTableBody');
-            const searchTerm = $('#searchInput').val().toLowerCase();
-            const categoryFilter = $('#categoryFilter').val();
-            tbody.empty();
-            let matches = 0;
-            products.forEach(p => {
-                if (searchTerm && !p.itemName.toLowerCase().includes(searchTerm)) return;
-                if (categoryFilter && p.itemCategory !== categoryFilter) return;
-                matches++;
-                const statusBadge = p.isActive
-                    ? '<span class="status-badge status-active">Active</span>'
-                    : '<span class="status-badge status-inactive">Inactive</span>';
-                let imgSrc = p.image;
-                if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('../')) {
-                    imgSrc = '../' + imgSrc;
-                }
-                const row = `
+            function renderTableRows(products) {
+                const tbody = $('#productTableBody');
+                const searchTerm = $('#searchInput').val().toLowerCase();
+                const categoryFilter = $('#categoryFilter').val();
+                tbody.empty();
+                let matches = 0;
+                products.forEach(p => {
+                    if (searchTerm && !p.itemName.toLowerCase().includes(searchTerm)) return;
+                    if (categoryFilter && p.itemCategory !== categoryFilter) return;
+                    matches++;
+                    const statusBadge = p.isActive
+                        ? '<span class="status-badge status-active">Active</span>'
+                        : '<span class="status-badge status-inactive">Inactive</span>';
+                    let imgSrc = p.image;
+                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('../')) {
+                        imgSrc = '../' + imgSrc;
+                    }
+                    const row = `
                         <tr>
                             <td><img src="${imgSrc}" class="prod-img-mini" alt="img" onerror="this.src='../assets/images/logos/favicon.png'"></td>
                             <td>
@@ -2300,177 +2207,177 @@
                             </td>
                         </tr>
                     `;
-                tbody.append(row);
-            });
-            if (matches === 0) {
-                $('#noResults').removeClass('d-none');
-            } else {
-                $('#noResults').addClass('d-none');
+                    tbody.append(row);
+                });
+                if (matches === 0) {
+                    $('#noResults').removeClass('d-none');
+                } else {
+                    $('#noResults').addClass('d-none');
+                }
             }
-        }
 
-        async function populateFilters() {
-            const products = await ProductManager.getAllProducts();
-            const categories = [...new Set(products.map(p => p.itemCategory))];
-            const select = $('#categoryFilter');
-            select.find('option:gt(0)').remove();
-            categories.forEach(c => {
-                select.append(`<option value="${c}">${c}</option>`);
-            });
-        }
-
-        $('#searchInput').on('keyup', renderProducts);
-        $('#categoryFilter').on('change', renderProducts);
-
-        const updateIndicator = $('<div id="updateIndicator" class="alert alert-info fixed-top m-0 rounded-0 text-center d-none" style="z-index: 9999;"><i class="fas fa-sync fa-spin me-2"></i> Processing Update...</div>');
-        $('body').prepend(updateIndicator);
-        function showUpdate() { updateIndicator.removeClass('d-none'); }
-        function hideUpdate() { updateIndicator.addClass('d-none'); }
-
-        $(document).on('change', '.toggle-status', async function () {
-            const id = $(this).data('id');
-            const checkbox = $(this);
-            checkbox.prop('disabled', true);
-            showUpdate();
-            try {
-                await ProductManager.toggleStatus(id);
-                renderProducts();
-            } catch (e) {
-                console.error(e);
-                alert("Update failed: " + AdminManager.sanitizeMessage(e.message));
-            } finally {
-                hideUpdate();
+            async function populateFilters() {
+                const products = await ProductManager.getAllProducts();
+                const categories = [...new Set(products.map(p => p.itemCategory))];
+                const select = $('#categoryFilter');
+                select.find('option:gt(0)').remove();
+                categories.forEach(c => {
+                    select.append(`<option value="${c}">${c}</option>`);
+                });
             }
-        });
 
-        $(document).on('click', '.btn-delete', async function () {
-            if (confirm('Are you sure you want to delete this product?')) {
-                const btn = $(this);
-                const originalHtml = btn.html();
-                btn.html('<span class="spinner-border spinner-border-sm"></span>').prop('disabled', true);
-                const id = btn.data('id');
+            $('#searchInput').on('keyup', renderProducts);
+            $('#categoryFilter').on('change', renderProducts);
+
+            const updateIndicator = $('<div id="updateIndicator" class="alert alert-info fixed-top m-0 rounded-0 text-center d-none" style="z-index: 9999;"><i class="fas fa-sync fa-spin me-2"></i> Processing Update...</div>');
+            $('body').prepend(updateIndicator);
+            function showUpdate() { updateIndicator.removeClass('d-none'); }
+            function hideUpdate() { updateIndicator.addClass('d-none'); }
+
+            $(document).on('change', '.toggle-status', async function () {
+                const id = $(this).data('id');
+                const checkbox = $(this);
+                checkbox.prop('disabled', true);
                 showUpdate();
                 try {
-                    await ProductManager.deleteProduct(id);
+                    await ProductManager.toggleStatus(id);
                     renderProducts();
-                    populateFilters();
                 } catch (e) {
-                    alert("Delete failed: " + AdminManager.sanitizeMessage(e.message));
-                    btn.html(originalHtml).prop('disabled', false);
+                    console.error(e);
+                    alert("Update failed: " + AdminManager.sanitizeMessage(e.message));
                 } finally {
                     hideUpdate();
                 }
-            }
-        });
+            });
 
-        window.resetForm = function () {
-            $('#productForm')[0].reset();
-            $('#prodId').val('');
-            $('#modalTitle').text('Add New Product');
-            $('#prodActive').prop('checked', true);
-            $('#imagePreview').addClass('d-none');
-        };
-
-        $(document).on('click', '.btn-edit', function () {
-            const id = $(this).data('id').toString();
-            const products = ProductManager.getLocalProducts();
-            const p = products.find(x => String(x.id) === id);
-            if (p) {
-                $('#modalTitle').text('Edit Product');
-                $('#prodId').val(p.id);
-                $('#prodName').val(p.itemName);
-                $('#prodCategory').val(p.itemCategory);
-                $('#prodPrice').val(p.price);
-                $('#prodImage').val(p.image);
-                $('#prodDesc').val(p.description);
-                $('#prodActive').prop('checked', p.isActive);
-                $('#imagePreview').removeClass('d-none');
-                let imgSrc = p.image;
-                if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('../')) {
-                    imgSrc = '../' + imgSrc;
+            $(document).on('click', '.btn-delete', async function () {
+                if (confirm('Are you sure you want to delete this product?')) {
+                    const btn = $(this);
+                    const originalHtml = btn.html();
+                    btn.html('<span class="spinner-border spinner-border-sm"></span>').prop('disabled', true);
+                    const id = btn.data('id');
+                    showUpdate();
+                    try {
+                        await ProductManager.deleteProduct(id);
+                        renderProducts();
+                        populateFilters();
+                    } catch (e) {
+                        alert("Delete failed: " + AdminManager.sanitizeMessage(e.message));
+                        btn.html(originalHtml).prop('disabled', false);
+                    } finally {
+                        hideUpdate();
+                    }
                 }
-                $('#imagePreview img').attr('src', imgSrc);
-                productModal.show();
-            }
-        });
+            });
 
-        $('#previewBtn').click(function () {
-            let url = $('#prodImage').val();
-            if (url) {
-                if (!url.startsWith('http') && !url.startsWith('../')) {
-                    url = '../' + url;
+            window.resetForm = function () {
+                $('#productForm')[0].reset();
+                $('#prodId').val('');
+                $('#modalTitle').text('Add New Product');
+                $('#prodActive').prop('checked', true);
+                $('#imagePreview').addClass('d-none');
+            };
+
+            $(document).on('click', '.btn-edit', function () {
+                const id = $(this).data('id').toString();
+                const products = ProductManager.getLocalProducts();
+                const p = products.find(x => String(x.id) === id);
+                if (p) {
+                    $('#modalTitle').text('Edit Product');
+                    $('#prodId').val(p.id);
+                    $('#prodName').val(p.itemName);
+                    $('#prodCategory').val(p.itemCategory);
+                    $('#prodPrice').val(p.price);
+                    $('#prodImage').val(p.image);
+                    $('#prodDesc').val(p.description);
+                    $('#prodActive').prop('checked', p.isActive);
+                    $('#imagePreview').removeClass('d-none');
+                    let imgSrc = p.image;
+                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('../')) {
+                        imgSrc = '../' + imgSrc;
+                    }
+                    $('#imagePreview img').attr('src', imgSrc);
+                    productModal.show();
                 }
-                $('#imagePreview').removeClass('d-none');
-                $('#imagePreview img').attr('src', url);
-            }
-        });
+            });
 
-        $('#productForm').on('submit', async function (e) {
-            e.preventDefault();
-            const btn = $(this).find('button[type="submit"]');
-            const originalText = btn.text();
-            btn.text('Saving...').prop('disabled', true);
-            showUpdate();
-            try {
-                const productData = {
-                    id: $('#prodId').val(),
-                    itemName: $('#prodName').val(),
-                    itemCategory: $('#prodCategory').val(),
-                    price: parseFloat($('#prodPrice').val()),
-                    description: $('#prodDesc').val(),
-                    image: $('#prodImage').val(),
-                    isActive: $('#prodActive').is(':checked')
-                };
-                await ProductManager.saveProduct(productData);
-                productModal.hide();
-                renderProducts();
-                populateFilters();
-            } catch (error) {
-                console.error(error);
-                alert('Error saving product: ' + AdminManager.sanitizeMessage(error.message));
-            } finally {
-                btn.text(originalText).prop('disabled', false);
-                hideUpdate();
-            }
-        });
-
-        $('#mainAdminTabs button').on('click', function () {
-            $('#mainAdminTabs button').removeClass('active');
-            $(this).addClass('active');
-            const view = $(this).data('view');
-            if (view === 'products') {
-                $('#productControls').removeClass('d-none');
-                $('#productThead, #productTableBody').removeClass('d-none');
-                $('#orderThead, #orderTableBody').addClass('d-none');
-            } else {
-                $('#productControls').addClass('d-none');
-                $('#productThead, #productTableBody').addClass('d-none');
-                $('#orderThead, #orderTableBody').removeClass('d-none');
-                renderOrders();
-            }
-        });
-
-        async function renderOrders() {
-            const tbody = $('#orderTableBody');
-            tbody.html('<tr><td colspan="7" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>');
-            try {
-                const orders = await AdminManager.getOrders();
-                tbody.empty();
-                if (orders.length === 0) {
-                    tbody.html('<tr><td colspan="7" class="text-center py-5">No orders found.</td></tr>');
-                    return;
+            $('#previewBtn').click(function () {
+                let url = $('#prodImage').val();
+                if (url) {
+                    if (!url.startsWith('http') && !url.startsWith('../')) {
+                        url = '../' + url;
+                    }
+                    $('#imagePreview').removeClass('d-none');
+                    $('#imagePreview img').attr('src', url);
                 }
-                orders.forEach(o => {
-                    const date = new Date(o.orderDate).toLocaleString();
-                    const itemsList = o.items.map(i => `<div class="small fw-500">• ${i.title} (x${i.quantity})</div>`).join('');
-                    const statusOptions = ['New', 'Processing', 'Completed', 'Cancelled'].map(s =>
-                        `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`
-                    ).join('');
-                    const pStatus = o.paymentStatus || 'Pending';
-                    const payOptions = ['Pending', 'Paid', 'Failed', 'Refunded'].map(s =>
-                        `<option value="${s}" ${pStatus === s ? 'selected' : ''}>${s}</option>`
-                    ).join('');
-                    const row = `
+            });
+
+            $('#productForm').on('submit', async function (e) {
+                e.preventDefault();
+                const btn = $(this).find('button[type="submit"]');
+                const originalText = btn.text();
+                btn.text('Saving...').prop('disabled', true);
+                showUpdate();
+                try {
+                    const productData = {
+                        id: $('#prodId').val(),
+                        itemName: $('#prodName').val(),
+                        itemCategory: $('#prodCategory').val(),
+                        price: parseFloat($('#prodPrice').val()),
+                        description: $('#prodDesc').val(),
+                        image: $('#prodImage').val(),
+                        isActive: $('#prodActive').is(':checked')
+                    };
+                    await ProductManager.saveProduct(productData);
+                    productModal.hide();
+                    renderProducts();
+                    populateFilters();
+                } catch (error) {
+                    console.error(error);
+                    alert('Error saving product: ' + AdminManager.sanitizeMessage(error.message));
+                } finally {
+                    btn.text(originalText).prop('disabled', false);
+                    hideUpdate();
+                }
+            });
+
+            $('#mainAdminTabs button').on('click', function () {
+                $('#mainAdminTabs button').removeClass('active');
+                $(this).addClass('active');
+                const view = $(this).data('view');
+                if (view === 'products') {
+                    $('#productControls').removeClass('d-none');
+                    $('#productThead, #productTableBody').removeClass('d-none');
+                    $('#orderThead, #orderTableBody').addClass('d-none');
+                } else {
+                    $('#productControls').addClass('d-none');
+                    $('#productThead, #productTableBody').addClass('d-none');
+                    $('#orderThead, #orderTableBody').removeClass('d-none');
+                    renderOrders();
+                }
+            });
+
+            async function renderOrders() {
+                const tbody = $('#orderTableBody');
+                tbody.html('<tr><td colspan="7" class="text-center py-5"><div class="spinner-border text-primary"></div></td></tr>');
+                try {
+                    const orders = await AdminManager.getOrders();
+                    tbody.empty();
+                    if (orders.length === 0) {
+                        tbody.html('<tr><td colspan="7" class="text-center py-5">No orders found.</td></tr>');
+                        return;
+                    }
+                    orders.forEach(o => {
+                        const date = new Date(o.orderDate).toLocaleString();
+                        const itemsList = o.items.map(i => `<div class="small fw-500">• ${i.title} (x${i.quantity})</div>`).join('');
+                        const statusOptions = ['New', 'Processing', 'Completed', 'Cancelled'].map(s =>
+                            `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`
+                        ).join('');
+                        const pStatus = o.paymentStatus || 'Pending';
+                        const payOptions = ['Pending', 'Paid', 'Failed', 'Refunded'].map(s =>
+                            `<option value="${s}" ${pStatus === s ? 'selected' : ''}>${s}</option>`
+                        ).join('');
+                        const row = `
                             <tr>
                                 <td style="white-space: nowrap;">
                                     <div class="fw-bold text-dark">${date}</div>
@@ -2503,88 +2410,88 @@
                                 <td><div style="min-width: 250px;">${itemsList}</div></td>
                             </tr>
                         `;
-                    tbody.append(row);
-                });
-            } catch (e) {
-                console.error("Render Orders Error", e);
-                tbody.html('<tr><td colspan="7" class="text-center text-danger">Error loading orders.</td></tr>');
+                        tbody.append(row);
+                    });
+                } catch (e) {
+                    console.error("Render Orders Error", e);
+                    tbody.html('<tr><td colspan="7" class="text-center text-danger">Error loading orders.</td></tr>');
+                }
             }
-        }
 
-        function getStatusColor(status) {
-            switch (status) {
-                case 'New': return '#0d6efd';
-                case 'Processing': return '#ffc107';
-                case 'Completed': return '#198754';
-                case 'Cancelled': return '#dc3545';
-                default: return '#6c757d';
+            function getStatusColor(status) {
+                switch (status) {
+                    case 'New': return '#0d6efd';
+                    case 'Processing': return '#ffc107';
+                    case 'Completed': return '#198754';
+                    case 'Cancelled': return '#dc3545';
+                    default: return '#6c757d';
+                }
             }
-        }
 
-        function getPaymentColor(status) {
-            switch (status) {
-                case 'Pending': return '#ffc107';
-                case 'Paid': return '#198754';
-                case 'Failed': return '#dc3545';
-                case 'Refunded': return '#0dcaf0';
-                default: return '#6c757d';
+            function getPaymentColor(status) {
+                switch (status) {
+                    case 'Pending': return '#ffc107';
+                    case 'Paid': return '#198754';
+                    case 'Failed': return '#dc3545';
+                    case 'Refunded': return '#0dcaf0';
+                    default: return '#6c757d';
+                }
             }
-        }
 
-        $(document).on('change', '.order-status-select', async function () {
-            const id = $(this).data('id');
-            const newStatus = $(this).val();
-            const select = $(this);
-            select.prop('disabled', true);
-            try {
-                await AdminManager.updateOrderStatus(id, newStatus);
-                select.css('background-color', getStatusColor(newStatus));
-            } catch (e) {
-                alert("Failed to update status: " + AdminManager.sanitizeMessage(e.message));
-            } finally {
-                select.prop('disabled', false);
-            }
-        });
+            $(document).on('change', '.order-status-select', async function () {
+                const id = $(this).data('id');
+                const newStatus = $(this).val();
+                const select = $(this);
+                select.prop('disabled', true);
+                try {
+                    await AdminManager.updateOrderStatus(id, newStatus);
+                    select.css('background-color', getStatusColor(newStatus));
+                } catch (e) {
+                    alert("Failed to update status: " + AdminManager.sanitizeMessage(e.message));
+                } finally {
+                    select.prop('disabled', false);
+                }
+            });
 
-        $(document).on('change', '.payment-status-select', async function () {
-            const id = $(this).data('id');
-            const newStatus = $(this).val();
-            const select = $(this);
-            select.prop('disabled', true);
-            try {
-                await AdminManager.updatePaymentStatus(id, newStatus);
-                select.css('background-color', getPaymentColor(newStatus));
-            } catch (e) {
-                alert("Failed to update status: " + AdminManager.sanitizeMessage(e.message));
-            } finally {
-                select.prop('disabled', false);
-            }
-        });
+            $(document).on('change', '.payment-status-select', async function () {
+                const id = $(this).data('id');
+                const newStatus = $(this).val();
+                const select = $(this);
+                select.prop('disabled', true);
+                try {
+                    await AdminManager.updatePaymentStatus(id, newStatus);
+                    select.css('background-color', getPaymentColor(newStatus));
+                } catch (e) {
+                    alert("Failed to update status: " + AdminManager.sanitizeMessage(e.message));
+                } finally {
+                    select.prop('disabled', false);
+                }
+            });
 
-        // --- API Management Logic ---
-        window.loadApiSettings = async function () {
-            const settings = await AdminManager.getGlobalSettings();
-            if (settings && settings.openrouter_api_key) {
-                $('#openrouter_api_key').val(settings.openrouter_api_key);
-            }
-        };
+            // --- API Management Logic ---
+            window.loadApiSettings = async function () {
+                const settings = await AdminManager.getGlobalSettings();
+                if (settings && settings.openrouter_api_key) {
+                    $('#openrouter_api_key').val(settings.openrouter_api_key);
+                }
+            };
 
-        $('#apiSettingsForm').on('submit', async function (e) {
-            e.preventDefault();
-            const key = $('#openrouter_api_key').val().trim();
-            const btn = $('#btnSaveApiSettings');
+            $('#apiSettingsForm').on('submit', async function (e) {
+                e.preventDefault();
+                const key = $('#openrouter_api_key').val().trim();
+                const btn = $('#btnSaveApiSettings');
 
-            btn.prop('disabled', true).text('Saving...');
-            try {
-                await AdminManager.updateGlobalSettings({ openrouter_api_key: key });
-                alert("API Configuration Updated successfully!");
-                bootstrap.Modal.getInstance(document.getElementById('apiManagementModal')).hide();
-            } catch (e) {
-                alert("Error saving API settings: " + AdminManager.sanitizeMessage(e.message));
-            } finally {
-                btn.prop('disabled', false).text('Save Configuration');
-            }
-        });
+                btn.prop('disabled', true).text('Saving...');
+                try {
+                    await AdminManager.updateGlobalSettings({ openrouter_api_key: key });
+                    alert("API Configuration Updated successfully!");
+                    bootstrap.Modal.getInstance(document.getElementById('apiManagementModal')).hide();
+                } catch (e) {
+                    alert("Error saving API settings: " + AdminManager.sanitizeMessage(e.message));
+                } finally {
+                    btn.prop('disabled', false).text('Save Configuration');
+                }
+            });
 
         });
     </script>
