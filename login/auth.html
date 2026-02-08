@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="description" content="Gridify Admin Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Title -->
+    <title>Gridify - Login</title>
+    <!-- Favicon Icon -->
+    <link rel="shortcut icon" href="../assets/images/logos/favicon.png" type="image/x-icon">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="../assets/css/fontawesome-5.14.0.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .auth-page {
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            overflow: hidden;
+            font-family: 'Outfit', sans-serif;
+            background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1000') no-repeat center center;
+            background-size: cover;
+            position: relative;
+        }
+
+        .auth-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.4) 100%);
+            z-index: 0;
+        }
+
+        .auth-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-sidebar {
+            flex: 1;
+            position: relative;
+            display: none;
+            color: white;
+            padding: 60px;
+        }
+
+        @media (min-width: 992px) {
+            .auth-sidebar {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                max-width: 50%;
+            }
+        }
+
+        .sidebar-content {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            height: 40px;
+            width: auto;
+        }
+
+        .brand-name {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .hero-text h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .hero-text p {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .social-proof {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 100px;
+            width: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .proof-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .stars {
+            color: #ffcc00;
+            margin-right: 5px;
+        }
+
+        .auth-form-wrapper {
+            flex: 1;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .auth-form-container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: #000;
+        }
+
+        .form-header p {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .social-auth {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            background: #f9f9f9;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .social-btn:hover {
+            background: #f0f0f0;
+            border-color: #ccc;
+        }
+
+        .social-btn img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 30px 0;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .separator span {
+            margin: 0 15px;
+        }
+
+        .form-label {
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+
+        .input-with-icon i.toggle-password {
+            left: auto;
+            right: 25px;
+            cursor: pointer;
+        }
+
+        .input-with-icon .form-control {
+            padding: 14px 25px 14px 55px;
+            border-radius: 50px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            font-size: 14px;
+            transition: all 0.2s;
+            height: 50px;
+        }
+
+        .input-with-icon .form-control:focus {
+            border-color: #4361ee;
+            box-shadow: none;
+        }
+
+        .theme-btn {
+            background-color: #4361ee;
+            color: #ffffff;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 20px;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .theme-btn:hover {
+            background-color: #3046bc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+        }
+
+        .form-footer {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-footer a {
+            color: #1a1a1a;
+            font-weight: 700;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="loginSection" class="auth-page">
+        <div class="auth-container">
+            <div class="auth-sidebar">
+                <div class="sidebar-content">
+                    <div class="brand">
+                        <img src="../assets/images/logos/logo.png" alt="Gridify" class="brand-logo"
+                            style="width:150px; height:auto;">
+                        <span class="brand-name">Gridify.in</span>
+                    </div>
+
+                    <div class="hero-text">
+                        <h1 style="color: #d0b426;">Transforming Ideas into Reality with Gridify .in</h1>
+                        <p>Join the Gridify.in early access program to be one of the first to experience our innovative
+                            platform.</p>
+                    </div>
+
+                    <div class="social-proof">
+                        <div class="proof-text">
+                            <span class="stars">★</span> designed and developed by Gridify.in <span
+                                class="stars">★</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-form-wrapper">
+                <div class="auth-form-container">
+                    <!-- Signup Section -->
+                    <div id="signupSectionContent" class="auth-section d-none">
+                        <div class="form-header">
+                            <h2>Create your account</h2>
+                            <p>Start your journey towards a better career. No fees required.</p>
+                        </div>
+                        <div class="social-auth">
+                            <button class="social-btn google-btn" type="button" onclick="handleGoogleLogin(this)">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                    alt="Google">
+                                Continue with Google
+                            </button>
+                        </div>
+                        <div class="separator"><span>Or sign up with email</span></div>
+                        <form id="signupForm">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Full Name</label>
+                                <div class="input-with-icon"><i class="far fa-user"></i><input type="text"
+                                        id="regFullName" class="form-control" placeholder="e.g. Alex Johnson" required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email Address</label>
+                                <div class="input-with-icon"><i class="far fa-envelope"></i><input type="email"
+                                        id="regEmail" class="form-control" placeholder="name@example.com" required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Password</label>
+                                <div class="input-with-icon"><i class="fas fa-lock"></i><input type="password"
+                                        id="regPass" class="form-control" placeholder="Create a password" required><i
+                                        class="far fa-eye toggle-password"></i></div>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Confirm Password</label>
+                                <div class="input-with-icon"><i class="fas fa-redo"></i><input type="password"
+                                        id="regConfirmPass" class="form-control" placeholder="Confirm your password"
+                                        required></div>
+                            </div>
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">I agree to the <a href="#">Terms of
+                                        Service</a> and <a href="#">Privacy Policy</a>.</label>
+                            </div>
+                            <div id="signupError" class="text-danger small mb-3 text-center d-none">Error</div>
+                            <button type="submit" class="theme-btn w-100 justify-content-center py-3">Create
+                                Account</button>
+                        </form>
+                        <div class="form-footer mt-4">Already have an account? <a href="#"
+                                onclick="toggleAuth('login')">Log In</a></div>
+                    </div>
+
+                    <!-- Login Section -->
+                    <div id="loginSectionContent" class="auth-section">
+                        <div class="form-header">
+                            <h2>Welcome back</h2>
+                            <p>Enter your credentials to access your account.</p>
+                        </div>
+                        <div class="social-auth">
+                            <button class="social-btn google-btn" type="button" onclick="handleGoogleLogin(this)">
+                                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                                    alt="Google">
+                                Continue with Google
+                            </button>
+                        </div>
+                        <div class="separator"><span>Or log in with email</span></div>
+                        <form id="loginForm">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email Address / Username</label>
+                                <div class="input-with-icon"><i class="far fa-envelope"></i><input type="text"
+                                        id="username" class="form-control" placeholder="name@example.com" required>
+                                </div>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="form-label">Password</label>
+                                <div class="input-with-icon"><i class="fas fa-lock"></i><input type="password"
+                                        id="password" class="form-control" placeholder="Enter your password" required><i
+                                        class="far fa-eye toggle-password"></i></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-4"><a href="#"
+                                    id="forgotPassLink" class="small">Forgot Password?</a></div>
+                            <div id="loginError" class="text-danger small mb-3 text-center d-none">Invalid credentials
+                            </div>
+                            <button type="submit" class="theme-btn w-100 justify-content-center py-3">Log In</button>
+                        </form>
+                        <div class="form-footer mt-4">Don't have an account? <a href="#"
+                                onclick="toggleAuth('signup')">Sign Up</a></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTP Modal -->
+    <div class="modal fade" id="otpModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Verify Email</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="text-muted mb-4">We've sent a One-Time Password (OTP) to <strong
+                            id="otpEmailDisp">email</strong>. Please enter it below.</p>
+                    <div class="mb-4">
+                        <input type="text" id="otpInput" class="form-control text-center text-primary fw-bold"
+                            style="font-size: 24px; letter-spacing: 5px;" placeholder="000000" maxlength="6">
+                    </div>
+                    <button id="btnVerifyOtp" class="theme-btn w-100 justify-content-center">Verify OTP</button>
+                    <div class="mt-3"><a href="#" id="resendOtp" class="small text-muted"
+                            style="text-decoration: none;">Resend OTP</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal fade" id="forgotPassModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reset Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="fpStep1">
+                        <div class="mb-3">
+                            <label class="form-label">Enter your email</label>
+                            <input type="email" id="fpEmail" class="form-control" placeholder="Email address">
+                        </div>
+                        <button id="btnFpSendOtp" class="theme-btn w-100 justify-content-center">Send OTP</button>
+                    </div>
+                    <div id="fpStep2" class="d-none">
+                        <p class="text-muted small text-center">Enter OTP sent to your email and your new password.</p>
+                        <div class="mb-3">
+                            <label class="form-label">OTP</label>
+                            <input type="text" id="fpOtp" class="form-control text-center" placeholder="000000">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">New Password</label>
+                            <input type="password" id="fpNewPass" class="form-control" placeholder="New password">
+                        </div>
+                        <button id="btnFpReset" class="theme-btn w-100 justify-content-center">Reset Password</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Jquery -->
+    <script src="../assets/js/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../assets/js/bootstrap.min.js"></script>
+    <script type="module">
+        import { AdminManager } from '../assets/js/admin-manager.js';
+
+        $(document).ready(function () {
+            let registrationData = {};
+            const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+            const fpModal = new bootstrap.Modal(document.getElementById('forgotPassModal'));
+
+            // Redirect if already logged in
+            const session = AdminManager.getSession();
+            if (session) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            window.toggleAuth = function (mode) {
+                if (mode === 'signup') {
+                    $('#loginSectionContent').addClass('d-none');
+                    $('#signupSectionContent').removeClass('d-none');
+                } else {
+                    $('#signupSectionContent').addClass('d-none');
+                    $('#loginSectionContent').removeClass('d-none');
+                }
+            };
+
+            $(document).on('click', '.toggle-password', function () {
+                const input = $(this).siblings('input');
+                const type = input.attr('type') === 'password' ? 'text' : 'password';
+                input.attr('type', type);
+                $(this).toggleClass('fa-eye fa-eye-slash');
+            });
+
+            window.handleGoogleLogin = async function (btn) {
+                const originalContent = $(btn).html();
+                $(btn).html('<i class="fas fa-spinner fa-spin me-2"></i> Connecting...').prop('disabled', true);
+                try {
+                    const result = await AdminManager.googleLogin();
+                    if (result.success) {
+                        window.location.href = 'index.html';
+                    } else {
+                        $('#loginError').removeClass('d-none').text(result.message);
+                        $('#signupError').removeClass('d-none').text(result.message);
+                    }
+                } catch (error) {
+                    alert("Google Login failed: " + AdminManager.sanitizeMessage(error.message));
+                } finally {
+                    $(btn).html(originalContent).prop('disabled', false);
+                }
+            };
+
+            $('#loginForm').on('submit', async function (e) {
+                e.preventDefault();
+                const u = $('#username').val().toLowerCase().trim();
+                const p = $('#password').val();
+                const btn = $(this).find('button');
+                const originalText = btn.text();
+                btn.text("Verifying...").prop('disabled', true);
+                const result = await AdminManager.login(u, p);
+                if (result.success) {
+                    window.location.href = 'index.html';
+                } else {
+                    $('#loginError').removeClass('d-none').text(result.message);
+                }
+                btn.text(originalText).prop('disabled', false);
+            });
+
+            $('#signupForm').on('submit', async function (e) {
+                e.preventDefault();
+                const email = $('#regEmail').val().toLowerCase().trim();
+                const pass = $('#regPass').val();
+                const confirm = $('#regConfirmPass').val();
+                const fullName = $('#regFullName').val();
+                if (pass !== confirm) {
+                    $('#signupError').removeClass('d-none').text("Passwords do not match");
+                    return;
+                }
+                const btn = $(this).find('button');
+                btn.prop('disabled', true).text('Sending OTP...');
+                const res = await AdminManager.sendOtp(email);
+                if (res.result === 'success') {
+                    registrationData = { email, pass, fullName, mode: 'signup' };
+                    $('#otpEmailDisp').text(email);
+                    otpModal.show();
+                    $('#signupError').addClass('d-none');
+                } else {
+                    $('#signupError').removeClass('d-none').text("Error sending OTP: " + (res.error || 'Unknown'));
+                }
+                btn.prop('disabled', false).text('Create Account');
+            });
+
+            $('#btnVerifyOtp').click(async function () {
+                const otp = $('#otpInput').val();
+                if (registrationData.mode !== 'signup') return;
+                const btn = $(this);
+                btn.prop('disabled', true).text('Verifying...');
+                const vRes = await AdminManager.verifyOtp(registrationData.email, otp);
+                if (vRes.result === 'success') {
+                    const cRes = await AdminManager.registerUser(registrationData.email, registrationData.pass, registrationData.fullName);
+                    if (cRes.success) {
+                        alert("Account created successfully! Please login.");
+                        otpModal.hide();
+                        toggleAuth('login');
+                    } else {
+                        alert("Registration failed: " + AdminManager.sanitizeMessage(cRes.message));
+                    }
+                } else {
+                    alert("Invalid OTP");
+                }
+                btn.prop('disabled', false).text('Verify OTP');
+            });
+
+            $('#forgotPassLink').click(function (e) {
+                e.preventDefault();
+                $('#fpStep1').removeClass('d-none');
+                $('#fpStep2').addClass('d-none');
+                fpModal.show();
+            });
+
+            $('#btnFpSendOtp').click(async function () {
+                const email = $('#fpEmail').val().toLowerCase().trim();
+                if (!email) return;
+                $(this).prop('disabled', true).text('Sending...');
+                const res = await AdminManager.sendOtp(email);
+                if (res.result === 'success') {
+                    registrationData = { email, mode: 'reset' };
+                    $('#fpStep1').addClass('d-none');
+                    $('#fpStep2').removeClass('d-none');
+                } else {
+                    alert("Error: " + res.error);
+                }
+                $(this).prop('disabled', false).text('Send OTP');
+            });
+
+            $('#btnFpReset').click(async function () {
+                const otp = $('#fpOtp').val();
+                const newPass = $('#fpNewPass').val();
+                const vRes = await AdminManager.verifyOtp(registrationData.email, otp);
+                if (vRes.result === 'success') {
+                    const rRes = await AdminManager.resetPassword(registrationData.email, newPass);
+                    if (rRes.success) {
+                        alert("Password reset successful!");
+                        fpModal.hide();
+                    } else {
+                        alert(rRes.message);
+                    }
+                } else {
+                    alert("Invalid OTP");
+                }
+            });
+
+            $('#resendOtp').click(async function (e) {
+                e.preventDefault();
+                await AdminManager.sendOtp(registrationData.email);
+                alert("OTP Resent!");
+            });
+        });
+    </script>
+</body>
+
+</html>
