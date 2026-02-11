@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | M.G. University Inter Zone Powerlifting Championship</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏋️</text></svg>">
+</head>
+
+<body>
+    <header></header>
+
+    <main>
+        <section style="background-color: var(--bg-alt); min-height: 80vh; display: flex; align-items: center;">
+            <div class="container">
+                <div class="form-container" style="max-width: 500px;">
+                    <div class="section-title">
+                        <h2>Create Account</h2>
+                        <div></div>
+                    </div>
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label for="full_name">Full Name</label>
+                            <input type="text" id="full_name" name="full_name" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="password" name="password" required
+                                    placeholder="Min. 6 characters">
+                                <span class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</span>
+                            </div>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">Sign Up</button>
+                        </div>
+                        <div id="auth-message" style="margin-top: 1.5rem; text-align: center; font-weight: 500;">
+                        </div>
+                        <p style="text-align: center; margin-top: 1.5rem;">
+                            Already have an account? <a href="login.html"
+                                style="color: var(--primary-color); font-weight: 600;">Login</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer></footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

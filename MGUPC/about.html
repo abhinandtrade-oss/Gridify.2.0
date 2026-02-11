@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | M.G. University Inter Zone Powerlifting Championship</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏋️</text></svg>">
+</head>
+
+<body>
+    <header></header>
+
+    <main>
+        <section class="hero" style="padding: 4rem 0;">
+            <div class="container">
+                <h1>About the Organizers</h1>
+                <p>Learn more about the institutions and the department behind this championship.</p>
+            </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <!-- MGU Section -->
+                <div class="info-card-large"
+                    style="margin-bottom: 5rem; padding: 3rem; background: var(--bg-alt); border-radius: 20px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                        <img src="assets/images/MG-logo.png" alt="MGU Logo"
+                            style="height: 120px; width: auto; margin-bottom: 1.5rem;">
+                        <div class="section-title">
+                            <h2>Mahatma Gandhi University (MGU)</h2>
+                            <div></div>
+                        </div>
+                    </div>
+                    <p style="text-align: center; max-width: 900px; margin: 0 auto 3rem; line-height: 1.8;">
+                        Mahatma Gandhi University, established in 1983, is a premier center of higher learning in
+                        Kerala.
+                        Recognized as a <strong>Category-1 Autonomous University</strong> by the UGC and accredited with
+                        a
+                        prestigious <strong>NAAC A++ Grade</strong>, MGU is globally recognized for its academic rigor
+                        and
+                        research-led pedagogy.
+                    </p>
+                    <div class="grid">
+                        <div class="card">
+                            <h3>National Ranking</h3>
+                            <p>Ranked <strong>37th</strong> in NIRF 2024 (Impact Ranking) and consistently features
+                                among
+                                the top 50 universities in India, reflecting its commitment to quality education.</p>
+                        </div>
+                        <div class="card">
+                            <h3>Global Research</h3>
+                            <p>Partners with international giants like <strong>Max Planck Institute (Germany)</strong>,
+                                <strong>Caltech (USA)</strong>, and <strong>Brown University</strong> for cutting-edge
+                                scientific and social research.
+                            </p>
+                        </div>
+                        <div class="card">
+                            <h3>Innovation Hub</h3>
+                            <p>A powerhouse for intellectual property with numerous US and Indian patents, particularly
+                                in Chemical Sciences and Materials Research.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SSV College Section -->
+                <div class="info-card-large" style="margin-bottom: 5rem;">
+                    <div
+                        style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 2rem;">
+                        <img src="assets/images/SSV-logo.jpg" alt="SSV Logo"
+                            style="height: 100px; width: auto; border-radius: 5px; margin-bottom: 1.5rem;">
+                        <div class="section-title" style="margin-bottom: 0;">
+                            <h2 style="font-size: 2rem;">Sree Sankara Vidyapeetom (SSV) College</h2>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div style="max-width: 1000px; margin: 0 auto; text-align: center;">
+                        <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                            Guided by the motto <em>"Thamaso ma jyothir gamaya"</em> (Lead me from darkness to light),
+                            SSV College is a NAAC <strong>A++ Accredited</strong> (CGPA 3.59) institution managed by
+                            the Sree Sankara Trust. Established in 1967, it blends traditional Vedic values with
+                            modern technological advancements.
+                        </p>
+                        <div class="grid" style="text-align: left; margin-top: 3rem;">
+                            <div class="card">
+                                <h3>Academic Diversity</h3>
+                                <p>Offers undergraduate and postgraduate programs across <strong>13
+                                        departments</strong>,
+                                    including specialized PG courses in Computer Science, History, and Clinical
+                                    Chemistry.</p>
+                            </div>
+                            <div class="card">
+                                <h3>Community & Heritage</h3>
+                                <p>Houses a unique <strong>Heritage Museum</strong> and conducts over 75+ annual
+                                    extension
+                                    activities, fostering strong social responsibility among students.</p>
+                            </div>
+                            <div class="card">
+                                <h3>Skill Ecosystem</h3>
+                                <p>Home to active IEDC, Entrepreneurship Clubs, and IIC, empowering students through
+                                    innovation fellowships and real-world industrial exposure.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dept of Physical Education Section -->
+                <div class="info-card-large" style="margin-bottom: 5rem;">
+                    <div class="section-title">
+                        <h2>Department of Physical Education</h2>
+                        <div></div>
+                    </div>
+
+                    <!-- Vision & Mission -->
+                    <div class="grid" style="margin-bottom: 3rem;">
+                        <div class="card" style="border-top-color: var(--secondary-color);">
+                            <h3 style="color: var(--secondary-color); margin-bottom: 1rem;">Our Vision</h3>
+                            <p>To engage in relentless pursuit of excellence in physical education and sports for
+                                health, fitness and well-being of the students and staff.</p>
+                        </div>
+                        <div class="card" style="border-top-color: var(--primary-color);">
+                            <h3 style="color: var(--primary-color); margin-bottom: 1rem;">Our Mission</h3>
+                            <p>Quality teaching and coaching in cognitive psychomotor and affective domains in physical
+                                education and sports. All-round development through participation in diverse sports
+                                activities.</p>
+                        </div>
+                    </div>
+
+                    <!-- Detailed About -->
+                    <div style="background: var(--bg-alt); padding: 3rem; border-radius: 20px; margin-bottom: 3rem;">
+                        <p style="margin-bottom: 1.5rem; line-height: 1.8;">
+                            The Department of Physical Education has come a long way since its establishment in
+                            <strong>1967</strong>.
+                            Within the liberal arts framework of SSV College, we offer instruction in individual, dual,
+                            and group activities
+                            that promote lifelong fitness. Our philosophy, <em>"A sound mind in a sound body"</em>,
+                            drives us to implement
+                            new systems that balance elite sports performance with healthy lifestyle practices.
+                        </p>
+                        <p style="line-height: 1.8;">
+                            If exercise were a pill, it would be the most cost-effective drug ever invented. To this
+                            end, we boast a
+                            <strong>4-acre sports center</strong> within our 18.5-acre campus, featuring a 200m 6-lane
+                            track,
+                            badminton courts, and a multi-stationed fitness center open to both the campus and the
+                            general public.
+                        </p>
+                    </div>
+
+                    <div class="grid" style="gap: 2rem;">
+                        <!-- Academics & Facilities -->
+                        <div>
+                            <h3
+                                style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--secondary-color); display: inline-block;">
+                                Academic & Skill Offerings</h3>
+                            <ul style="list-style: none; padding-left: 0; margin-top: 1rem;">
+                                <li style="margin-bottom: 0.8rem;">📚 <strong>Lecture Courses:</strong> Bodyworks,
+                                    Advanced Principles of Exercise, Wellness & Injury Prevention.</li>
+                                <li style="margin-bottom: 0.8rem;">🏟️ <strong>Infrastructure:</strong> 4-Acre Sports
+                                    Ground, 200m 6-Lane Track, Badminton Courts.</li>
+                                <li style="margin-bottom: 0.8rem;">🧘 <strong>Yoga Centre:</strong> Monthly classes in
+                                    Hatha, Ashtanga Vinyasa, Pranayama, and Hatha Yoga.</li>
+                                <li style="margin-bottom: 0.8rem;">🏋️ <strong>Fitness:</strong> Multi-stationed fitness
+                                    centre and Health & Fitness Club.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Specialized Coaching -->
+                        <div>
+                            <h3
+                                style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-color); display: inline-block;">
+                                Specialized Coaching</h3>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Athletics</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Powerlifting</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Weightlifting</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Judo</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Wrestling</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Kabaddi</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Karate</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Taekwondo</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Handball</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Badminton</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Cricket</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Tug
+                                    of War</span>
+                                <span class="tag"
+                                    style="background: #e1f5fe; color: #01579b; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 500;">Yoga</span>
+                            </div>
+                            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">Also providing
+                                coaching in Chess, Cross-country, Swimming, and Best Physique.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer></footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

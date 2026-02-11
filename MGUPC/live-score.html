@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Scores | MGUPC</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #fbbf24;
+            --secondary: #1f2937;
+            --accent: #ef4444;
+            --dark-bg: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--dark-bg);
+            color: white;
+            overflow: hidden;
+            /* For slideshow */
+            height: 100vh;
+        }
+
+        /* --- Fullscreen TV Layout --- */
+        #slide-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 10;
+        }
+
+        /* Background Image with Overlay */
+        .slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            filter: brightness(0.4);
+        }
+
+        .slide-content {
+            z-index: 20;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            /* Bottom alignment for TV style */
+            padding: 4rem;
+        }
+
+        /* Lower Third Graphic */
+        .lower-third {
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.8) 60%, transparent 100%);
+            padding: 2rem;
+            border-left: 10px solid var(--primary);
+            width: 80%;
+            animation: slideIn 0.5s ease-out;
+            margin-bottom: 3rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .match-category {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+            letter-spacing: 2px;
+        }
+
+        .college-name {
+            font-size: 2rem;
+            /* Make it prominent */
+            color: white;
+            font-weight: 300;
+            /* Lighter weight for contrast */
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .candidate-name {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .score-value {
+            font-size: 5rem;
+            font-weight: 900;
+            color: #4ade80;
+            /* Green for success */
+            text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+            margin-left: 20px;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: baseline;
+        }
+
+        /* --- Controls --- */
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
+            display: flex;
+            gap: 10px;
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+
+        /* body:hover .controls {
+            opacity: 1;
+        } Removed to allow JS idle timer to control visibility */
+
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .logo-watermark {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            z-index: 30;
+            opacity: 0.8;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #6b7280;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="logo-watermark">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+        MGUPC LIVE
+    </div>
+
+    <div class="controls">
+        <button id="fs-toggle" class="btn" onclick="toggleFullscreen()">Fullscreen</button>
+        <button class="btn" onclick="location.href='index.html'">Exit</button>
+    </div>
+
+    <div id="slide-container">
+        <div class="loading">Waiting for live updates...</div>
+    </div>
+
+    <!-- Hidden audio for alerts if needed, optional -->
+
+    <!-- Supabase Client is loaded via CDN above -->
+    <script>
+        // Supabase is initialized in admin.js as window.supabaseAdmin
+        // Since this is a public page, we can use the same client or create a simpler one.
+        // admin.js might target specific DOM elements that don't exist here, which is fine (try-catch blocks).
+        // To be safe and cleaner, let's just re-init text here, as admin.js is heavy.
+
+        const SUPABASE_URL = 'https://rcmeifutgontewyycivi.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_aJ9CPJVCp3cM1lUVrjOKFA_Yrx-jDe4';
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let slidesData = [];
+        let currentIndex = 0;
+        let slideInterval;
+        const container = document.getElementById('slide-container');
+
+        // Asset fallback
+        const RANDOM_IMAGE = 'assets/random_event.jpg';
+
+        async function fetchScores() {
+            // Fetch last 15 active scores
+            const { data, error } = await sbClient
+                .from('score_logs')
+                .select('*, live_scores(match_name), participants(college_name)')
+                .eq('is_active', true)
+                .order('created_at', { ascending: false })
+                .limit(15);
+
+
+            if (error) {
+                console.error('Error fetching scores:', error);
+                return;
+            }
+
+            if (data && data.length > 0) {
+                // If new data is different, update slides
+                // Simple check: compare IDs of first item
+                // Compare full content signatures (simple stringify) to catch updates
+                const newSignature = JSON.stringify(data);
+                const oldSignature = JSON.stringify(slidesData);
+
+                if (newSignature !== oldSignature) {
+                    slidesData = data;
+                    // Reset index if out of bounds to distinguish deletions
+                    if (currentIndex >= slidesData.length) currentIndex = 0;
+                    renderSlides();
+                }
+            } else {
+                container.innerHTML = '<div class="loading">No live scores available yet.</div>';
+            }
+        }
+
+        function renderSlides() {
+            // Clear container but try to maintain transition smooth if possible
+            // For simplicity, we rebuild. 
+            container.innerHTML = '';
+
+            slidesData.forEach((score, index) => {
+                const div = document.createElement('div');
+                div.className = `slide ${index === currentIndex ? 'active' : ''}`;
+
+                // Image Logic: Use user image or random
+                const imgUrl = score.image_url || RANDOM_IMAGE;
+
+                const matchName = score.live_scores?.match_name || 'Event';
+                const collegeName = score.participants?.college_name || '';
+
+                div.innerHTML = `
+                    <img src="${imgUrl}" class="slide-bg" onerror="this.src='${RANDOM_IMAGE}'">
+                    <div class="slide-content">
+                        <div class="lower-third">
+                            <div class="match-category">${matchName}</div>
+                            ${collegeName ? `<div class="college-name">${collegeName}</div>` : ''}
+                            <div class="score-row">
+                                <div class="candidate-name">${score.candidate_name}</div>
+                                <div class="score-value">${score.score_update}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function startSlideshow() {
+            if (slideInterval) clearInterval(slideInterval);
+            slideInterval = setInterval(() => {
+                const slides = document.querySelectorAll('.slide');
+                if (slides.length === 0) return;
+
+                slides[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % slides.length;
+                slides[currentIndex].classList.add('active');
+            }, 3000); // 3 seconds
+        }
+
+        // --- Realtime Subscription ---
+        sbClient
+            .channel('public:score_logs')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'score_logs' }, payload => {
+                console.log('Score Update Received!', payload);
+                fetchScores(); // Refresh data
+            })
+            .subscribe();
+
+        // Initial Load
+        fetchScores();
+        startSlideshow();
+
+        // --- Inactivity Hiding (TV Mode) ---
+        let idleTimer;
+        const body = document.body;
+        const controls = document.querySelector('.controls');
+
+        function resetIdleTimer() {
+            // Show cursor and controls
+            body.style.cursor = 'default';
+            controls.style.opacity = '1';
+
+            clearTimeout(idleTimer);
+
+            // Hide after 3 seconds of no movement
+            idleTimer = setTimeout(() => {
+                // Only hide if we are in fullscreen or just generally idle?
+                // Usually for TV mode we want this always or just in fullscreen.
+                // Let's do it always for this page as it is a display page.
+                body.style.cursor = 'none';
+                controls.style.opacity = '0';
+            }, 3000);
+        }
+
+        // Listen for mouse events
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('click', resetIdleTimer);
+        document.addEventListener('keydown', resetIdleTimer);
+
+        // Initial call
+        resetIdleTimer();
+
+        // Fullscreen Toggle (Robust Cross-Browser)
+        window.toggleFullscreen = () => {
+            const btn = document.getElementById('fs-toggle');
+            const doc = window.document;
+            const docEl = doc.documentElement;
+
+            const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+            const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+            const isFullScreen = doc.fullscreenElement || doc.mozFullScreenElement || doc.webkitFullscreenElement || doc.msFullscreenElement;
+
+            if (!isFullScreen) {
+                if (requestFullScreen) {
+                    requestFullScreen.call(docEl).catch(err => {
+                        console.error('Fullscreen Error:', err);
+                        alert('Error trying to enable fullscreen: ' + err.message);
+                    });
+                } else {
+                    alert('Fullscreen API is not supported in this browser.');
+                }
+            } else {
+                if (cancelFullScreen) {
+                    cancelFullScreen.call(doc);
+                }
+            }
+        };
+
+        // Listen for fullscreen change to update button text (Standard & Prefixed)
+        const fsEvents = ['fullscreenchange', 'mozfullscreenchange', 'webkitfullscreenchange', 'msfullscreenchange'];
+        fsEvents.forEach(event => {
+            document.addEventListener(event, () => {
+                const btn = document.getElementById('fs-toggle');
+                const doc = window.document;
+                const isFullScreen = doc.fullscreenElement || doc.mozFullScreenElement || doc.webkitFullscreenElement || doc.msFullscreenElement;
+                if (btn) {
+                    btn.textContent = isFullScreen ? 'Exit Fullscreen' : 'Fullscreen';
+                }
+            });
+        });
+
+        // Poll every 30s just in case realtime misses
+        setInterval(fetchScores, 30000);
+
+    </script>
+</body>
+
+</html>

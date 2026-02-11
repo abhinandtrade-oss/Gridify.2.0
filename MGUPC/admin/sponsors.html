@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Sponsors | MGUPC Admin</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="admin-style.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sponsor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .sponsor-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .sponsor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .sponsor-image {
+            width: 100%;
+            height: 150px;
+            object-fit: contain;
+            background: #f8fafc;
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .sponsor-info {
+            padding: 1.25rem;
+        }
+
+        .sponsor-name {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .sponsor-link {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            word-break: break-all;
+        }
+
+        .sponsor-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-disabled {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .add-sponsor-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="auth-overlay">
+        <h2>Admin Access Required</h2>
+        <p>You must be logged in as an administrator to view this page.</p>
+        <a href="login.html" class="btn btn-primary" style="margin-top: 1rem;">Go to Login</a>
+    </div>
+
+    <div id="sidebar-container"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1>Sponsor Banner Management</h1>
+            <div class="user-info">
+                <span id="admin-email">Admin</span>
+            </div>
+        </header>
+
+        <section class="add-sponsor-card">
+            <h2 style="margin-bottom: 1.5rem;">Add New Sponsor Ads Banner</h2>
+            <form id="addSponsorForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Sponsor Name</label>
+                    <input type="text" id="sponsor-name" class="modal-input" placeholder="e.g. Nike" required>
+                </div>
+                <div class="form-group">
+                    <label>Website Address</label>
+                    <input type="url" id="sponsor-website" class="modal-input" placeholder="https://www.nike.com"
+                        required>
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Banner Image URL</label>
+                    <input type="url" id="sponsor-image" class="modal-input"
+                        placeholder="https://example.com/banner.jpg" required>
+                    <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">Only provide horizontal banners
+                        (recommended size (1200x200px approx)).</p>
+                </div>
+                <div style="grid-column: span 2; display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2rem;">Add Sponsor</button>
+                </div>
+            </form>
+        </section>
+
+        <section>
+            <h2>Current Sponsors</h2>
+            <div id="sponsors-container" class="sponsor-grid">
+                <!-- Sponsors will be loaded here -->
+                <p>Loading sponsors...</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+    <script>
+        // Sponsor-specific initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // We wait for supabaseAdmin from admin.js
+            const checkInit = setInterval(() => {
+                if (window.supabaseAdmin) {
+                    clearInterval(checkInit);
+                    loadSponsors();
+
+                    document.getElementById('addSponsorForm').onsubmit = async (e) => {
+                        e.preventDefault();
+                        const name = document.getElementById('sponsor-name').value;
+                        const website = document.getElementById('sponsor-website').value;
+                        const image = document.getElementById('sponsor-image').value;
+
+                        const { error } = await window.supabaseAdmin
+                            .from('sponsors')
+                            .insert({ name, website_url: website, image_url: image });
+
+                        if (error) {
+                            showAdminModal({ title: 'Error', message: error.message });
+                        } else {
+                            document.getElementById('addSponsorForm').reset();
+                            loadSponsors();
+                            showAdminModal({ title: 'Success', message: 'Sponsor banner added successfully.' });
+                        }
+                    };
+                }
+            }, 100);
+        });
+
+        async function loadSponsors() {
+            const container = document.getElementById('sponsors-container');
+            if (!container) return;
+
+            try {
+                const { data, error } = await window.supabaseAdmin
+                    .from('sponsors')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    if (error.code === '42P01') { // Table not found
+                        container.innerHTML = `
+                            <div style="background: #fee2e2; border: 1px solid #ef4444; padding: 2rem; border-radius: 12px; text-align: center;">
+                                <h3 style="color: #991b1b; margin-bottom: 1rem;">Sponsors Table Missing</h3>
+                                <p style="color: #b91c1c; margin-bottom: 1.5rem;">The 'sponsors' table hasn't been created in your Supabase database yet. Please run the SQL migration script provided in the root directory (admin/CREATE_SPONSORS.sql) in your Supabase SQL Editor.</p>
+                                <a href="https://supabase.com/dashboard" target="_blank" class="btn btn-primary" style="background: #ef4444;">Go to Supabase Dashboard</a>
+                            </div>
+                        `;
+                    } else {
+                        container.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                    }
+                    return;
+                }
+
+                if (data.length === 0) {
+                    container.innerHTML = `<p>No sponsors found. Add your first sponsor banner above.</p>`;
+                    return;
+                }
+
+                container.innerHTML = data.map(s => `
+                    <div class="sponsor-card">
+                        <img src="${s.image_url}" alt="${s.name}" class="sponsor-image" onerror="this.src='https://via.placeholder.com/600x200?text=Invalid+Image+URL'">
+                        <div class="sponsor-info">
+                            <span class="sponsor-name">${s.name}</span>
+                            <a href="${s.website_url}" target="_blank" class="sponsor-link">${s.website_url}</a>
+                            <div class="sponsor-actions">
+                                <span class="status-badge ${s.is_active ? 'status-active' : 'status-disabled'}">
+                                    ${s.is_active ? 'Active' : 'Disabled'}
+                                </span>
+                                <div style="display: flex; gap: 0.5rem;">
+                                    <button class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; background: ${s.is_active ? '#64748b' : '#3b82f6'}; color: white;" 
+                                        onclick="toggleSponsor('${s.id}', ${s.is_active})">
+                                        ${s.is_active ? 'Disable' : 'Enable'}
+                                    </button>
+                                    <button class="btn" style="padding: 0.3rem 0.8rem; font-size: 0.8rem; background: #ef4444; color: white;" 
+                                        onclick="deleteSponsor('${s.id}', '${s.name.replace(/'/g, "\\'")}')">
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Sponsor loading crash:', err);
+                container.innerHTML = `<p style="color: red;">Failed to connect to database. Please check your internet connection.</p>`;
+            }
+        }
+
+        async function toggleSponsor(id, currentActive) {
+            const { error } = await window.supabaseAdmin
+                .from('sponsors')
+                .update({ is_active: !currentActive })
+                .eq('id', id);
+
+            if (error) {
+                showAdminModal({ title: 'Error', message: error.message });
+            } else {
+                loadSponsors();
+            }
+        }
+
+        async function deleteSponsor(id, name) {
+            showAdminModal({
+                title: 'Delete Sponsor',
+                message: `Are you sure you want to remove the sponsor banner for "${name}"?`,
+                isDanger: true,
+                onConfirm: async () => {
+                    const { error } = await window.supabaseAdmin
+                        .from('sponsors')
+                        .delete()
+                        .eq('id', id);
+
+                    if (error) {
+                        showAdminModal({ title: 'Error', message: error.message });
+                    } else {
+                        loadSponsors();
+                        closeAdminModal();
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

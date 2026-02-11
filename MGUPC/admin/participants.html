@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Participants | MGUPC Admin</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="admin-style.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-alt);
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .data-table-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .btn-export {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="auth-overlay">
+        <h2>Admin Access Required</h2>
+        <p>You must be logged in as an administrator to view this page.</p>
+        <a href="login.html" class="btn btn-primary" style="margin-top: 1rem;">Go to Login</a>
+    </div>
+
+    <div id="sidebar-container">
+        <!-- Static Fallback matching new premium UI -->
+        <div class="admin-sidebar">
+            <h2>
+                <span class="logo-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="3"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                </span>
+                MGUPC Admin
+            </h2>
+            <ul class="admin-nav">
+                <li><a href="index.html"><span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <polyline points="9 22 9 12 15 12 15 22" />
+                            </svg></span> Dashboard</a></li>
+                <li><a href="participants.html" class="active"><span class="nav-icon"><svg width="20" height="20"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                <circle cx="19" cy="11" r="2" />
+                            </svg></span> Registrations</a></li>
+                <li><a href="colleges.html"><span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+                                <path d="M9 22v-4h6v4" />
+                                <path d="M8 6h.01" />
+                                <path d="M16 6h.01" />
+                                <path d="M8 10h.01" />
+                                <path d="M16 10h.01" />
+                                <path d="M8 14h.01" />
+                                <path d="M16 14h.01" />
+                            </svg></span> Colleges</a></li>
+
+                <li><a href="categories.html"><span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M4 7V4h16v3M9 20h6M12 4v16" />
+                            </svg></span> Categories</a></li>
+                <li><a href="../index.html"><span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="2" x2="22" y1="12" y2="12" />
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                            </svg></span> View Site</a></li>
+            </ul>
+            <div class="admin-logout-section">
+                <a href="#" id="admin-logout"><span class="nav-icon"><svg width="20" height="20" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" x2="9" y1="12" y2="12" />
+                        </svg></span> Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1>Participant Management</h1>
+            <div class="user-info">
+                <span id="admin-email">Admin</span>
+            </div>
+        </header>
+
+        <section class="data-table-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <div>
+                    <h2 style="margin-bottom: 0.25rem;">All Registered Participants</h2>
+                    <p style="font-size: 0.85rem; color: #666;">Click on any row to view complete participant details
+                    </p>
+                </div>
+                <button class="btn-export" onclick="exportToCSV()">Export to CSV (Excel)</button>
+            </div>
+
+            <div class="search-box" style="margin-bottom: 1.5rem;">
+                <input type="text" id="participantSearch" placeholder="Search by name, ID, college, or reg no..."
+                    style="width: 100%; padding: 0.8rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; outline: none; transition: border-color 0.2s;"
+                    onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='#e2e8f0'">
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Registration ID</th>
+                        <th>Name</th>
+                        <th>College</th>
+                        <th>Reg No</th>
+                        <th>Gender</th>
+                        <th>Category</th>
+                        <th>Age</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="participantsList">
+                    <tr>
+                        <td colspan="8" style="text-align: center;">Loading participants...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+    <script>
+        document.getElementById('participantSearch').addEventListener('input', (e) => {
+            if (!window.allParticipants) return;
+            const term = e.target.value.toLowerCase();
+            const filtered = window.allParticipants.filter(p =>
+                (p.full_name || '').toLowerCase().includes(term) ||
+                (p.ssv_reg_no || '').toLowerCase().includes(term) ||
+                (p.college_name || '').toLowerCase().includes(term) ||
+                (p.register_number || '').toLowerCase().includes(term)
+            );
+            window.renderParticipants(filtered);
+        });
+    </script>
+</body>
+
+</html>

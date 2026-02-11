@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration | M.G. University Inter Zone Powerlifting Championship</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏋️</text></svg>">
+</head>
+
+<body>
+    <header></header>
+
+    <main>
+        <section class="hero" style="padding: 3rem 0;">
+            <div class="container">
+                <h1>Participant Registration</h1>
+                <p>Register online to participate in the Inter Zone Powerlifting Championship. Please ensure all details
+                    are correct.</p>
+            </div>
+        </section>
+
+        <section style="background-color: var(--bg-alt);">
+            <div class="container">
+                <div class="form-container">
+                    <form id="registrationForm">
+                        <div class="form-group">
+                            <label for="full_name">Full Name (As per records) *</label>
+                            <input type="text" id="full_name" name="full_name" required
+                                placeholder="Enter your full name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="college_search">College Name *</label>
+                            <div class="searchable-select">
+                                <input type="text" id="college_search" placeholder="Search your College..."
+                                    autocomplete="off">
+                                <input type="hidden" id="college_name" name="college_name" required>
+                                <div id="college_dropdown" class="dropdown-content">
+                                    <div class="dropdown-item-select"
+                                        style="text-align: center; color: #666; padding: 1rem;">Loading colleges...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="other_college_group"
+                            style="display: none; margin-top: -0.5rem; margin-bottom: 1.5rem;">
+                            <label for="other_college">Please Specify College Name *</label>
+                            <input type="text" id="other_college" placeholder="Enter full college name">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dob">Date of Birth *</label>
+                                <input type="date" id="dob" name="dob" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="age">Age (as of 01/07/2025) *</label>
+                                <input type="number" id="age" name="age" readonly placeholder="Auto-calculated"
+                                    style="background-color: #f0f0f0; cursor: not-allowed;">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="register_number">University Register Number *</label>
+                                <input type="text" id="register_number" name="register_number" required
+                                    placeholder="Reg. No">
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender *</label>
+                                <select id="gender" name="gender" required>
+                                    <option value="" disabled selected>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="weight_category">Weight Category *</label>
+                                <select id="weight_category" name="weight_category" required>
+                                    <option value="" disabled selected>Select Category (Select Gender first)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Participant Phone Number *</label>
+                                <input type="tel" id="phone" name="phone" required placeholder="10-digit mobile number"
+                                    pattern="[0-9]{10}">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emergency_contact_name">Emergency Contact Person Name *</label>
+                                <input type="text" id="emergency_contact_name" name="emergency_contact_name" required
+                                    placeholder="Enter contact person name">
+                            </div>
+                            <div class="form-group">
+                                <label for="emergency_contact_phone">Emergency Contact Number *</label>
+                                <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" required
+                                    placeholder="Must be different from your number" pattern="[0-9]{10}">
+                            </div>
+                        </div>
+
+                        <div class="form-group checkbox-group"
+                            style="margin-top: 1.5rem; display: flex; gap: 10px; align-items: flex-start;">
+                            <input type="checkbox" id="rules_agreement" name="rules_agreement" required
+                                style="width: auto; margin-top: 5px;">
+                            <label for="rules_agreement" style="font-size: 0.9rem; font-weight: 400; line-height: 1.4;">
+                                I have read and agree to the <a href="rules.html" target="_blank"
+                                    style="color: var(--primary-color); font-weight: 600;">Rules & Regulations</a> of
+                                the championship. *
+                            </label>
+                        </div>
+
+                        <div class="form-group checkbox-group"
+                            style="margin-top: 1rem; display: flex; gap: 10px; align-items: flex-start;">
+                            <input type="checkbox" id="gdpr_consent" name="gdpr_consent" required
+                                style="width: auto; margin-top: 5px;">
+                            <label for="gdpr_consent" style="font-size: 0.9rem; font-weight: 400; line-height: 1.4;">
+                                I agree to the <a href="privacy.html" target="_blank"
+                                    style="color: var(--primary-color); font-weight: 600;">Privacy Policy</a> and
+                                consent to the collection and processing of my personal data for the purpose of
+                                championship registration. *
+                            </label>
+                        </div>
+
+                        <div style="margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary"
+                                style="width: 100%; border-radius: 5px;">Submit Registration</button>
+                        </div>
+                        <div id="form-message" style="margin-top: 1.5rem; text-align: center; font-weight: 500;"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer></footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

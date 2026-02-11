@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weight Category Management | MGUPC Admin</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="admin-style.css">
+    <style>
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f4f7f6;
+        }
+
+        .admin-main {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.25rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .container-box {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: flex-end;
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .gender-badge {
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .gender-men {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .gender-women {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="auth-overlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; visibility: hidden;">
+        <h2>Admin Access Required</h2>
+        <p>You must be logged in as an administrator to view this page.</p>
+        <a href="login.html" class="btn btn-primary" style="margin-top: 1rem;">Go to Login</a>
+    </div>
+
+    <div id="sidebar-container"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <h1>Weight Category Management</h1>
+            <div class="user-info">
+                <span id="admin-email">Admin</span>
+            </div>
+        </header>
+
+        <section class="container-box">
+            <h2 style="margin-bottom: 1rem;">Add New Category</h2>
+            <form id="addCategoryForm" class="flex-row">
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select id="gender" required
+                        style="padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+                        <option value="Men">Men</option>
+                        <option value="Women">Women</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="name">Weight (e.g., 59kg)</label>
+                    <input type="text" id="name" placeholder="e.g., 100kg" required
+                        style="padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Add Category</button>
+            </form>
+
+            <h2 style="margin-bottom: 1rem;">Existing Categories</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Gender</th>
+                        <th>Weight Name</th>
+                        <th style="text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="categories-list">
+                    <!-- Loaded dynamically -->
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('addCategoryForm');
+            const listContainer = document.getElementById('categories-list');
+
+            const checkInterval = setInterval(() => {
+                if (window.supabaseAdmin) {
+                    clearInterval(checkInterval);
+                    loadCategories();
+                }
+            }, 100);
+
+            async function loadCategories() {
+                const { data, error } = await window.supabaseAdmin
+                    .from('weight_categories')
+                    .select('*')
+                    .order('gender', { ascending: true })
+                    .order('name', { ascending: true });
+
+                if (error) {
+                    listContainer.innerHTML = '<tr><td colspan="3">Error loading categories</td></tr>';
+                    return;
+                }
+
+                listContainer.innerHTML = data.map(c => `
+                    <tr>
+                        <td><span class="gender-badge gender-${c.gender.toLowerCase()}">${c.gender}</span></td>
+                        <td style="font-weight: 500;">${c.name}</td>
+                        <td style="text-align: right;">
+                            <button class="btn-delete" onclick="deleteCategory('${c.id}', '${c.name}')">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('name').value.trim();
+                const gender = document.getElementById('gender').value;
+
+                const { error } = await window.supabaseAdmin
+                    .from('weight_categories')
+                    .insert([{ name, gender }]);
+
+                if (error) {
+                    alert('Error adding category: ' + error.message);
+                } else {
+                    form.reset();
+                    loadCategories();
+                }
+            });
+
+            window.deleteCategory = async (id, name) => {
+                if (!confirm(`Are you sure you want to delete the "${name}" category? This will not affect existing registrations but will remove it from future registration options.`)) return;
+
+                const { error } = await window.supabaseAdmin
+                    .from('weight_categories')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) {
+                    alert('Error deleting category: ' + error.message);
+                } else {
+                    loadCategories();
+                }
+            };
+        });
+    </script>
+</body>
+
+</html>

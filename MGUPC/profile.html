@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | M.G. University Inter Zone Powerlifting Championship</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏋️</text></svg>">
+</head>
+
+<body>
+    <header></header>
+
+    <main>
+        <section class="hero"
+            style="padding: 4rem 0; background: linear-gradient(135deg, var(--primary-color) 0%, #003366 100%);">
+            <div class="container">
+                <h1 style="color: white; margin-bottom: 0.5rem;">My Digital Portal</h1>
+                <p style="color: rgba(255,255,255,0.8); font-size: 1.1rem;">Manage your participation and access your
+                    official ticket.</p>
+            </div>
+        </section>
+
+        <section style="background-color: var(--bg-alt); min-height: 70vh; padding: 4rem 0;">
+            <div class="container">
+                <div id="profileContent">
+                    <!-- Loading State -->
+                    <div style="text-align: center; padding: 5rem 0;">
+                        <div class="loader"
+                            style="width: 50px; height: 50px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1.5rem;">
+                        </div>
+                        <p style="color: var(--text-muted); font-weight: 500;">Retrieving your registration records...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer></footer>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const checkInterval = setInterval(async () => {
+                if (window.supabaseClient) {
+                    clearInterval(checkInterval);
+                    loadUserProfile();
+                }
+            }, 100);
+        });
+
+        async function loadUserProfile() {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { data: participant, error } = await window.supabaseClient
+                .from('participants')
+                .select('*')
+                .eq('user_id', user.id)
+                .maybeSingle();
+
+            const container = document.getElementById('profileContent');
+
+            if (error) {
+                container.innerHTML = `<div class="alert error" style="background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 1.5rem; border-radius: 12px; text-align: center; font-weight: 600;">Error connecting to database: ${error.message}</div>`;
+                return;
+            }
+
+            if (!participant) {
+                container.innerHTML = `
+                    <div class="form-container" style="text-align: center; padding: 4rem 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); background: white;">
+                        <div style="font-size: 4rem; margin-bottom: 1.5rem;">📋</div>
+                        <h2 style="color: var(--primary-color); margin-bottom: 1rem;">Welcome, ${user.email.split('@')[0]}!</h2>
+                        <p style="margin-bottom: 2.5rem; color: #666; font-size: 1.1rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                            You haven't completed your registration for the championship yet. Join 300+ athletes from across M.G. University.
+                        </p>
+                        <a href="register.html" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem; border-radius: 12px;">Start Registration</a>
+                    </div>
+                `;
+                return;
+            }
+
+            renderProfile(participant);
+        }
+
+        function renderProfile(p) {
+            const container = document.getElementById('profileContent');
+            const isApproved = p.verification_status === 'Approved';
+
+            let statusColor, statusBg, statusIcon;
+
+            if (isApproved) {
+                statusColor = '#059669';
+                statusBg = '#ecfdf5';
+                statusIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+            } else if (p.verification_status === 'Rejected') {
+                statusColor = '#dc2626';
+                statusBg = '#fef2f2';
+                statusIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            } else {
+                statusColor = '#d97706';
+                statusBg = '#fffbeb';
+                statusIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+            }
+
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 2.5rem; align-items: flex-start;">
+                    
+                    <!-- Left Column: Athlete Profile -->
+                    <div style="display: flex; flex-direction: column; gap: 2rem;">
+                        <div class="glass-card" style="padding: 2.5rem; border-radius: 32px; background: white; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.08); border: 1px solid rgba(226, 232, 240, 0.8); position: relative; overflow: hidden; animation: slideUp 0.5s ease-out;">
+                            <div style="position: absolute; top: 0; right: 0; width: 300px; height: 300px; background: radial-gradient(circle at top right, #3b82f61a, transparent 70%); opacity: 0.5; pointer-events: none;"></div>
+                            
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3.5rem; position: relative; z-index: 1;">
+                                <div>
+                                    <h2 style="margin: 0; font-size: 2.25rem; font-weight: 800; color: #0f172a; letter-spacing: -0.03em;">Athlete Portal</h2>
+                                    <p style="margin: 0.5rem 0 0; color: #64748b; font-size: 1rem; font-weight: 500;">Your official registration and participation hub.</p>
+                                    
+                                    ${(p.verification_status === 'Pending' || !p.verification_status) ? `
+                                        <button onclick="startResubmission()" class="btn" style="margin-top: 1.5rem; background: white; color: var(--primary-color); border: 2px solid var(--primary-color); padding: 0.6rem 1.5rem; border-radius: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                            Edit Registration
+                                        </button>
+                                    ` : ''}
+                                </div>
+                                <div style="background: ${statusBg}; color: ${statusColor}; padding: 0.75rem 1.25rem; border-radius: 16px; font-weight: 800; font-size: 0.8rem; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.03); letter-spacing: 0.02em; text-transform: uppercase;">
+                                    <span style="display: flex; align-items: center; justify-content: center; background: white; width: 22px; height: 22px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">${statusIcon}</span> 
+                                    ${p.verification_status || 'Pending Verification'}
+                                </div>
+                            </div>
+
+                            ${p.verification_status === 'Rejected' ? `
+                                <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 2rem; border-radius: 20px; margin-bottom: 3rem; animation: slideIn 0.5s ease-out;">
+                                    <div style="display: flex; gap: 16px;">
+                                        <div style="flex-shrink: 0; width: 48px; height: 48px; background: #fb7185; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white;">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg>
+                                        </div>
+                                        <div style="flex-grow: 1;">
+                                            <h4 style="color: #9f1239; margin: 0 0 0.5rem 0; font-size: 1.1rem; font-weight: 700;">Submission Hold: Action Required</h4>
+                                            <p style="color: #be123c; font-size: 0.95rem; margin-bottom: 0; line-height: 1.6;"><strong>Reason:</strong> ${p.rejection_reason || 'Missing or incorrect documentation provided during registration.'}</p>
+                                            <p style="color: #be123c; font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.8;">Please contact support to unlock editing if needed, as your current status prevents direct modifications.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5rem;">
+                                <div class="profile-field">
+                                    <label>FULL NAME</label>
+                                    <div class="val">${p.full_name}</div>
+                                </div>
+                                <div class="profile-field">
+                                    <label>ATHLETE REG ID</label>
+                                    <div class="val" style="font-family: 'JetBrains Mono', monospace; color: var(--primary-color); font-weight: 800;">#${p.ssv_reg_no || 'TBD'}</div>
+                                </div>
+                                <div class="profile-field" style="grid-column: span 2;">
+                                    <label>INSTITUTION / COLLEGE</label>
+                                    <div class="val" style="color: #475569;">${p.college_name}</div>
+                                </div>
+                                <div class="profile-field">
+                                    <label>UNI REGISTER NO</label>
+                                    <div class="val">${p.register_number}</div>
+                                </div>
+                                <div class="profile-field">
+                                    <label>DIVISION & CATEGORY</label>
+                                    <div class="val">${p.gender} / ${p.weight_category}</div>
+                                </div>
+                                <div class="profile-field">
+                                    <label>DATE OF BIRTH</label>
+                                    <div class="val">${p.dob} <span style="font-size: 0.85rem; color: #94a3b8; margin-left: 8px;">(Age: ${p.age || 'N/A'})</span></div>
+                                </div>
+                                <div class="profile-field">
+                                    <label>CONTACT NUMBER</label>
+                                    <div class="val">${p.phone}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Documents & Security -->
+                    <div style="display: flex; flex-direction: column; gap: 2rem;">
+                        ${isApproved ? `
+                            <div class="athlete-pass-card">
+                                <div class="pass-header">
+                                    <div style="display: flex; align-items: center; gap: 12px;">
+                                        <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 0.9rem; font-weight: 800; letter-spacing: 1px; color: white;">MGU CHAMPIONSHIP</div>
+                                            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.7); font-weight: 700;">OFFICIAL ATHLETE PASS</div>
+                                        </div>
+                                    </div>
+                                    <div style="background: rgba(255,255,255,0.2); color: white; padding: 4px 10px; border-radius: 8px; font-size: 0.65rem; font-weight: 800; border: 1px solid rgba(255,255,255,0.1);">2024-25</div>
+                                </div>
+                                <div class="pass-body">
+                                    <div style="margin-bottom: 2rem;">
+                                        <div style="font-size: 0.65rem; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Competitor</div>
+                                        <div style="font-size: 1.5rem; font-weight: 900; color: #1e293b; line-height: 1.1;">${p.full_name}</div>
+                                    </div>
+                                    
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                                        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+                                            <div>
+                                                <div style="font-size: 0.6rem; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Weight Category</div>
+                                                <div style="font-size: 1.1rem; font-weight: 800; color: #1e293b;">${p.gender.substring(0, 1)} - ${p.weight_category}</div>
+                                            </div>
+                                            <div>
+                                                <div style="font-size: 0.6rem; color: #94a3b8; font-weight: 800; text-transform: uppercase;">Reg Ref</div>
+                                                <div style="font-size: 1.1rem; font-weight: 800; color: var(--primary-color);">${p.ssv_reg_no}</div>
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div class="pass-qrcode">
+                                                <div style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border: 1.5px dashed #cbd5e1; border-radius: 12px;">
+                                                    <span style="font-size: 0.55rem; color: #94a3b8; font-weight: 800; text-align: center; line-height: 1.2;">SECURE<br>AUTH</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="pass-footer">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    MGU-Verified Identification
+                                </div>
+                            </div>
+                            <button onclick="window.print()" class="btn-premium-action">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
+                                PRINT OFFICIAL TICKET
+                            </button>
+                        ` : `
+                            <div class="pending-card">
+                                <div class="animated-blob"></div>
+                                <div style="position: relative; z-index: 1;">
+                                    <div style="width: 70px; height: 70px; background: #fffbeb; border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; box-shadow: 0 10px 20px -5px rgba(245, 158, 11, 0.2); border: 1px solid #fde68a;">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    </div>
+                                    <h4 style="color: #92400e; margin: 0 0 0.75rem 0; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.01em;">Verification in Progress</h4>
+                                    <p style="color: #b45309; font-size: 0.95rem; line-height: 1.6; margin: 0; font-weight: 500;">Our technical team is verifying your registration details. Your digital athlete pass will be generated once approved.</p>
+                                </div>
+                            </div>
+                        `}
+                        
+                        <div class="support-action-card">
+                            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 1.5rem;">
+                                <div style="width: 48px; height: 48px; background: #eff6ff; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #2563eb;">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1e293b;">Account Security</h4>
+                            </div>
+                            <button onclick="openPasswordChangeModal()" class="btn" style="width: 100%; padding: 0.8rem; border-radius: 12px; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                Change Password
+                            </button>
+                        </div>
+
+                        <div class="support-action-card" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: none;">
+                            <h4 style="margin: 0 0 0.5rem 0; font-size: 1.1rem; font-weight: 700; color: white;">Need Assistance?</h4>
+                            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 1.5rem; line-height: 1.5;">Our support team is available 24/7 for technical and category queries.</p>
+                            <a href="mailto:support@mgupc.in" class="btn" style="width: 100%; border-radius: 12px; background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0.8rem;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                support@mgupc.in
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        function startResubmission() {
+            window.location.href = 'register.html';
+        }
+
+        let userEmail = '';
+
+        async function openPasswordChangeModal() {
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            userEmail = user.email;
+            document.getElementById('passwordModal').style.display = 'flex';
+            document.getElementById('step1').style.display = 'block';
+            document.getElementById('step2').style.display = 'none';
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        async function sendOTP() {
+            const btn = document.getElementById('sendOtpBtn');
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            const { error } = await window.supabaseClient.auth.resetPasswordForEmail(userEmail);
+
+            if (error) {
+                showToast(error.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Send Verification Code';
+            } else {
+                showToast('Verification code sent to your email!', 'success');
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+            }
+        }
+
+        async function verifyAndChangePassword() {
+            const code = document.getElementById('otpCode').value.trim();
+            const newPassword = document.getElementById('newPassword').value;
+            const btn = document.getElementById('updatePasswordBtn');
+
+            if (!code || code.length < 6) return showToast('Please enter the 6-digit code.', 'error');
+            if (newPassword.length < 6) return showToast('Password must be at least 6 characters.', 'error');
+
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            try {
+                // Step 1: Verify OTP (using type recovery for password reset)
+                const { error: verifyError } = await window.supabaseClient.auth.verifyOtp({
+                    email: userEmail,
+                    token: code,
+                    type: 'recovery'
+                });
+
+                if (verifyError) throw verifyError;
+
+                // Step 2: Update Password
+                const { error: updateError } = await window.supabaseClient.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (updateError) throw updateError;
+
+                showToast('Password updated successfully!', 'success');
+                closePasswordModal();
+                // Clear fields
+                document.getElementById('otpCode').value = '';
+                document.getElementById('newPassword').value = '';
+            } catch (err) {
+                showToast(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Update Password';
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --border-subtle: rgba(226, 232, 240, 0.8);
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+
+        .profile-field label {
+            display: block;
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.075em;
+            margin-bottom: 0.4rem;
+        }
+
+        .profile-field .val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        /* Athlete Digital Pass */
+        .athlete-pass-card {
+            background: white;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.12);
+            border: 1px solid var(--border-subtle);
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .pass-header {
+            background: #1e293b;
+            padding: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pass-body {
+            padding: 2.5rem 2rem;
+            position: relative;
+        }
+
+        .pass-body::after,
+        .pass-body::before {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            width: 30px;
+            height: 30px;
+            background: #f8fafc;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .pass-body::after {
+            left: -15px;
+        }
+
+        .pass-body::before {
+            right: -15px;
+        }
+
+        .pass-footer {
+            background: #f8fafc;
+            padding: 1.25rem;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #94a3b8;
+            border-top: 2px dashed #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-premium-action {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            width: 100%;
+            border-radius: 16px;
+            padding: 1.25rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.3);
+        }
+
+        .btn-premium-action:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .pending-card {
+            background: white;
+            padding: 3rem 2rem;
+            border-radius: 32px;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            text-align: center;
+            box-shadow: 0 20px 40px -15px rgba(251, 191, 36, 0.1);
+        }
+
+        .support-action-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 24px;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .support-action-card:hover {
+            transform: translateY(-4px);
+        }
+
+        @media screen and (max-width: 1024px) {
+            #profileContent {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        @media print {
+
+            header,
+            footer,
+            .hero,
+            .btn,
+            .btn-premium-action,
+            .support-action-card {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            .athlete-pass-card {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                margin: 40px auto;
+                transform: scale(1.2);
+            }
+        }
+    </style>
+    <!-- Password Change Modal -->
+    <div id="passwordModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="text-align: left; max-width: 450px; border-radius: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0; color: var(--primary-color);">Security Verification</h3>
+                <button onclick="closePasswordModal()"
+                    style="background: none; border: none; cursor: pointer; color: #94a3b8;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="step1">
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6;">
+                    To change your password, we'll send a one-time verification code to your registered email address
+                    for security.
+                </p>
+                <button onclick="sendOTP()" id="sendOtpBtn" class="btn btn-primary"
+                    style="width: 100%; padding: 1rem; border-radius: 12px; font-weight: 700;">SEND VERIFICATION
+                    CODE</button>
+            </div>
+
+            <div id="step2" style="display: none;">
+                <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">
+                    Enter the code sent to your email and choose a strong new password.
+                </p>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>6-Digit Code</label>
+                    <input type="text" id="otpCode" placeholder="000000" maxlength="6"
+                        style="letter-spacing: 8px; font-weight: 800; text-align: center; font-size: 1.25rem; background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 1rem;">
+                </div>
+                <div class="form-group" style="margin-bottom: 2rem;">
+                    <label>New Password</label>
+                    <div class="password-wrapper" style="position: relative;">
+                        <input type="password" id="newPassword" placeholder="Minimum 6 characters"
+                            style="border-radius: 12px; padding: 1rem; background: #f8fafc; border: 2px solid #e2e8f0; width: 100%;">
+                        <span class="toggle-password" onclick="togglePasswordVisibility('newPassword')"
+                            style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+                <button onclick="verifyAndChangePassword()" id="updatePasswordBtn" class="btn btn-primary"
+                    style="width: 100%; padding: 1rem; border-radius: 12px; font-weight: 700;">VERIFY & UPDATE
+                    PASSWORD</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

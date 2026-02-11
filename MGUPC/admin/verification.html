@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification | Admin Panel</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="admin-body">
+    <div id="sidebar-container"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>Verification</h1>
+                <div class="user-info">
+                    <span id="admin-email">admin@mgupc.com</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="admin-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Pending Registrations</h3>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search by name or ID..."
+                            style="padding: 0.5rem; border-radius: 5px; border: 1px solid #ddd;"
+                            oninput="filterVerifications()">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Reg. ID</th>
+                                <th>Name</th>
+                                <th>Institution</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="verificationList">
+                            <tr>
+                                <td colspan="5" style="text-align: center;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Verification Modal -->
+    <div id="verificationModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <h3>Verify Candidate</h3>
+            <p id="verifyName" style="font-weight: 600; font-size: 1.1rem; margin-bottom: 1rem;"></p>
+
+            <div id="verifyFields" style="margin-bottom: 2rem;">
+                <!-- Setup-based fields appear here -->
+            </div>
+
+            <div id="rejectionReasonBox" style="display: none; margin-bottom: 1rem;">
+                <label for="rejectionReason" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Reason for
+                    Rejection *</label>
+                <textarea id="rejectionReason" rows="3" placeholder="Explain why the registration is being rejected..."
+                    style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn" style="background: #ef4444; color: white;" onclick="showRejection()">Reject</button>
+                <button class="btn btn-primary" onclick="approveRegistration()">Approve</button>
+                <button class="btn btn-cancel" onclick="closeVerifyModal()">Close</button>
+            </div>
+            <div id="rejectionActions" style="display: none; margin-top: 1rem; text-align: right;">
+                <button class="btn" style="background: #ef4444; color: white;" onclick="submitRejection()">Confirm
+                    Rejection</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+    <script>
+        let currentVerifyId = null;
+        let setupFields = [];
+
+        async function loadVerifications() {
+            const [partsRes, setupRes] = await Promise.all([
+                window.supabaseAdmin.from('participants').select('*').order('created_at', { ascending: false }),
+                window.supabaseAdmin.from('verification_setup').select('*').eq('is_required', true)
+            ]);
+
+            if (partsRes.error) return console.error(partsRes.error);
+            window.allParticipants = partsRes.data;
+            setupFields = setupRes.data || [];
+
+            renderVerifications(window.allParticipants);
+        }
+
+        function renderVerifications(data) {
+            const tbody = document.getElementById('verificationList');
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No registrations found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(p => {
+                let statusBadge = '';
+                if (p.verification_status === 'Approved') statusBadge = '<span style="background: #dcfce7; color: #15803d; padding: 3px 8px; border-radius: 99px; font-size: 0.75rem; font-weight: 600;">Approved</span>';
+                else if (p.verification_status === 'Rejected') statusBadge = '<span style="background: #fee2e2; color: #b91c1c; padding: 3px 8px; border-radius: 99px; font-size: 0.75rem; font-weight: 600;" title="' + (p.rejection_reason || 'No reason given') + '">Rejected</span>';
+                else statusBadge = '<span style="background: #fef9c3; color: #854d0e; padding: 3px 8px; border-radius: 99px; font-size: 0.75rem; font-weight: 600;">Pending</span>';
+
+                return `
+                    <tr>
+                        <td style="font-weight: 600;">${p.ssv_reg_no || 'N/A'}</td>
+                        <td>${p.full_name}</td>
+                        <td>${p.college_name}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 0.2rem 0.6rem; font-size: 0.8rem;" onclick="openVerifyModal('${p.id}')">Verify</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterVerifications() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!window.allParticipants) return;
+
+            const filtered = window.allParticipants.filter(p => {
+                const name = (p.full_name || '').toLowerCase();
+                const regNo = (p.ssv_reg_no || '').toLowerCase();
+                const college = (p.college_name || '').toLowerCase();
+                return name.includes(searchTerm) || regNo.includes(searchTerm) || college.includes(searchTerm);
+            });
+
+            renderVerifications(filtered);
+        }
+
+        function openVerifyModal(id) {
+            currentVerifyId = id;
+            const p = window.allParticipants?.find(item => item.id === id);
+            if (!p) return;
+
+            document.getElementById('verifyName').textContent = p.full_name;
+            const container = document.getElementById('verifyFields');
+
+            container.innerHTML = setupFields.map(field => {
+                const isCustom = field.type === 'custom';
+                const isText = field.input_type === 'text';
+                const value = isCustom ? '<span style="color: #3b82f6; font-style: italic;">Manual Action Required</span>' : (p[field.column_name] || 'N/A');
+
+                let inputHtml = `<input type="checkbox" style="width: 18px; height: 18px;" class="verify-check" data-field-id="${field.id}" required>`;
+                if (isCustom && isText) {
+                    inputHtml += `<input type="text" placeholder="Note..." class="verify-text" data-field-id="${field.id}" style="margin-left: 10px; padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem;">`;
+                }
+
+                return `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.75rem; border-bottom: 1px solid #f3f4f6; background: ${isCustom ? '#f0f9ff' : 'transparent'}">
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.8rem; color: #6b7280; display: block;">${field.display_name} ${isCustom ? '(Custom Step)' : ''}</span>
+                            <span style="font-weight: 500;">${value}</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${inputHtml}
+                            <span style="font-size: 0.75rem; color: #10b981; font-weight: 600;">Done</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('rejectionReasonBox').style.display = 'none';
+            document.getElementById('rejectionActions').style.display = 'none';
+            document.getElementById('verificationModal').style.display = 'flex';
+        }
+
+        function closeVerifyModal() {
+            document.getElementById('verificationModal').style.display = 'none';
+        }
+
+        function showRejection() {
+            document.getElementById('rejectionReasonBox').style.display = 'block';
+            document.getElementById('rejectionActions').style.display = 'block';
+        }
+
+        async function approveRegistration() {
+            // Collect custom responses
+            const responses = {};
+            document.querySelectorAll('.verify-text').forEach(input => {
+                responses[input.dataset.fieldId] = input.value.trim();
+            });
+
+            const { error } = await window.supabaseAdmin
+                .from('participants')
+                .update({
+                    verification_status: 'Approved',
+                    rejection_reason: null,
+                    verification_responses: responses
+                })
+                .eq('id', currentVerifyId);
+
+            if (error) {
+                alert(error.message);
+            } else {
+                showToast('Registration Approved!', 'success');
+                loadVerifications();
+                closeVerifyModal();
+            }
+        }
+
+        async function submitRejection() {
+            const reason = document.getElementById('rejectionReason').value.trim();
+            if (!reason) {
+                alert('Please provide a reason for rejection.');
+                return;
+            }
+
+            const { error } = await window.supabaseAdmin
+                .from('participants')
+                .update({ verification_status: 'Rejected', rejection_reason: reason })
+                .eq('id', currentVerifyId);
+
+            if (error) {
+                alert(error.message);
+            } else {
+                showToast('Registration Rejected', 'error');
+                loadVerifications();
+                closeVerifyModal();
+            }
+        }
+
+        const checkInterval = setInterval(() => {
+            if (window.supabaseAdmin) {
+                clearInterval(checkInterval);
+                loadVerifications();
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>

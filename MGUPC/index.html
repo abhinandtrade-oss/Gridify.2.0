@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M.G. University Inter Zone Powerlifting Championship | Home</title>
+    <meta name="description"
+        content="Official website for the M.G. University Inter Zone Powerlifting Championship organized by SSV College.">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏋️</text></svg>">
+</head>
+
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-content">
+            <h2 class="preloader-title">M.G. University Inter Zone <br> Powerlifting Championship</h2>
+            <div class="dumbbell-animation">
+                <div class="weight left"></div>
+                <div class="bar"></div>
+                <div class="weight right"></div>
+            </div>
+            <div class="loading-text">Loading Strength...</div>
+        </div>
+    </div>
+
+    <header></header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-backgrounds">
+                <div class="hero-bg active" style="background-image: url('assets/home/slider1.jpg');"></div>
+                <div class="hero-bg" style="background-image: url('assets/home/slider2.jpg');"></div>
+                <div class="hero-bg video-bg">
+                    <video muted playsinline id="hero-video">
+                        <source src="assets/home/ssv.vdo.1.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="hero-overlay"></div>
+            </div>
+            <div class="container">
+                <span class="hero-date">Feb 20-21, 2026</span>
+                <h1>M.G. University Inter Zone <br>Powerlifting Championship</h1>
+                <p class="hero-description">Witness raw strength and determination as the top collegiate athletes
+                    compete for glory.<br>
+                    <span class="organizer-label">Organized by Department of Physical Education,</span>
+                    <span class="organizer-name">SSV College, Valayanchirangara.</span>
+                </p>
+                <div class="cta-buttons">
+                    <a href="register.html" class="btn btn-primary">
+                        <span>Register Now</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                    <a href="rules.html" class="btn btn-secondary">Read Rules</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-section" style="display: none;">
+            <div class="container">
+                <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Colleges</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Athletes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Disciplines</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Days of Action</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="highlights">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Event Highlights</h2>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <div
+                            style="background: rgba(37, 99, 235, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--primary-color);">
+                            <i data-lucide="medal" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h3>Elite Competition</h3>
+                        <p>Compete against the best powerlifters from across the university in a high-stakes
+                            environment.</p>
+                    </div>
+                    <div class="card">
+                        <div
+                            style="background: rgba(16, 185, 129, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: var(--secondary-color);">
+                            <i data-lucide="map-pin" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h3>Professional Venue</h3>
+                        <p>Hosted at SSV College with IPF standard equipment and certified officials ensuring fair play.
+                        </p>
+                    </div>
+                    <div class="card">
+                        <div
+                            style="background: rgba(245, 158, 11, 0.1); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; color: #f59e0b;">
+                            <i data-lucide="award" style="width: 24px; height: 24px;"></i>
+                        </div>
+                        <h3>Recognition</h3>
+                        <p>Official university certification and medals for winners, paving the way for inter-university
+                            selection.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="competition-details">
+            <div class="container">
+                <div class="section-title">
+                    <h2>The Three Lifts</h2>
+                    <p style="color: var(--text-muted);">The ultimate test of total body strength</p>
+                </div>
+
+                <div class="lifts-container" style="margin-bottom: 5rem;">
+                    <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                        <div class="lift-card">
+                            <div class="lift-icon"><i data-lucide="dumbbell"></i></div>
+                            <h3>Squat</h3>
+                            <p>The King of Lifts. A test of lower body and core strength, requiring depth below
+                                parallel.</p>
+                        </div>
+                        <div class="lift-card">
+                            <div class="lift-icon"><i data-lucide="grip-horizontal"></i></div>
+                            <h3>Bench Press</h3>
+                            <p>Pure upper body power. The bar must touch the chest and be pressed to full lockout.</p>
+                        </div>
+                        <div class="lift-card">
+                            <div class="lift-icon"><i data-lucide="zap"></i></div>
+                            <h3>Deadlift</h3>
+                            <p>The truest test of strength. Lifting dead weight from the floor to a standing position.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h2>Weight Categories</h2>
+                </div>
+
+                <div class="grid">
+                    <div class="category-card">
+                        <h3><i data-lucide="user"></i> Men's Categories</h3>
+                        <ul class="category-list">
+                            <li>59kg</li>
+                            <li>66kg</li>
+                            <li>74kg</li>
+                            <li>83kg</li>
+                            <li>93kg</li>
+                            <li>105kg</li>
+                            <li>120kg</li>
+                            <li>120+kg</li>
+                        </ul>
+                    </div>
+                    <div class="category-card">
+                        <h3><i data-lucide="user"></i> Women's Categories</h3>
+                        <ul class="category-list">
+                            <li>47kg</li>
+                            <li>52kg</li>
+                            <li>57kg</li>
+                            <li>63kg</li>
+                            <li>69kg</li>
+                            <li>76kg</li>
+                            <li>84kg</li>
+                            <li>84+kg</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="info-section">
+            <div class="container">
+                <div class="grid" style="align-items: center; gap: 4rem;">
+                    <div style="position: relative;">
+                        <div
+                            style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: var(--primary-color); opacity: 0.1; border-radius: 50%; z-index: 0;">
+                        </div>
+                        <img src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800&auto=format&fit=crop"
+                            alt="Powerlifting"
+                            style="width: 100%; border-radius: 20px; box-shadow: var(--shadow-xl); position: relative; z-index: 1;">
+                        <div
+                            style="position: absolute; bottom: -20px; right: -20px; width: 150px; height: 150px; background: var(--secondary-color); opacity: 0.1; border-radius: 50%; z-index: 0;">
+                        </div>
+                    </div>
+                    <div>
+                        <h2
+                            style="font-size: 2.5rem; color: var(--text-color); margin-bottom: 1.5rem; font-weight: 700; line-height: 1.2;">
+                            Ready to Prove Your Strength?</h2>
+                        <p style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-muted);">The championship
+                            is open to all eligible students from colleges under M.G. University. Ensure your college
+                            sports department completes the registration before the deadline. <strong>Event Dates:
+                                20/02/2026 & 21/02/2026</strong></p>
+
+                        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div
+                                    style="background: #eff6ff; padding: 10px; border-radius: 50%; color: var(--primary-color);">
+                                    <i data-lucide="check"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 0.2rem;">Official IPF Rules</h4>
+                                    <p style="color: var(--text-muted); font-size: 0.9rem;">Competition follows strict
+                                        international powerlifting federation guidelines.</p>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div
+                                    style="background: #eff6ff; padding: 10px; border-radius: 50%; color: var(--primary-color);">
+                                    <i data-lucide="check"></i>
+                                </div>
+                                <div>
+                                    <h4 style="font-weight: 600; margin-bottom: 0.2rem;">Team Championship</h4>
+                                    <p style="color: var(--text-muted); font-size: 0.9rem;">Points are awarded to
+                                        colleges for top placements in each category.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="register.html" class="btn btn-primary">Start Registration</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <section id="sponsors-section" style="padding: 4rem 0; background: var(--bg-alt); display: none;">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Partners & Sponsors</h2>
+                <div></div>
+            </div>
+            <div id="sponsors-container" class="sponsor-carousel">
+                <!-- Sponsors will be injected here -->
+            </div>
+        </div>
+    </section>
+
+    <footer></footer>
+
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Preloader Logic
+        window.addEventListener('load', function () {
+            const preloader = document.getElementById('preloader');
+            // Minimum display time for the preloader to be seen
+            setTimeout(() => {
+                preloader.classList.add('hidden');
+                // Remove from DOM after transition
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 500);
+            }, 800); // 800ms delay for smoother experience
+        });
+    </script>
+</body>
+
+</html>

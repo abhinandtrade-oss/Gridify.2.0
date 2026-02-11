@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Setup | Admin Panel</title>
+    <link rel="stylesheet" href="admin-style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body class="admin-body">
+    <div id="sidebar-container"></div>
+
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="header-content">
+                <h1>Verification - setup</h1>
+                <div class="user-info">
+                    <span id="admin-email">admin@mgupc.com</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="admin-content">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem;">Add Custom Verification Step / Question</h3>
+                <p>Create additional checklist items or questions for the verification procedure.</p>
+                <div
+                    style="display: flex; gap: 1rem; margin-top: 1rem; background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 300px;">
+                        <label
+                            style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem;">Question
+                            / Step Description</label>
+                        <input type="text" id="newCustomStep" placeholder="e.g. Verify Original ID Card"
+                            style="width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1;">
+                    </div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <label style="display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.5rem;">Input
+                            Type</label>
+                        <select id="newCustomType"
+                            style="width: 100%; padding: 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1;">
+                            <option value="checkbox">Checkbox Only</option>
+                            <option value="text">Checkbox + Short Text</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn btn-primary" style="padding: 0.75rem 1.5rem;" onclick="addCustomStep()">Add
+                            Step</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Verification Procedure Hierarchy</h3>
+                    <button class="btn btn-primary" onclick="saveSetup()">Save All Changes</button>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <h4
+                        style="color: var(--admin-text-muted); text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
+                        1. Registration Fields to Verify</h4>
+                    <table class="admin-table" style="margin-bottom: 2rem;">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Enable</th>
+                                <th>Field Name</th>
+                                <th>Display Label</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fieldSetupList">
+                            <!-- Registration fields -->
+                        </tbody>
+                    </table>
+
+                    <h4
+                        style="color: var(--admin-text-muted); text-transform: uppercase; font-size: 0.8rem; margin-bottom: 1rem; border-bottom: 1px solid #eee; padding-bottom: 0.5rem;">
+                        2. Custom Verification Steps / Questions</h4>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">Enable</th>
+                                <th>Description / Question</th>
+                                <th style="width: 100px; text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="customSetupList">
+                            <!-- Custom questions -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+    <script>
+        // Specific logic for this page
+        async function loadSetup() {
+            const { data, error } = await window.supabaseAdmin
+                .from('verification_setup')
+                .select('*')
+                .order('type', { ascending: true })
+                .order('column_name', { ascending: true });
+
+            if (error) {
+                console.error('Error loading setup:', error);
+                return;
+            }
+
+            const fieldBody = document.getElementById('fieldSetupList');
+            const customBody = document.getElementById('customSetupList');
+
+            const fields = data.filter(d => d.type === 'field' || !d.type);
+            const customs = data.filter(d => d.type === 'custom');
+
+            fieldBody.innerHTML = fields.map(col => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="col-check" data-id="${col.id}" ${col.is_required ? 'checked' : ''} style="width: 20px; height: 20px;">
+                    </td>
+                    <td style="font-family: monospace; color: #6b7280;">${col.column_name}</td>
+                    <td style="font-weight: 600;">${col.display_name}</td>
+                </tr>
+            `).join('');
+
+            customBody.innerHTML = customs.map(col => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="col-check" data-id="${col.id}" ${col.is_required ? 'checked' : ''} style="width: 20px; height: 20px;">
+                    </td>
+                    <td style="font-weight: 500;">${col.display_name}</td>
+                    <td>
+                        <span style="font-size: 0.8rem; background: #f3f4f6; padding: 2px 8px; border-radius: 4px; color: #4b5563;">
+                            ${col.input_type === 'text' ? 'Checkbox + Text' : 'Checkbox Only'}
+                        </span>
+                    </td>
+                    <td style="text-align: right;">
+                        <button class="btn" style="background: #fee2e2; color: #ef4444; padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="deleteCustomStep('${col.id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            if (customs.length === 0) {
+                customBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #9ca3af; padding: 2rem;">No custom steps added yet.</td></tr>';
+            }
+        }
+
+        async function addCustomStep() {
+            const desc = document.getElementById('newCustomStep').value.trim();
+            if (!desc) return alert('Please enter a description or question.');
+
+            const type = document.getElementById('newCustomType').value;
+
+            const { error } = await window.supabaseAdmin
+                .from('verification_setup')
+                .insert([{
+                    display_name: desc,
+                    type: 'custom',
+                    input_type: type,
+                    is_required: true
+                }]);
+
+            if (error) {
+                alert(error.message);
+            } else {
+                document.getElementById('newCustomStep').value = '';
+                loadSetup();
+                showToast('Custom step added!', 'success');
+            }
+        }
+
+        async function deleteCustomStep(id) {
+            if (!confirm('Remove this custom verification step?')) return;
+
+            const { error } = await window.supabaseAdmin
+                .from('verification_setup')
+                .delete()
+                .eq('id', id);
+
+            if (error) alert(error.message);
+            else loadSetup();
+        }
+
+        async function saveSetup() {
+            const checks = document.querySelectorAll('.col-check');
+            const updates = Array.from(checks).map(check => ({
+                id: check.dataset.id,
+                is_required: check.checked
+            }));
+
+            const { error } = await window.supabaseAdmin
+                .from('verification_setup')
+                .upsert(updates);
+
+            if (error) {
+                showAdminModal({ title: 'Error', message: error.message });
+            } else {
+                showToast('Setup saved successfully!', 'success');
+            }
+        }
+
+        // Wait for Supabase to be ready from admin.js
+        const checkInterval = setInterval(() => {
+            if (window.supabaseAdmin) {
+                clearInterval(checkInterval);
+                loadSetup();
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>
