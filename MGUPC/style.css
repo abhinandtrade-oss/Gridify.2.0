@@ -1430,3 +1430,139 @@ footer {
         opacity: 0.6;
     }
 }
+
+/* --- Faculty Profiles --- */
+.faculty-section {
+    margin-bottom: 5rem;
+}
+
+.faculty-section .grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.faculty-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    text-align: center;
+    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    width: 100%;
+}
+
+.faculty-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-xl);
+    border-color: transparent;
+}
+
+.faculty-image-container {
+    width: 100%;
+    height: 320px;
+    background-color: var(--bg-alt);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.faculty-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.faculty-card:hover .faculty-image {
+    transform: scale(1.05);
+}
+
+.faculty-name {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+    padding: 0 1rem;
+}
+
+.faculty-role {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    padding: 0 1rem;
+    display: block;
+}
+
+.faculty-role.principal {
+    color: #9333ea;
+    /* Purple for Principal */
+}
+
+.faculty-role.hod {
+    color: #2563eb;
+    /* Blue for HOD */
+}
+
+.faculty-role.staff {
+    color: #db2777;
+    /* Pink/Red for Staff */
+}
+
+.faculty-contact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: var(--transition);
+    padding: 0 1rem;
+    word-break: break-all;
+    margin-top: 0.5rem;
+}
+
+.faculty-contact:hover {
+    color: var(--primary-color);
+}
+
+.faculty-contact svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+}
+
+.view-profile-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    padding: 0.6rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.faculty-card:hover .view-profile-btn {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
