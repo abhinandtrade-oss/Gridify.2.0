@@ -305,6 +305,31 @@ nav {
     box-shadow: var(--shadow-md);
 }
 
+/* Page Header - Simpler & Smaller */
+.page-header {
+    background: #000;
+    padding: 4rem 0;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: white;
+    line-height: 1.2;
+}
+
+.page-header p {
+    font-size: 1rem;
+    color: #cbd5e1;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
 /* Sections */
 section {
     padding: 6rem 0;
