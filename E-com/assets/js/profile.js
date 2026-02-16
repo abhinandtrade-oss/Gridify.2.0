@@ -87,9 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (error) {
-            alert('Error updating profile: ' + error.message);
+            showAlert('Error updating profile: ' + error.message, 'error');
         } else {
-            alert('Profile updated successfully!');
+            showAlert('Profile updated successfully!', 'success');
         }
 
         btnSaveProfile.disabled = false;
@@ -202,7 +202,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             addressModal.hide();
             loadAddresses();
         } catch (err) {
-            alert('Error saving address: ' + err.message);
+            showAlert('Error saving address: ' + err.message, 'error');
         } finally {
             btnSave.disabled = false;
             btnSave.innerText = originalText;
@@ -213,7 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.editAddress = async (id) => {
         const { data: addr, error } = await client.from('user_addresses').select('*').eq('id', id).single();
         if (error) {
-            alert('Error fetching address: ' + error.message);
+            showAlert('Error fetching address: ' + error.message, 'error');
             return;
         }
 
@@ -245,15 +245,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         addressModal.show();
     };
 
-    window.deleteAddress = async (id) => {
-        if (!confirm('Are you sure you want to delete this address?')) return;
-
-        const { error } = await client.from('user_addresses').delete().eq('id', id);
-        if (error) {
-            alert('Error deleting address: ' + error.message);
-        } else {
-            loadAddresses();
-        }
+    window.deleteAddress = (id) => {
+        showConfirm('Are you sure you want to delete this address?', async () => {
+            const { error } = await client.from('user_addresses').delete().eq('id', id);
+            if (error) {
+                showAlert('Error deleting address: ' + error.message, 'error');
+            } else {
+                loadAddresses();
+            }
+        });
     };
 
     // Reset modal on close
@@ -472,39 +472,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Cancel Order function
-    window.cancelOrder = async (orderId) => {
-        if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) return;
+    window.cancelOrder = (orderId) => {
+        showConfirm('Are you sure you want to cancel this order? This action cannot be undone.', async () => {
+            try {
+                // First check if it's still pending (double check)
+                const { data: order, error: fetchError } = await client
+                    .from('orders')
+                    .select('status')
+                    .eq('id', orderId)
+                    .single();
 
-        try {
-            // First check if it's still pending (double check)
-            const { data: order, error: fetchError } = await client
-                .from('orders')
-                .select('status')
-                .eq('id', orderId)
-                .single();
+                if (fetchError) throw fetchError;
 
-            if (fetchError) throw fetchError;
+                if (order.status !== 'pending') {
+                    showAlert('This order cannot be cancelled because it is no longer pending.', 'warning');
+                    loadOrders(); // Refresh to show new status
+                    return;
+                }
 
-            if (order.status !== 'pending') {
-                alert('This order cannot be cancelled because it is no longer pending.');
-                loadOrders(); // Refresh to show new status
-                return;
+                const { error } = await client
+                    .from('orders')
+                    .update({ status: 'cancelled' })
+                    .eq('id', orderId)
+                    .eq('status', 'pending');
+
+                if (error) throw error;
+
+                showAlert('Order cancelled successfully.', 'success');
+                loadOrders(); // Refresh the list
+            } catch (err) {
+                console.error('Error cancelling order:', err);
+                showAlert('Failed to cancel order: ' + err.message, 'error');
             }
-
-            const { error } = await client
-                .from('orders')
-                .update({ status: 'cancelled' })
-                .eq('id', orderId)
-                .eq('status', 'pending');
-
-            if (error) throw error;
-
-            alert('Order cancelled successfully.');
-            loadOrders(); // Refresh the list
-        } catch (err) {
-            console.error('Error cancelling order:', err);
-            alert('Failed to cancel order: ' + err.message);
-        }
+        });
     };
 
     // Global Tracking Function
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (err) {
             console.error(err);
-            alert('Failed to load tracking details');
+            showAlert('Failed to load tracking details', 'error');
             trackingModal.hide();
         }
     };
@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const comments = document.getElementById('return-comments').value;
 
                 if (!reason) {
-                    alert('Please select a reason for return.');
+                    showAlert('Please select a reason for return.', 'warning');
                     return;
                 }
 
@@ -788,14 +788,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (error) throw error;
 
-                    alert('Return request has been submitted successfully. We will review it shortly.');
+                    showAlert('Return request has been submitted successfully. We will review it shortly.', 'success');
                     bootstrap.Modal.getInstance(document.getElementById('returnModal')).hide();
 
                     // Optional: Refresh orders or hide button?
                     // For now, reload orders might be overkill, but let's just close modal.
                 } catch (err) {
                     console.error('Error submitting return:', err);
-                    alert('Failed to submit return request: ' + err.message);
+                    showAlert('Failed to submit return request: ' + err.message, 'error');
                 } finally {
                     btn.disabled = false;
                     btn.innerText = 'Submit Return';
