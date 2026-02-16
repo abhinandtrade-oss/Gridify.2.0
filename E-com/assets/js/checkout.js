@@ -309,7 +309,7 @@ document.addEventListener('commonComponentsLoaded', () => {
 
         } catch (err) {
             console.error(err);
-            alert('Error saving address: ' + err.message);
+            showAlert('Error saving address: ' + err.message, 'error');
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerText = originalText;
@@ -483,7 +483,7 @@ document.addEventListener('commonComponentsLoaded', () => {
             // Check if an address is selected
             const selectedAddress = document.querySelector('input[name="selected_address"]:checked');
             if (!selectedAddress) {
-                alert('Please select a delivery address.');
+                showAlert('Please select a delivery address.', 'warning');
                 return;
             }
 
@@ -497,7 +497,7 @@ document.addEventListener('commonComponentsLoaded', () => {
                 await processOrder();
             } catch (err) {
                 console.error('Order error:', err);
-                alert('An error occurred while placing your order: ' + err.message);
+                showAlert('An error occurred while placing your order: ' + err.message, 'error');
                 placeOrderBtn.disabled = false;
                 placeOrderBtn.textContent = 'Place Order';
             }
@@ -665,8 +665,10 @@ document.addEventListener('commonComponentsLoaded', () => {
         } else {
             msg = 'Order placed successfully! Order ID: #' + createdOrderIds[0].substring(0, 8);
         }
-        alert(msg);
-        window.location.href = 'profile.html'; // Redirect to profile to see orders
+        showAlert(msg, 'success');
+        setTimeout(() => {
+            window.location.href = 'profile.html'; // Redirect after delay to let toast be seen
+        }, 2000);
     }
 
     function showCouponError(msg) {
