@@ -263,6 +263,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
 
         try {
+            // Check storage limit first
+            const storageCheck = await window.checkStorageLimit();
+            if (storageCheck && storageCheck.allowed === false) {
+                showAlert(storageCheck.message, 'error');
+                return;
+            }
+
             const sku = skuPreview.textContent;
             const imageUrls = [];
 
