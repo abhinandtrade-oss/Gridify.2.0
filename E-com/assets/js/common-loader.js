@@ -254,9 +254,18 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Common components loaded and initialized');
 
         // Load global helpers
+        await loadScript('assets/js/notifications.js');
         await loadScript('assets/js/header-auth.js');
         await loadScript('assets/js/cart-manager.js');
         await loadScript('assets/js/gdpr.js');
+
+        // Load Lucide Icons if not present
+        if (typeof lucide === 'undefined') {
+            const lucideScript = document.createElement('script');
+            lucideScript.src = 'https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js';
+            lucideScript.onload = () => lucide.createIcons();
+            document.head.appendChild(lucideScript);
+        }
 
         // Page Protection logic
         const protectedPages = ['cart.html', 'wishlist.html', 'checkout.html', 'profile.html'];
