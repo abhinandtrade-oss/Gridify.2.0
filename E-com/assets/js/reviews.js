@@ -487,6 +487,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         btnSubmit.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> ${isEditing ? 'Updating...' : 'Submitting...'}`;
 
         try {
+            // Check storage limit first
+            const storageCheck = await window.checkStorageLimit();
+            if (storageCheck && storageCheck.allowed === false) {
+                alert(storageCheck.message);
+                return;
+            }
+
             const imageUrls = [];
             for (const img of selectedImages) {
                 if (img.isExisting) {
