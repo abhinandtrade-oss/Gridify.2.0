@@ -62,7 +62,7 @@ const initHeaderAuth = async () => {
                     const { error } = await window.supabase.auth.signOut();
                     if (error) {
                         console.error('Logout error:', error);
-                        alert('Logout failed: ' + error.message);
+                        showAlert('Logout failed: ' + error.message, 'error');
                     } else {
                         window.location.reload();
                     }
