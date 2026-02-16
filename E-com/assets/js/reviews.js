@@ -268,7 +268,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function renderReviews() {
         const filtered = activeFilter ? allReviews.filter(r => r.rating === activeFilter) : allReviews;
-        reviewsTab.textContent = `Reviews (${allReviews.length})`;
+        const countText = `Reviews (${allReviews.length})`;
+        if (reviewsTab) reviewsTab.textContent = countText;
+        const countBadge = document.getElementById('reviews-count-badge');
+        if (countBadge) countBadge.textContent = `${allReviews.length} Review${allReviews.length !== 1 ? 's' : ''}`;
 
         if (allReviews.length === 0) {
             reviewsPane.innerHTML = `
@@ -357,6 +360,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <div class="review-comment mt-3">${review.comment || 'No comment provided.'}</div>
                 ${imagesHtml ? `<div class="review-images mt-3">${imagesHtml}</div>` : ''}
+                
+                ${review.seller_reply ? `
+                    <div class="seller-reply-container mt-3 p-3 rounded" style="background: #f8f9fa; border-left: 4px solid #ef2853;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold small text-dark">
+                                <i class="flaticon-back-arrow" style="transform: scaleX(-1); display: inline-block; margin-right: 5px;"></i>
+                                ${review.replied_by_system ? 'System Administrator' : 'Seller Response'}
+                            </span>
+                            <span class="text-muted" style="font-size: 0.75rem;">${new Date(review.replied_at).toLocaleDateString()}</span>
+                        </div>
+                        <p class="mb-0 small text-muted italic">${review.seller_reply}</p>
+                    </div>
+                ` : ''}
             </div>
         `;
     }
