@@ -128,6 +128,7 @@ document.addEventListener('commonComponentsLoaded', () => {
                                     ${addr.is_default ? '<span class="badge bg-light text-primary border border-primary">Default</span>' : ''}
                                 </div>
                                 <div class="small text-muted mt-1">
+                                    <span class="fw-bold">${addr.full_name || ''}</span><br>
                                     ${addr.address_line1}<br>
                                     ${addr.address_line2 ? addr.address_line2 + '<br>' : ''}
                                     ${addr.city}, ${addr.state} - ${addr.pincode}
@@ -169,14 +170,18 @@ document.addEventListener('commonComponentsLoaded', () => {
         if (!address) return;
         const form = checkoutForm;
 
-        // We might need first/last name from profile if not in address
-        if (currentUser && currentUser.user_metadata) {
+        if (address.full_name) {
+            const names = address.full_name.split(' ');
+            form.first_name.value = names[0] || '';
+            form.last_name.value = names.length > 1 ? names.slice(1).join(' ') : '';
+        } else if (currentUser && currentUser.user_metadata) {
             const meta = currentUser.user_metadata;
-            if (meta.first_name) form.first_name.value = meta.first_name;
-            if (meta.last_name) form.last_name.value = meta.last_name;
-            // Profile might have split name differently
+            if (meta.full_name) {
+                const names = meta.full_name.split(' ');
+                form.first_name.value = names[0] || '';
+                form.last_name.value = names.length > 1 ? names.slice(1).join(' ') : '';
+            }
         }
-        // Or try to fetch profile name if we haven't already
 
         form.email.value = currentUser.email;
 
@@ -282,6 +287,7 @@ document.addEventListener('commonComponentsLoaded', () => {
             const data = {
                 user_id: currentUser.id,
                 title: fd.get('title'),
+                full_name: fd.get('full_name'),
                 address_line1: fd.get('address_line1'),
                 address_line2: fd.get('address_line2'),
                 state: fd.get('state') || 'Kerala',
