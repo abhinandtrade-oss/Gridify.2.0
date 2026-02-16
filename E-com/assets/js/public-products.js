@@ -100,8 +100,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderTrendingProducts(products, container) {
+    async function getProductRatings(skus) {
+        if (!skus || skus.length === 0) return {};
+
+        const { data: ratings, error } = await window.supabase
+            .from('product_reviews')
+            .select('product_sku, rating')
+            .in('product_sku', skus);
+
+        if (error) {
+            console.error('Error fetching ratings:', error);
+            return {};
+        }
+
+        const stats = {};
+        ratings.forEach(r => {
+            if (!stats[r.product_sku]) stats[r.product_sku] = { sum: 0, count: 0 };
+            stats[r.product_sku].sum += r.rating;
+            stats[r.product_sku].count += 1;
+        });
+
+        const final = {};
+        Object.keys(stats).forEach(sku => {
+            final[sku] = {
+                avg: (stats[sku].sum / stats[sku].count).toFixed(1),
+                count: stats[sku].count
+            };
+        });
+        return final;
+    }
+
+    function generateStarsHtml(rating) {
+        let stars = '';
+        const filledStars = Math.floor(rating || 0);
+        for (let i = 1; i <= 5; i++) {
+            if (i <= filledStars) {
+                stars += '<i class="flaticon-star text-warning"></i>';
+            } else if (i - 0.5 <= rating) {
+                stars += '<i class="flaticon-star text-warning" style="opacity: 0.6;"></i>';
+            } else {
+                stars += '<i class="flaticon-star" style="color: #e0e0e0;"></i>';
+            }
+        }
+        return stars;
+    }
+
+    async function renderTrendingProducts(products, container) {
         if (!container) return;
+
+        const skus = products.map(p => p.sku);
+        const ratingsMap = await getProductRatings(skus);
 
         container.innerHTML = products.map(product => {
             const mrp = parseFloat(product.mrp);
@@ -110,6 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const images = product.images || [];
             const mainImg = images.length > 0 ? images.sort((a, b) => a.arrangement - b.arrangement)[0].url : 'https://placehold.co/600x800?text=No+Image';
             const categoryName = product.categories?.name || 'Uncategorized';
+
+            const ratingData = ratingsMap[product.sku] || { avg: 0, count: 0 };
 
             return `
                 <div class="col">
@@ -127,7 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h4 class="ul-product-title"><a href="shop-details.html?id=${product.id}">${product.name}</a></h4>
                             <h5 class="ul-product-category"><a href="shop.html?category=${encodeURIComponent(categoryName)}">${categoryName}</a></h5>
                             
-                            <div class="ul-product-price-wrapper mt-2">
+                            <div class="ul-product-rating mt-1" style="font-size: 0.75rem;">
+                                ${generateStarsHtml(ratingData.avg)}
+                                <span class="text-muted ms-1">(${ratingData.count})</span>
+                            </div>
+
+                            <div class="ul-product-price-wrapper mt-1">
                                 <span class="ul-product-price text-dark fw-bold">₹${sellingPrice.toLocaleString()}</span>
                                 ${mrp > sellingPrice ? `
                                     <span class="ul-product-mrp text-muted text-decoration-line-through ms-2" style="font-size: 0.85rem;">₹${mrp.toLocaleString()}</span>
@@ -140,8 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
     }
 
-    function renderFlashSaleProducts(products, container) {
+    async function renderFlashSaleProducts(products, container) {
         if (!container) return;
+
+        const skus = products.map(p => p.sku);
+        const ratingsMap = await getProductRatings(skus);
 
         container.innerHTML = products.map(product => {
             const mrp = parseFloat(product.mrp);
@@ -150,6 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const images = product.images || [];
             const mainImg = images.length > 0 ? images.sort((a, b) => a.arrangement - b.arrangement)[0].url : 'https://placehold.co/600x800?text=No+Image';
             const categoryName = product.categories?.name || 'Uncategorized';
+
+            const ratingData = ratingsMap[product.sku] || { avg: 0, count: 0 };
 
             return `
                 <div class="swiper-slide">
@@ -172,6 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="ul-product-txt">
                             <h4 class="ul-product-title"><a href="shop-details.html?id=${product.id}">${product.name}</a></h4>
                             <h5 class="ul-product-category"><a href="shop.html?category=${encodeURIComponent(categoryName)}">${categoryName}</a></h5>
+                            <div class="ul-product-rating mt-1" style="font-size: 0.75rem;">
+                                ${generateStarsHtml(ratingData.avg)}
+                                <span class="text-muted ms-1">(${ratingData.count})</span>
+                            </div>
                         </div>
                     </div>
                 </div>
