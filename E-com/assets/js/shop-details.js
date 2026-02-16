@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentProduct = product;
             renderProduct(product);
+            loadProductRating(product.sku);
             loadRelatedProducts(product.categories.id, product.id);
             setupCartActions();
         } catch (err) {
@@ -240,6 +241,54 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.thumb-img').forEach(el => el.classList.remove('active'));
         thumbEl.classList.add('active');
     };
+
+    async function loadProductRating(sku) {
+        if (!sku) return;
+
+        try {
+            const { data: reviews } = await client
+                .from('product_reviews')
+                .select('rating')
+                .eq('product_sku', sku);
+
+            const ratingDisplay = document.getElementById('product-rating-display');
+            if (!ratingDisplay) return;
+
+            let avg = 0;
+            let count = 0;
+
+            if (reviews && reviews.length > 0) {
+                count = reviews.length;
+                const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+                avg = sum / count;
+            }
+
+            ratingDisplay.innerHTML = `
+                <div class="stars text-warning d-flex">
+                    ${generateStarsHtml(avg)}
+                </div>
+                <span class="text-muted small">(${count} review${count !== 1 ? 's' : ''})</span>
+            `;
+        } catch (err) {
+            console.error('Error loading product rating:', err);
+        }
+    }
+
+    function generateStarsHtml(rating) {
+        let stars = '';
+        const filledStars = Math.floor(rating || 0);
+        for (let i = 1; i <= 5; i++) {
+            if (i <= filledStars) {
+                stars += '<i class="flaticon-star"></i>';
+            } else if (i - 0.5 <= rating) {
+                // Approximate half star with opacity or just full if closer
+                stars += '<i class="flaticon-star" style="opacity: 0.6;"></i>';
+            } else {
+                stars += '<i class="flaticon-star" style="color: #e0e0e0;"></i>';
+            }
+        }
+        return stars;
+    }
 
     initProductDetails();
 });
