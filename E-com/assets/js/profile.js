@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const addressModal = new bootstrap.Modal(addressModalEl);
 
     let currentUser = null;
+    let selectedReviewImages = [];
+    const R2_WORKER_URL = 'https://review-images-proxy.info-adhil-ecom.workers.dev'.replace(/\/$/, '');
+    const ratingLabels = {
+        '5': 'Excellent!',
+        '4': 'Very Good',
+        '3': 'Average',
+        '2': 'Poor',
+        '1': 'Terrible'
+    };
 
     // Tab Logic
     const navLinks = document.querySelectorAll('.profile-nav-link');
@@ -459,8 +468,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </div>
                                 <div>
                                     ${cancelBtn}
+                                    ${order.status === 'delivered' ? `
+                                        <button class="btn btn-outline-secondary btn-sm me-2" onclick="viewOrderTracking('${order.id}', 'return')">Return</button>
+                                        <button class="btn btn-outline-primary btn-sm me-2" onclick="viewOrderTracking('${order.id}', 'review')">Review</button>
+                                    ` : ''}
                                     <button class="btn btn-outline-dark btn-sm" onclick="viewOrderTracking('${order.id}')">
-                                        Track Order
+                                        ${order.status === 'delivered' ? 'Order Details' : 'Track Order'}
                                     </button>
                                 </div>
                             </div>
@@ -539,13 +552,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Global Tracking Function
-    window.viewOrderTracking = async (orderId) => {
-        const trackingModal = new bootstrap.Modal(document.getElementById('trackingModal'));
+    window.viewOrderTracking = async (orderId, action = null) => {
+        const modalEl = document.getElementById('trackingModal');
+        // Use getOrCreateInstance to avoid multiple instances issues if possible, though new is fine if we hide properly.
+        const trackingModal = bootstrap.Modal.getOrCreateInstance(modalEl);
 
         // Reset/Loading state
         document.getElementById('track-order-id').innerText = '#' + orderId.substring(0, 8);
         document.getElementById('track-items-list').innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
         document.getElementById('track-courier-info').classList.add('d-none');
+
+        // Reset Modal Title default
+        const modalTitle = document.querySelector('#trackingModal .modal-title');
+        if (modalTitle) modalTitle.innerText = 'Track Order';
 
         trackingModal.show();
 
@@ -558,6 +577,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .single();
 
             if (orderError) throw orderError;
+
+            // Update Modal Title based on status
+            if (modalTitle && order.status === 'delivered') {
+                modalTitle.innerText = 'Order Details';
+            }
 
             // Fetch profile separately for phone fallback
             let profile = null;
@@ -572,10 +596,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const { data: items, error: itemsError } = await client
                 .from('order_items')
-                .select('*, products(name, images)')
+                .select('*, products(name, images, sku)')
                 .eq('order_id', orderId);
 
             if (itemsError) throw itemsError;
+
+            // Handle Action Shortcuts (Auto-open if single item)
+            // Wait for items to be fetched to know if we can auto-navigate
+            if (action && items.length === 1) {
+                const item = items[0];
+                const sku = item.products?.sku;
+
+                if (action === 'review' && sku) {
+                    modalEl.addEventListener('hidden.bs.modal', function onHidden() {
+                        initiateReview(sku, false);
+                        modalEl.removeEventListener('hidden.bs.modal', onHidden);
+                    });
+                    trackingModal.hide();
+                    return; // Stop rendering details since we are switching context
+                }
+
+                if (action === 'return') {
+                    modalEl.addEventListener('hidden.bs.modal', function onHidden() {
+                        initiateReturn(orderId, item.id);
+                        modalEl.removeEventListener('hidden.bs.modal', onHidden);
+                    });
+                    trackingModal.hide();
+                    return;
+                }
+            }
+
+            // Update Modal Title based on action if multiple items
+            if (modalTitle && action) {
+                if (action === 'review') modalTitle.innerText = 'Select Product to Review';
+                else if (action === 'return') modalTitle.innerText = 'Select Product to Return';
+            }
 
             // Update Status UI
             updateTrackingProgress(order.status);
@@ -637,8 +692,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
             }
 
+            // Fetch Existing Reviews for these products by this user
+            const productSkus = [...new Set(items.map(item => item.products?.sku).filter(Boolean))];
+            const { data: existingReviews } = await client
+                .from('product_reviews')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .in('product_sku', productSkus);
+
+            const reviewsMap = {};
+            if (existingReviews) {
+                existingReviews.forEach(rev => {
+                    reviewsMap[rev.product_sku] = rev;
+                });
+            }
+
             document.getElementById('track-items-list').innerHTML = items.map(item => {
                 const product = item.products;
+                const sku = product?.sku;
                 let img = '../assets/img/product-placeholder.png';
                 if (product && product.images) {
                     try {
@@ -671,6 +742,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
 
+                // Review Logic
+                let reviewBtnHtml = '';
+                if (order.status === 'delivered') {
+                    const existingReview = reviewsMap[sku];
+                    if (existingReview) {
+                        reviewBtnHtml = `<button class="btn btn-sm btn-outline-primary mt-1 ms-1" style="font-size: 0.7rem; padding: 2px 6px;" onclick="initiateReview('${sku}', true)">Edit Review</button>`;
+                    } else {
+                        reviewBtnHtml = `<button class="btn btn-sm btn-primary mt-1 ms-1" style="font-size: 0.7rem; padding: 2px 6px;" onclick="initiateReview('${sku}', false)">Write Review</button>`;
+                    }
+                }
+
                 return `
                     <div class="d-flex align-items-center mb-3">
                         <img src="${img}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='assets/img/logo.png'">
@@ -681,7 +763,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                         <div class="text-end">
                             <div class="fw-bold">₹${item.total_price.toLocaleString()}</div>
-                            ${showReturnButton ? `<button class="btn btn-sm btn-outline-danger mt-1" style="font-size: 0.7rem; padding: 2px 6px;" onclick="initiateReturn('${orderId}', '${item.id}')">Return</button>` : ''}
+                            <div class="d-flex justify-content-end gap-1">
+                                ${showReturnButton ? `<button class="btn btn-sm btn-outline-danger mt-1" style="font-size: 0.7rem; padding: 2px 6px;" onclick="initiateReturn('${orderId}', '${item.id}')">Return</button>` : ''}
+                                ${reviewBtnHtml}
+                            </div>
                         </div>
                     </div>
                 `;
@@ -853,6 +938,192 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         new bootstrap.Modal(document.getElementById('returnModal')).show();
     };
+
+    // --- Review Logic ---
+    window.initiateReview = async (productSku, isEdit = false) => {
+        const modalEl = document.getElementById('reviewModal');
+        const reviewModal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        document.getElementById('review-product-sku').value = productSku;
+        document.getElementById('review-id').value = '';
+        document.getElementById('review-form').reset();
+        document.getElementById('upload-preview').innerHTML = '';
+        document.getElementById('rating-label-display').textContent = '';
+        selectedReviewImages = [];
+
+        // Auto-detect existing review
+        let isEditMode = isEdit;
+        let review = null;
+
+        const { data: existingReview } = await client
+            .from('product_reviews')
+            .select('*')
+            .eq('user_id', currentUser.id)
+            .eq('product_sku', productSku)
+            .maybeSingle();
+
+        if (existingReview) {
+            review = existingReview;
+            isEditMode = true;
+        }
+
+        if (isEditMode && review) {
+            document.getElementById('review-id').value = review.id;
+            document.getElementById('review-comment-text').value = review.comment || '';
+            const ratingInput = document.querySelector(`input[name="rating"][value="${review.rating}"]`);
+            if (ratingInput) {
+                ratingInput.checked = true;
+                document.getElementById('rating-label-display').textContent = ratingLabels[review.rating] || '';
+            }
+
+            selectedReviewImages = (review.images || []).map(url => ({
+                id: Math.random(),
+                url: url,
+                isExisting: true
+            }));
+            updateReviewPreviews();
+
+            document.getElementById('btn-submit-review').innerText = 'Update Review';
+        } else {
+            document.getElementById('btn-submit-review').innerText = 'Submit Review';
+        }
+
+        reviewModal.show();
+    };
+
+    // Rating Label Toggle
+    document.querySelectorAll('input[name="rating"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const label = document.getElementById('rating-label-display');
+            if (label) label.textContent = ratingLabels[e.target.value] || '';
+        });
+    });
+
+    // Image Upload Handling
+    const reviewImageInput = document.getElementById('review-images-input');
+    reviewImageInput?.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        files.forEach(file => {
+            if (file.size > 1.5 * 1024 * 1024) {
+                showAlert('Image exceeds 1.5MB limit: ' + file.name, 'warning');
+                return;
+            }
+            if (selectedReviewImages.length >= 5) {
+                showAlert('Max 5 images allowed.', 'warning');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const id = Date.now() + Math.random();
+                selectedReviewImages.push({ id, file, base64: event.target.result });
+                updateReviewPreviews();
+            };
+            reader.readAsDataURL(file);
+        });
+        reviewImageInput.value = '';
+    });
+
+    function updateReviewPreviews() {
+        const previewContainer = document.getElementById('upload-preview');
+        if (!previewContainer) return;
+        previewContainer.innerHTML = selectedReviewImages.map(img => `
+            <div class="preview-box" style="position: relative; width: 60px; height: 60px;">
+                <img src="${img.base64 || img.url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                <button type="button" class="remove-img" onclick="removeSelectedReviewImage(${img.id})" 
+                    style="position: absolute; top: -5px; right: -5px; background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; line-height: 1; display: flex; align-items: center; justify-content: center; padding: 0;">×</button>
+            </div>
+        `).join('');
+    }
+
+    window.removeSelectedReviewImage = (id) => {
+        selectedReviewImages = selectedReviewImages.filter(img => img.id !== id);
+        updateReviewPreviews();
+    };
+
+    // Submit Review
+    document.getElementById('btn-submit-review')?.addEventListener('click', async () => {
+        const btn = document.getElementById('btn-submit-review');
+        const productSku = document.getElementById('review-product-sku').value;
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        const comment = document.getElementById('review-comment-text').value;
+
+        if (!rating) {
+            showAlert('Please select a rating.', 'warning');
+            return;
+        }
+
+        btn.disabled = true;
+        const originalText = btn.innerText;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Submitting...`;
+
+        try {
+            // Check storage limit
+            if (window.checkStorageLimit) {
+                const storageCheck = await window.checkStorageLimit();
+                if (storageCheck && storageCheck.allowed === false) {
+                    alert(storageCheck.message);
+                    btn.disabled = false;
+                    btn.innerText = originalText;
+                    return;
+                }
+            }
+
+            const imageUrls = [];
+            for (const img of selectedReviewImages) {
+                if (img.isExisting) {
+                    imageUrls.push(img.url);
+                } else {
+                    const url = await uploadReviewImageToR2(img.file);
+                    if (url) imageUrls.push(url);
+                }
+            }
+
+            const reviewData = {
+                user_id: currentUser.id,
+                product_sku: productSku,
+                rating: parseInt(rating),
+                comment: comment,
+                images: imageUrls
+            };
+
+            // Only set created_at for new reviews
+            if (!document.getElementById('review-id').value) {
+                reviewData.created_at = new Date().toISOString();
+            }
+
+            const { error } = await client
+                .from('product_reviews')
+                .upsert(reviewData, { onConflict: 'user_id,product_sku' });
+
+            if (error) throw error;
+
+            showAlert('Thank you! Your review has been submitted.', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
+
+        } catch (err) {
+            console.error('Submit Error:', err);
+            showAlert('Error: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerText = 'Submit Review';
+        }
+    });
+
+    async function uploadReviewImageToR2(file) {
+        if (!R2_WORKER_URL) return null;
+        const fileName = `reviews/${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+        try {
+            const response = await fetch(`${R2_WORKER_URL}?key=${encodeURIComponent(fileName)}`, {
+                method: 'PUT',
+                body: file,
+                headers: { 'Content-Type': file.type }
+            });
+            if (response.ok) return `${R2_WORKER_URL}?key=${encodeURIComponent(fileName)}`;
+            throw new Error('Upload failed');
+        } catch (e) {
+            console.error('R2 Error:', e);
+            throw e;
+        }
+    }
 
     // Init
     loadProfile();
