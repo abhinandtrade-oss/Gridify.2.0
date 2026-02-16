@@ -125,7 +125,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderProducts(products) {
+    async function getProductRatings(skus) {
+        if (!skus || skus.length === 0) return {};
+
+        const { data: ratings, error } = await client
+            .from('product_reviews')
+            .select('product_sku, rating')
+            .in('product_sku', skus);
+
+        if (error) {
+            console.error('Error fetching ratings:', error);
+            return {};
+        }
+
+        const stats = {};
+        ratings.forEach(r => {
+            if (!stats[r.product_sku]) stats[r.product_sku] = { sum: 0, count: 0 };
+            stats[r.product_sku].sum += r.rating;
+            stats[r.product_sku].count += 1;
+        });
+
+        const final = {};
+        Object.keys(stats).forEach(sku => {
+            final[sku] = {
+                avg: (stats[sku].sum / stats[sku].count).toFixed(1),
+                count: stats[sku].count
+            };
+        });
+        return final;
+    }
+
+    function generateStarsHtml(rating) {
+        let stars = '';
+        const filledStars = Math.floor(rating || 0);
+        for (let i = 1; i <= 5; i++) {
+            if (i <= filledStars) {
+                stars += '<i class="flaticon-star text-warning"></i>';
+            } else if (i - 0.5 <= rating) {
+                stars += '<i class="flaticon-star text-warning" style="opacity: 0.6;"></i>';
+            } else {
+                stars += '<i class="flaticon-star" style="color: #e0e0e0;"></i>';
+            }
+        }
+        return stars;
+    }
+
+    async function renderProducts(products) {
         productsLoading.style.display = 'none';
 
         if (!products || products.length === 0) {
@@ -133,6 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
             showNoProducts();
             return;
         }
+
+        const skus = products.map(p => p.sku);
+        const ratingsMap = await getProductRatings(skus);
 
         currentCount.textContent = products.length;
         productsGrid.style.display = 'grid';
@@ -145,6 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Image handling (using first image or placeholder)
             const images = product.images || [];
             const mainImage = images.length > 0 ? images.sort((a, b) => a.arrangement - b.arrangement)[0].url : 'https://placehold.co/600x800?text=No+Image';
+
+            const ratingData = ratingsMap[product.sku] || { avg: 0, count: 0 };
 
             return `
                 <div class="ul-product mb-4">
@@ -168,6 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             </a>
                         </div>
                         
+                        <div class="ul-product-rating mb-1" style="font-size: 0.75rem;">
+                            ${generateStarsHtml(ratingData.avg)}
+                            <span class="text-muted ms-1">(${ratingData.count})</span>
+                        </div>
+
                         <div class="ul-product-price-wrapper mt-2">
                             <span class="ul-product-price text-dark fw-bold" style="font-size: 1.1rem;">₹${sellingPrice.toLocaleString()}</span>
                             ${mrp > sellingPrice ? `
