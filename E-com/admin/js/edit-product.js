@@ -4,10 +4,15 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
     const client = window.supabase;
+    // Configuration
+    const R2_WORKER_URL = 'https://review-images-proxy.info-adhil-ecom.workers.dev'.replace(/\/$/, '');
+    const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
+
     const form = document.getElementById('edit-product-form');
     const categorySelect = document.getElementById('category-id');
-    const imageContainer = document.getElementById('image-container');
-    const btnAddImage = document.getElementById('btn-add-image');
+    const imagePreviewContainer = document.getElementById('image-preview-container');
+    const btnUploadImage = document.getElementById('btn-upload-image');
+    const productImagesInput = document.getElementById('product-images-input');
 
     // Pricing inputs
     const mrpInput = document.getElementById('mrp');
@@ -28,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let originalProduct = null;
     let platformFeeSettings = { platformFee: 0, gstRate: 18 };
     let productId = new URLSearchParams(window.location.search).get('id');
+    let selectedImages = []; // Array of { id, file, base64, url, isExisting }
 
     if (!productId) {
         showAlert('No product ID provided.', 'error');
@@ -109,50 +115,80 @@ document.addEventListener('DOMContentLoaded', async () => {
         discountValueInput.value = p.discount_value;
         document.getElementById('product-status').value = p.status;
 
-        // Images
-        imageContainer.innerHTML = '';
+        // Populate existing images
         if (p.images && p.images.length > 0) {
-            p.images.sort((a, b) => a.arrangement - b.arrangement).forEach(img => {
-                addImageRow(img.url, img.arrangement);
-            });
+            selectedImages = p.images.sort((a, b) => a.arrangement - b.arrangement).map(img => ({
+                id: Math.random(),
+                url: img.url,
+                isExisting: true
+            }));
         } else {
-            addImageRow('', 1);
+            selectedImages = [];
         }
-
+        updatePreviews();
         calculateFees();
     }
 
-    function addImageRow(url = '', order = 1) {
-        const row = document.createElement('div');
-        row.className = 'image-row';
-        row.innerHTML = `
-            <div class="flex-grow-1">
-                <label class="small text-muted mb-1">Image URL</label>
-                <input type="url" class="form-control img-url" placeholder="https://example.com/image.jpg" value="${url}" required>
-            </div>
-            <div style="width: 100px;">
-                <label class="small text-muted mb-1">Order</label>
-                <input type="number" class="form-control img-order" value="${order}" min="1">
-            </div>
-            <button type="button" class="btn btn-outline-danger btn-remove-img">
-                <i data-lucide="trash-2" style="width: 16px;"></i>
-            </button>
-        `;
-        imageContainer.appendChild(row);
-        lucide.createIcons();
+    // Image Management
+    btnUploadImage.addEventListener('click', () => productImagesInput.click());
 
-        row.querySelector('.btn-remove-img').addEventListener('click', () => {
-            if (imageContainer.children.length > 1) {
-                row.remove();
-            } else {
-                showAlert('At least one image is required.', 'warning');
+    productImagesInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        files.forEach(file => {
+            if (file.size > MAX_FILE_SIZE) {
+                showAlert(`Image exceeds 4MB limit: ${file.name}`, 'warning');
+                return;
             }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const id = Date.now() + Math.random();
+                selectedImages.push({
+                    id,
+                    file,
+                    base64: event.target.result,
+                    isExisting: false
+                });
+                updatePreviews();
+            };
+            reader.readAsDataURL(file);
         });
+        productImagesInput.value = '';
+    });
+
+    function updatePreviews() {
+        if (!imagePreviewContainer) return;
+        imagePreviewContainer.innerHTML = selectedImages.map((img, index) => `
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="image-preview-item">
+                    <img src="${img.base64 || img.url}">
+                    <button type="button" class="remove-btn" onclick="removeImage(${img.id})">&times;</button>
+                    <div class="arrangement-badge">Rank ${index + 1}</div>
+                </div>
+            </div>
+        `).join('');
     }
 
-    btnAddImage.addEventListener('click', () => {
-        addImageRow('', imageContainer.children.length + 1);
-    });
+    window.removeImage = (id) => {
+        selectedImages = selectedImages.filter(img => img.id !== id);
+        updatePreviews();
+    };
+
+    async function uploadToR2(file, filename) {
+        if (!R2_WORKER_URL) return null;
+        try {
+            const response = await fetch(`${R2_WORKER_URL}?key=${encodeURIComponent(filename)}`, {
+                method: 'PUT',
+                body: file,
+                headers: { 'Content-Type': file.type }
+            });
+            if (response.ok) return `${R2_WORKER_URL}?key=${encodeURIComponent(filename)}`;
+            throw new Error('Upload failed');
+        } catch (e) {
+            console.error('R2 Error:', e);
+            throw e;
+        }
+    }
 
     // Pricing Logic
     function calculateFees() {
@@ -172,8 +208,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const gstAmount = (feeAmount * platformFeeSettings.gstRate) / 100;
-        const totalDeduction = feeAmount + gstAmount;
-        const payout = sprice - totalDeduction;
+        const total_deduction = feeAmount + gstAmount;
+        const payout = sprice - total_deduction;
 
         estFeeEl.textContent = `₹${feeAmount.toFixed(2)}`;
         estGstEl.textContent = `₹${gstAmount.toFixed(2)}`;
@@ -212,47 +248,78 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        if (selectedImages.length === 0) {
+            showAlert('Please upload at least one image.', 'warning');
+            return;
+        }
+
         const btn = document.getElementById('btn-submit-product');
         const originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
 
-        const imageRows = imageContainer.querySelectorAll('.image-row');
-        const images = Array.from(imageRows).map(row => ({
-            url: row.querySelector('.img-url').value,
-            arrangement: parseInt(row.querySelector('.img-order').value) || 1
-        }));
+        try {
+            const sku = skuPreview.textContent;
+            const imageUrls = [];
 
-        const productData = {
-            category_id: categorySelect.value,
-            name: document.getElementById('product-name').value,
-            description: document.getElementById('product-description').value,
-            keywords: document.getElementById('product-keywords').value,
-            mrp: parseFloat(mrpInput.value),
-            selling_price: sprice,
-            discount_type: discountTypeSelect.value,
-            discount_value: parseFloat(discountValueInput.value) || 0,
-            stock_quantity: parseInt(document.getElementById('stock-quantity').value) || 0,
-            images: images,
-            status: document.getElementById('product-status').value,
-            previous_data: originalProduct
-        };
+            // Process all selected images
+            for (let i = 0; i < selectedImages.length; i++) {
+                const img = selectedImages[i];
+                const slNo = i + 1;
 
-        const { error } = await client
-            .from('products')
-            .update(productData)
-            .eq('id', productId);
+                if (img.isExisting) {
+                    imageUrls.push({
+                        url: img.url,
+                        arrangement: slNo
+                    });
+                } else {
+                    const extension = img.file.name.split('.').pop() || 'jpg';
+                    const filename = `products/IM-${sku}-${slNo}-${Date.now()}.${extension}`; // Added Date.now for uniqueness in case they delete and re-add during same session
 
-        if (error) {
-            console.error('Update error:', error);
-            showAlert('Error updating product: ' + error.message, 'error');
-        } else {
+                    btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Image ${slNo}/${selectedImages.length}...`;
+
+                    const url = await uploadToR2(img.file, filename);
+                    if (url) {
+                        imageUrls.push({
+                            url: url,
+                            arrangement: slNo
+                        });
+                    }
+                }
+            }
+
+            const productData = {
+                category_id: categorySelect.value,
+                name: document.getElementById('product-name').value,
+                description: document.getElementById('product-description').value,
+                keywords: document.getElementById('product-keywords').value,
+                mrp: parseFloat(mrpInput.value),
+                selling_price: sprice,
+                discount_type: discountTypeSelect.value,
+                discount_value: parseFloat(discountValueInput.value) || 0,
+                stock_quantity: parseInt(document.getElementById('stock-quantity').value) || 0,
+                images: imageUrls,
+                status: document.getElementById('product-status').value,
+                previous_data: originalProduct
+            };
+
+            const { error } = await client
+                .from('products')
+                .update(productData)
+                .eq('id', productId);
+
+            if (error) throw error;
+
             showAlert('Product updated successfully!', 'success');
             setTimeout(() => window.location.href = 'products.html', 1500);
-        }
 
-        btn.disabled = false;
-        btn.innerHTML = originalText;
+        } catch (err) {
+            console.error('Update error:', err);
+            showAlert('Error: ' + err.message, 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
     });
 
     init();
