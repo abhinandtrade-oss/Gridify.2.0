@@ -137,11 +137,19 @@
                         return;
                     }
                 } else {
-                    const currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+                    let currentPage = window.location.pathname.split('/').pop() || 'dashboard.html';
+                    if (!currentPage.endsWith('.html') && currentPage !== '') {
+                        currentPage += '.html';
+                    }
+
                     allowedPages = permData.accessible_pages || [];
 
-                    // Always allow dashboard and security
-                    if (currentPage !== 'dashboard.html' && currentPage !== 'security.html' && !allowedPages.includes(currentPage)) {
+                    // Always allow dashboard, security, and profile pages
+                    const alwaysAllowed = ['dashboard.html', 'security.html', 'shop-profile.html', 'modify-shop-profile.html'];
+                    const isAlwaysAllowed = alwaysAllowed.includes(currentPage);
+                    const isExplicitlyAllowed = allowedPages.includes(currentPage);
+
+                    if (!isAlwaysAllowed && !isExplicitlyAllowed) {
                         renderContent(
                             "Permission Denied",
                             "You do not have permission to view this specific page.",
@@ -250,7 +258,7 @@
                 let filename = href.split('/').pop();
                 const cleanFilename = filename.split('?')[0];
 
-                if (allowedPages.includes(filename) || allowedPages.includes(cleanFilename) || cleanFilename === 'security.html' || link.id === 'nav-security') {
+                if (allowedPages.includes(filename) || allowedPages.includes(cleanFilename) || cleanFilename === 'dashboard.html' || cleanFilename === 'security.html' || link.id === 'nav-security') {
                     link.style.display = '';
                     visibleLinksCount++;
                 } else {
