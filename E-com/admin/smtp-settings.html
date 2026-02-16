@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMTP Settings | House of Pachu Admin</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .settings-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .instruction-step {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color, #4f46e5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.875rem;
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .btn-copy-code {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-copy-code:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-tabs-custom {
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-tabs-custom .nav-link {
+            border: none;
+            color: #64748b;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-tabs-custom .nav-link.active {
+            color: var(--primary-color, #4f46e5);
+            border-bottom-color: var(--primary-color, #4f46e5);
+            background: transparent;
+        }
+
+        .option-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .badge-info {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+    </style>
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="js/auth-check.js"></script>
+</head>
+
+<body>
+
+    <button class="sidebar-toggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="admin-main">
+        <header class="page-header">
+            <div class="page-title">
+                <h1>Email Settings (SMTP)</h1>
+                <p>Configure how the system sends emails to customers and sellers.</p>
+            </div>
+            <div class="page-actions d-flex gap-2">
+                <button class="btn btn-outline-primary d-flex align-items-center gap-2" id="btn-test-connection">
+                    <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                    Test Connection
+                </button>
+                <button class="btn btn-primary d-flex align-items-center gap-2" id="btn-save-settings">
+                    <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                    Save Settings
+                </button>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="settings-card">
+                    <h5 class="mb-4">Email Provider</h5>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="radio" name="emailProvider" id="providerGoogleScript"
+                            value="google-script" checked>
+                        <label class="form-check-label fw-semibold" for="providerGoogleScript">
+                            Google Apps Script
+                        </label>
+                        <p class="text-muted small">Send emails via your Google account using a custom script.</p>
+                    </div>
+
+                    <div id="google-script-config" class="ps-4 border-start ms-2">
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Configuration Mode</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="card h-100 p-3 shadow-none border-2 border-primary cursor-pointer script-type-card"
+                                        id="card-system" data-type="system">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="option-badge badge-info">Option 1</span>
+                                            <input class="form-check-input" type="radio" name="scriptType"
+                                                id="typeSystem" value="system" checked>
+                                        </div>
+                                        <h6 class="mb-1">System Wide</h6>
+                                        <p class="text-muted small mb-0">Single email account for all platform
+                                            communications.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100 p-3 shadow-none border cursor-pointer script-type-card"
+                                        id="card-user" data-type="user">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span class="option-badge badge-warning">Option 2</span>
+                                            <input class="form-check-input" type="radio" name="scriptType" id="typeUser"
+                                                value="user">
+                                        </div>
+                                        <h6 class="mb-1">Personal / User ID</h6>
+                                        <p class="text-muted small mb-0">Emails are sent directly from the active user's
+                                            Google ID.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="senderName" class="form-label fw-semibold">Sender Name</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i data-lucide="user"
+                                        style="width: 16px;"></i></span>
+                                <input type="text" class="form-control" id="senderName" placeholder="House of Pachu">
+                            </div>
+                            <div class="form-text">The name that recipients will see in their inbox.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="scriptUrl" class="form-label fw-semibold">Web App URL</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i data-lucide="link"
+                                        style="width: 16px;"></i></span>
+                                <input type="url" class="form-control" id="scriptUrl"
+                                    placeholder="https://script.google.com/macros/s/.../exec">
+                            </div>
+                            <div class="form-text">The URL provided by Google after deployment.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h5 class="mb-4">Setup Instructions</h5>
+
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <div>
+                            <p class="mb-1"><strong>Create Project:</strong> Open <a href="https://script.google.com/"
+                                    target="_blank">Google Apps Script</a> and click <strong>"New Project"</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <div class="w-100">
+                            <p class="mb-1"><strong>Paste Code:</strong> Delete existing code and paste the snippet
+                                below.
+                                <span class="text-info small" id="mode-note">(Option 1: System Wide)</span>
+                            </p>
+                            <div class="code-block" id="script-code">
+                                <button class="btn-copy-code" onclick="copyCode()">Copy</button>
+                                <pre class="mb-0"><code>function doPost(e) {
+  var data = JSON.parse(e.postData.contents);
+  var to = data.to;
+  var subject = data.subject || "No Subject";
+  var body = data.body || "";
+  var htmlBody = data.htmlBody || null;
+  
+  try {
+    MailApp.sendEmail({
+      to: to,
+      subject: subject,
+      body: body,
+      htmlBody: htmlBody
+    });
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "success",
+      "message": "Email sent successfully"
+    })).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      "status": "error",
+      "message": error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <div>
+                            <p class="mb-1"><strong>Deploy:</strong> Click <strong>Deploy</strong> > <strong>New
+                                    Deployment</strong>.</p>
+                            <ol class="small text-muted mt-2">
+                                <li>Select <strong>"Web App"</strong> as the type.</li>
+                                <li>Set <strong>"Execute as"</strong> to <strong>"Me"</strong> <span
+                                        id="execute-as-note">(this determines the sender email)</span>.</li>
+                                <li>Set <strong>"Who has access"</strong> to <strong>"Anyone"</strong>.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">4</div>
+                        <div>
+                            <p class="mb-1"><strong>Authorize:</strong> Click "Deploy" and authorize the script to
+                                access your Google account to send emails.</p>
+                        </div>
+                    </div>
+
+                    <div class="instruction-step">
+                        <div class="step-number">5</div>
+                        <div>
+                            <p class="mb-1"><strong>Copy URL & Save:</strong> Copy the generated Web App URL and paste
+                                it in
+                                the field above. Then click <strong>Save Settings</strong>.</p>
+                            <p class="text-danger small mt-1"><strong>Important:</strong> If you update your settings
+                                here (like Sender Name or Mode), you must <strong>copy the new code</strong> and
+                                <strong>re-deploy</strong> as a <strong>"New Deployment"</strong> in Google Apps Script.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/smtp-settings.js"></script>
+    <script>
+        // Initialize Lucide Icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+
+        function copyCode() {
+            const code = document.querySelector('#script-code pre code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.btn-copy-code');
+                btn.innerText = 'Copied!';
+                setTimeout(() => btn.innerText = 'Copy', 2000);
+            });
+        }
+    </script>
+</body>
+
+</html>

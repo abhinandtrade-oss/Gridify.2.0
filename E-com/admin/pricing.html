@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Settings | House of Pachu Admin</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .settings-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .fee-input-group {
+            max-width: 400px;
+        }
+
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+        }
+
+        .info-box i {
+            color: #0ea5e9;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 0.875rem;
+            color: #0369a1;
+        }
+    </style>
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="js/auth-check.js"></script>
+</head>
+
+<body>
+
+    <button class="sidebar-toggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="admin-main">
+        <header class="page-header">
+            <div class="page-title">
+                <h1>Pricing Settings</h1>
+                <p>Configure platform fees and other charges for sellers.</p>
+            </div>
+            <div class="page-actions d-flex gap-2">
+                <button class="btn btn-primary d-flex align-items-center gap-2" id="btn-save-pricing">
+                    <i data-lucide="save" style="width: 16px; height: 16px;"></i>
+                    Save Settings
+                </button>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="settings-card">
+                    <h5 class="mb-4">Platform Fee Configuration</h5>
+
+                    <div class="info-box">
+                        <i data-lucide="info" style="width: 20px; height: 20px;"></i>
+                        <div>
+                            <p>The platform fee is a percentage charged on every successful order. This fee will be
+                                deducted from the seller's payout.</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 fee-input-group">
+                        <label for="platformFee" class="form-label fw-semibold">Platform Fee Percentage (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="platformFee" placeholder="e.g. 10" step="0.01"
+                                min="0" max="100">
+                            <span class="input-group-text bg-light">%</span>
+                        </div>
+                        <div class="form-text">Enter the percentage to be charged as platform fee.</div>
+                    </div>
+
+                    <div class="mb-4 fee-input-group">
+                        <label for="minFee" class="form-label fw-semibold">Minimum Fee (Optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">₹</span>
+                            <input type="number" class="form-control" id="minFee" placeholder="0.00" step="0.01"
+                                min="0">
+                        </div>
+                        <div class="form-text">The minimum amount charged regardless of the percentage logic.</div>
+                    </div>
+                </div>
+
+                <div class="settings-card">
+                    <h5 class="mb-4">Tax Settings (GST)</h5>
+                    <div class="mb-4 fee-input-group">
+                        <label for="gstRate" class="form-label fw-semibold">GST Rate on Platform Fee (%)</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="gstRate" placeholder="18" step="0.1" min="0">
+                            <span class="input-group-text bg-light">%</span>
+                        </div>
+                        <div class="form-text">Standard GST rate applied to the platform fee amount (usually 18%).</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="settings-card">
+                    <h6 class="text-uppercase text-muted small fw-bold mb-3">Fee Preview</h6>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="p-3 bg-light rounded border">
+                            <label class="small text-muted d-block mb-1">Example Order Amount</label>
+                            <div class="h5 mb-0">₹1,000.00</div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Platform Fee (<span id="preview-fee-percent">0</span>%)</span>
+                            <span class="fw-semibold" id="preview-fee-amount">₹0.00</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">GST on Fee (<span id="preview-gst-percent">0</span>%)</span>
+                            <span class="fw-semibold" id="preview-gst-amount">₹0.00</span>
+                        </div>
+
+                        <hr class="my-1">
+
+                        <div class="d-flex justify-content-between align-items-center h6 mb-0">
+                            <span>Total Deduction</span>
+                            <span class="text-danger" id="preview-total-deduction">₹0.00</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center h6 mb-0 text-primary">
+                            <span>Seller Earns</span>
+                            <span class="fw-bold" id="preview-seller-earnings">₹1,000.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/pricing.js"></script>
+    <script>
+        // Initialize Lucide Icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+
+</html>

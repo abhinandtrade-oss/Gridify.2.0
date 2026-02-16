@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Approvals | House of Pachu Admin</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/categories.css">
+
+    <style>
+        .product-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: #f1f5f9;
+        }
+
+        .modal-body img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .price-tag {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .mrp-tag {
+            text-decoration: line-through;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .action-btns .approve-btn:hover {
+            color: #059669 !important;
+            background: #ecfdf5;
+        }
+
+        .action-btns .reject-btn:hover {
+            color: #dc2626 !important;
+            background: #fef2f2;
+        }
+    </style>
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="js/auth-check.js"></script>
+</head>
+
+<body>
+
+    <button class="sidebar-toggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="admin-main">
+        <header class="page-header">
+            <div class="page-title">
+                <h1>Product Approvals</h1>
+                <p>Review and approve new product listings from sellers.</p>
+            </div>
+        </header>
+
+        <div class="category-table-container">
+            <table class="category-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Seller</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pending-product-list">
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            <span class="ms-2">Loading pending products...</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Details Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title">Product Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="product-details-content">
+                    <!-- Dynamic -->
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-danger" id="btn-reject-modal">Reject Product</button>
+                    <button type="button" class="btn btn-success" id="btn-approve-modal">Approve & Live</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/product-approval.js"></script>
+</body>
+
+</html>

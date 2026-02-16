@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounts Overview | House of Pachu Admin</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="js/auth-check.js"></script>
+</head>
+
+<body>
+
+    <button class="sidebar-toggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="admin-main">
+        <header class="page-header">
+            <div class="page-title">
+                <h1>Accounts Overview</h1>
+                <p>Financial visibility, revenue tracking, and supplier ledgers.</p>
+            </div>
+            <div class="page-actions d-flex flex-wrap gap-2 align-items-center">
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <div>
+                        <select class="form-select text-truncate" id="supplier-select" style="max-width: 200px;">
+                            <option value="all" selected>All Suppliers</option>
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <input type="date" class="form-control" id="date-start">
+                    </div>
+                    <span class="text-muted align-self-center">to</span>
+                    <div>
+                        <input type="date" class="form-control" id="date-end">
+                    </div>
+                    <button class="btn btn-outline-secondary" id="btn-refresh">
+                        <i data-lucide="refresh-cw"></i> Refresh
+                    </button>
+                    <button class="btn btn-outline-secondary" id="btn-print">
+                        <i data-lucide="printer"></i> Print
+                    </button>
+                    <button class="btn btn-primary" id="btn-export-csv">
+                        <i data-lucide="download"></i> Export CSV
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Grid -->
+        <section class="stats-grid mb-4">
+            <div class="stat-card">
+                <div class="stat-icon indigo">
+                    <i data-lucide="dollar-sign"></i>
+                </div>
+                <div class="stat-value" id="total-revenue">₹0</div>
+                <div class="stat-label">Gross Sales (GMV)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon emerald">
+                    <i data-lucide="layers"></i>
+                </div>
+                <div class="stat-value" id="platform-fees">₹0</div>
+                <div class="stat-label">Platform Fees Generated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i data-lucide="briefcase"></i>
+                </div>
+                <div class="stat-value" id="supplier-earnings">₹0</div>
+                <div class="stat-label">Supplier Net Balance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon rose">
+                    <i data-lucide="rotate-ccw"></i>
+                </div>
+                <div class="stat-value" id="total-refunds">₹0</div>
+                <div class="stat-label">Total Refunds Processed</div>
+            </div>
+        </section>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card h-100 py-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="stat-icon bg-light text-muted mb-0" style="width: 40px; height: 40px;">
+                            <i data-lucide="clock" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value fs-4 mb-0" id="pending-revenue">₹0</div>
+                            <div class="stat-label">Pending Revenue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="accountTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab"
+                    data-bs-target="#overview-content" type="button">Financial Charts</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="suppliers-tab" data-bs-toggle="tab" data-bs-target="#suppliers-content"
+                    type="button">Supplier Summary</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger-content"
+                    type="button">Transaction Ledger</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" id="payouts-tab" data-bs-toggle="tab" data-bs-target="#payouts-content"
+                    type="button">Settlement History</button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="accountTabsContent">
+
+            <!-- 1. Overview / Charts -->
+            <div class="tab-pane fade show active" id="overview-content">
+                <div class="row g-4">
+                    <div class="col-lg-8">
+                        <div class="content-card h-100">
+                            <h5 class="mb-4 fw-bold">Revenue Breakdown</h5>
+                            <div style="height: 350px;">
+                                <canvas id="revenueBreakdownChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="content-card h-100">
+                            <h5 class="mb-4 fw-bold">Financial Distribution</h5>
+                            <div class="d-flex justify-content-center align-items-center h-75">
+                                <div style="width: 280px; height: 280px;">
+                                    <canvas id="distributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Supplier Summary Table -->
+            <div class="tab-pane fade" id="suppliers-content">
+                <div class="content-card">
+                    <h5 class="mb-4 fw-bold">Supplier Accounts</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 20%">Supplier Name</th>
+                                    <th class="text-center" style="width: 10%">Orders</th>
+                                    <th class="text-end" style="width: 12%">Gross Sales</th>
+                                    <th class="text-end" style="width: 12%">Refunds</th>
+                                    <th class="text-end" style="width: 12%">Fees</th>
+                                    <th class="text-end" style="width: 12%">Paid</th>
+                                    <th class="text-end fw-bold" style="width: 12%">Net Balance</th>
+                                    <th class="text-end text-muted" style="width: 10%">Pending</th>
+                                </tr>
+                            </thead>
+                            <tbody id="supplier-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Transaction Ledger -->
+            <div class="tab-pane fade" id="ledger-content">
+                <div class="content-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">Full Transaction Ledger</h5>
+                        <!-- Pagination controls could go here -->
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 12%">Reference</th>
+                                    <th style="width: 12%">Date</th>
+                                    <th style="width: 15%">Supplier</th>
+                                    <th style="width: 13%">Status</th>
+                                    <th class="text-end" style="width: 10%">Gross</th>
+                                    <th class="text-end" style="width: 10%">Fee</th>
+                                    <th class="text-end" style="width: 10%">Refund</th>
+                                    <th class="text-end" style="width: 10%">Earning</th>
+                                    <th class="text-end fw-bold" style="width: 10%">Net Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledger-table-body">
+                                <tr>
+                                    <td colspan="9" class="text-center py-4">Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Settlement History (Payouts) -->
+            <div class="tab-pane fade" id="payouts-content">
+                <div class="content-card">
+                    <h5 class="mb-4 fw-bold">Seller Payout Transactions</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 15%">Date</th>
+                                    <th style="width: 25%">Supplier</th>
+                                    <th class="text-end" style="width: 20%">Amount Paid</th>
+                                    <th class="text-center" style="width: 15%">Status</th>
+                                    <th style="width: 25%">Transaction Ref</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payout-table-body">
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <div class="mb-2">
+                                            <i data-lucide="info" style="width: 32px; height: 32px; opacity: 0.5;"></i>
+                                        </div>
+                                        <div>No settlement records found for this period.</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <!-- Accounts Logic -->
+    <script src="js/accounts.js"></script>
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+
+</html>

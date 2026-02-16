@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | House of Pachu</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="../assets/img/logo.png" type="image/png">
+
+    <!-- CSS libraries -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Main Style (for logo and branding consistency) -->
+    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+
+    <style>
+        :root {
+            --primary: #EF2853;
+            /* Matches --ul-primary in style.css */
+            --primary-hover: #d12248;
+            --bg-gradient: linear-gradient(135deg, #FFF5F7 0%, #FFFFFF 100%);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            font-family: 'Jost', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: auto;
+            /* Allow scrolling if needed */
+            position: relative;
+        }
+
+        .auth-card {
+            background: white;
+            padding: clamp(2rem, 5vw, 3rem);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(239, 40, 83, 0.08);
+            width: 100%;
+            max-width: 450px;
+            margin: 20px;
+            border: 1px solid rgba(239, 40, 83, 0.05);
+        }
+
+        .auth-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 2rem;
+            object-fit: contain;
+        }
+
+        .auth-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #eee;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(239, 40, 83, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            border-radius: 12px;
+            padding: 0.8rem;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(239, 40, 83, 0.2);
+        }
+
+        .auth-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .auth-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        #error-msg {
+            display: none;
+            background: #fff5f5;
+            color: #e53e3e;
+            padding: 0.75rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            border: 1px solid #feb2b2;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="text-center">
+            <a href="../index.html">
+                <img src="../assets/img/logo2.png" alt="House of Pachu Logo" class="auth-logo">
+            </a>
+        </div>
+        <div class="auth-header text-center">
+            <h1>Welcome Back</h1>
+            <p>Login to your House of Pachu account</p>
+        </div>
+
+        <div id="error-msg"></div>
+
+        <form id="login-form">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-control" placeholder="example@email.com" required>
+            </div>
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label for="password" class="form-label mb-0">Password</label>
+                    <a href="forgot-password.html" class="text-muted small text-decoration-none">Forgot?</a>
+                </div>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-submit">Sign In</button>
+        </form>
+
+        <div class="auth-footer">
+            Don't have an account? <a href="signup.html">Create one</a>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const errorEl = document.getElementById('error-msg');
+        const submitBtn = document.getElementById('btn-submit');
+
+        // Check for URL parameters
+        const urlParams = new URL(window.location.href).searchParams;
+        const message = urlParams.get('message');
+        const redirect = urlParams.get('redirect');
+
+        if (message === 'please_login') {
+            errorEl.textContent = 'Please log in to access this page.';
+            errorEl.style.display = 'block';
+            errorEl.style.background = '#ebf8ff';
+            errorEl.style.color = '#2b6cb0';
+            errorEl.style.borderColor = '#bee3f8';
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in...';
+            errorEl.style.display = 'none';
+
+            try {
+                const { data, error } = await window.supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+
+                if (error) throw error;
+
+                // Success
+                if (redirect) {
+                    window.location.href = redirect;
+                } else {
+                    window.location.href = '../index.html';
+                }
+            } catch (err) {
+                // Restore error style if it was modified for info message
+                errorEl.style.background = '#fff5f5';
+                errorEl.style.color = '#e53e3e';
+                errorEl.style.borderColor = '#feb2b2';
+
+                errorEl.textContent = err.message;
+                errorEl.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Sign In';
+            }
+        });
+
+        // Redirect if already logged in (but only if no redirect is pending from an explicit login request)
+        (async () => {
+            const { data: { session } } = await window.supabase.auth.getSession();
+            if (session && !redirect) {
+                window.location.href = '../index.html';
+            }
+        })();
+    </script>
+    <script src="../assets/js/gdpr.js"></script>
+</body>
+
+</html>

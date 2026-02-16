@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Customers | House of Pachu Admin</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .user-table-container {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th {
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .user-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .user-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .section-title-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .count-badge {
+            background: #e2e8f0;
+            color: #475569;
+            padding: 0.1rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+    </style>
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="js/auth-check.js"></script>
+</head>
+
+<body>
+
+    <button class="sidebar-toggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="admin-main">
+        <header class="page-header">
+            <div class="page-title">
+                <h1>Registered Customers</h1>
+                <p>Monitor and manage all public registered users.</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-primary d-flex align-items-center gap-2" id="btn-export">
+                    <i data-lucide="download" style="width: 16px; height: 16px;"></i>
+                    Export List
+                </button>
+            </div>
+        </header>
+
+        <div class="section-title-wrapper">
+            <h2 class="fs-5 fw-semibold mb-0">
+                All Customers
+                <span class="count-badge" id="customer-count">0</span>
+            </h2>
+        </div>
+
+        <div class="user-table-container">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>College</th>
+                        <th>Status</th>
+                        <th>Joined Date</th>
+                    </tr>
+                </thead>
+                <tbody id="customer-list">
+                    <tr>
+                        <td colspan="5" class="text-center p-5">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            <span class="ms-2 text-muted">Loading customers...</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/customers.js"></script>
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+
+</html>

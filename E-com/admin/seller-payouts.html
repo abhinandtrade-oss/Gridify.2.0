@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Payouts | House of Pachu Admin</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/icon/flaticon_glamer.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/categories.css"> <!-- Reusing table styles -->
+
+    <style>
+        .payout-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .payout-stat {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .payout-stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-pending {
+            background: #fffbeb;
+            color: #b45309;
+        }
+
+        .stat-completed {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .stat-total {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .stat-details h4 {
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .stat-details p {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-item {
+            min-width: 150px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 16px;
+        }
+
+        .search-box input {
+            padding-left: 36px;
+        }
+    </style>
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="js/auth-check.js"></script>
+</head>
+
+<body>
+
+    <button class="sidebar-toggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="admin-main">
+        <header class="page-header">
+            <div class="page-title">
+                <h1>Seller Payouts</h1>
+                <p>Track and manage payments to store vendors.</p>
+            </div>
+            <div class="page-actions">
+                <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal"
+                    data-bs-target="#payoutModal" id="btn-request-payout">
+                    <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+                    Request Payout
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="payout-card">
+                    <div class="payout-stat">
+                        <div class="payout-stat-icon stat-pending">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h4>Pending Payouts</h4>
+                            <p id="stat-pending-amount">₹0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="payout-card">
+                    <div class="payout-stat">
+                        <div class="payout-stat-icon stat-completed">
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h4>Total Paid</h4>
+                            <p id="stat-paid-amount">₹0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="payout-card">
+                    <div class="payout-stat">
+                        <div class="payout-stat-icon stat-total">
+                            <i data-lucide="wallet"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h4>Total Sellers</h4>
+                            <p id="stat-seller-count">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="text" class="form-control" id="search-seller" placeholder="Search by store name or ID...">
+            </div>
+            <div class="filter-item">
+                <select class="form-select" id="filter-status">
+                    <option value="all">All Status</option>
+                    <option value="requested">Requested</option>
+                    <option value="processing">Processing</option>
+                    <option value="paid">Paid</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="category-table-container">
+            <table class="category-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Seller / Store</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Transaction ID</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="payout-list">
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            <span class="ms-2">Loading payouts...</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Payout Modal -->
+    <div class="modal fade" id="payoutModal" tabindex="-1" aria-labelledby="payoutModalTitle">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="payoutModalTitle">Record New Payout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="payout-form">
+                    <div class="modal-body">
+                        <input type="hidden" id="payout-id">
+                        <div class="mb-3">
+                            <label for="seller-id" class="form-label">Select Seller</label>
+                            <select class="form-select" id="seller-id" required>
+                                <option value="">Choose a seller...</option>
+                                <!-- Sellers loaded via JS -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payout-amount" class="form-label">Payout Amount (₹)</label>
+                            <input type="number" class="form-control" id="payout-amount" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payout-status" class="form-label">Status</label>
+                            <select class="form-select" id="payout-status" disabled>
+                                <option value="requested" selected>Requested</option>
+                                <option value="processing">Processing</option>
+                                <option value="paid">Paid</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <div class="form-text">Status is set to 'Requested' and sent to Accounts.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="payout-notes" class="form-label">Internal Notes</label>
+                            <textarea class="form-control" id="payout-notes" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="btn-save-payout">Save Payout Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/seller-payouts.js"></script>
+    <script>
+        // Initialize Lucide Icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+
+</html>

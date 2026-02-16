@@ -1,0 +1,130 @@
+<aside class="admin-sidebar">
+    <div class="sidebar-header">
+        <h2>HOP-Dashboard</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="global-search.html" class="nav-item" id="nav-global-search">
+            <i data-lucide="search"></i>
+            <span>Global Search</span>
+        </a>
+        <div class="nav-group">
+            <a href="javascript:void(0)" class="nav-item has-submenu" id="nav-products">
+                <i data-lucide="package"></i>
+                <span>Products</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="products.html">All Products</a>
+                <a href="add-product.html">Add Product</a>
+                <a href="categories.html">Categories</a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <a href="javascript:void(0)" class="nav-item has-submenu" id="nav-orders">
+                <i data-lucide="shopping-cart"></i>
+                <span>Orders</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="orders.html">All Orders</a>
+                <a href="orders.html?status=pending">Pending</a>
+                <a href="orders.html?status=completed">Completed</a>
+                <a href="returns.html">Returns</a>
+                <a href="mp-returns.html">All MP Returns</a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <a href="javascript:void(0)" class="nav-item has-submenu" id="nav-customers">
+                <i data-lucide="users"></i>
+                <span>Users</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="customers.html">All Customers</a>
+                <a href="user-management.html">Admin Users</a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <a href="javascript:void(0)" class="nav-item has-submenu" id="nav-sellers">
+                <i data-lucide="store"></i>
+                <span>Sellers</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="sellers.html">All Sellers</a>
+                <a href="pending-sellers.html">Pending Approval</a>
+                <a href="product-approval.html">Product Approval</a>
+                <a href="seller-payouts.html">Payouts</a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <a href="javascript:void(0)" class="nav-item has-submenu" id="nav-accounts">
+                <i data-lucide="wallet"></i>
+                <span>Accounts</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="accounts.html">Overview</a>
+                <a href="account-payouts.html">Payout to seller</a>
+            </div>
+        </div>
+
+        <div class="nav-group" id="nav-marketplace">
+            <a href="javascript:void(0)" class="nav-item has-submenu">
+                <i data-lucide="shopping-bag"></i>
+                <span>Marketplace</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="shop-profile.html">Shop Profile</a>
+                <a href="modify-shop-profile.html">Modify Profile</a>
+                <a href="marketplace-products.html">My Products</a>
+                <a href="edit-marketplace-product.html">Edit Products</a>
+                <a href="add-marketplace-product.html">Add Product</a>
+                <a href="marketplace-coupons.html">Coupons</a>
+            </div>
+        </div>
+
+        <div class="nav-group">
+            <a href="javascript:void(0)" class="nav-item has-submenu" id="nav-settings">
+                <i data-lucide="settings"></i>
+                <span>Settings</span>
+                <i data-lucide="chevron-down" class="dropdown-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="settings.html">General Settings</a>
+                <a href="roles.html">Roles & Permissions</a>
+                <a href="smtp-settings.html">SMTP</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="shipping.html">Shipping</a>
+                <a href="payments.html">Payments</a>
+                <a href="security.html" id="nav-security">Security</a>
+            </div>
+        </div>
+        <div class="nav-separator"></div>
+        <a href="#" class="nav-item text-danger" id="btn-logout">
+            <i data-lucide="log-out"></i>
+            <span>Logout</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-profile">
+            <div class="user-avatar">AD</div>
+            <div class="user-info">
+                <span class="name">Admin User</span>
+                <span class="role">Store Manager</span>
+            </div>
+        </div>
+    </div>
+</aside>
