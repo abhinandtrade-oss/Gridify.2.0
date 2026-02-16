@@ -143,29 +143,13 @@ const CartManager = {
     },
 
     showToast(message) {
-        this._renderToast(message, 'check');
+        if (window.showAlert) window.showAlert(message, 'success');
+        else console.log('Cart:', message);
     },
 
     showErrorToast(message) {
-        this._renderToast(message, 'close', 'error');
-    },
-
-    _renderToast(message, icon, type = 'success') {
-        const toast = document.createElement('div');
-        toast.className = `ul-toast ${type}`;
-        toast.innerHTML = `
-            <div class="toast-content">
-                <i class="flaticon-${icon}"></i>
-                <span>${message}</span>
-            </div>
-        `;
-        document.body.appendChild(toast);
-
-        setTimeout(() => toast.classList.add('show'), 100);
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 500);
-        }, 3000);
+        if (window.showAlert) window.showAlert(message, 'error');
+        else console.error('Cart Error:', message);
     },
 
     init() {
@@ -200,45 +184,9 @@ const CartManager = {
     }
 };
 
-// Add toast styles
+// Add count badge styles
 const style = document.createElement('style');
 style.textContent = `
-    .ul-toast {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: #000;
-        color: #fff;
-        padding: 15px 25px;
-        border-radius: 10px;
-        z-index: 10000;
-        transform: translateY(100px);
-        opacity: 0;
-        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    }
-    .ul-toast.show {
-        transform: translateY(0);
-        opacity: 1;
-    }
-    .ul-toast.error {
-        background: #dc3545;
-    }
-    .ul-toast.error i {
-        color: #fff;
-    }
-    .toast-content {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    .toast-content i {
-        color: #28a745;
-        font-size: 1.2rem;
-    }
-    .ul-toast.error .toast-content i {
-        color: #fff;
-    }
     .badge-count {
         position: absolute;
         top: -8px;
@@ -253,6 +201,7 @@ style.textContent = `
         align-items: center;
         justify-content: center;
         font-weight: 700;
+        z-index: 10;
     }
 `;
 document.head.appendChild(style);
