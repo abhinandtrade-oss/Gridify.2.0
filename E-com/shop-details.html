@@ -61,6 +61,13 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            cursor: pointer;
+        }
+
+        .main-img-container a {
+            display: block;
+            width: 100%;
+            height: 100%;
         }
 
         .thumb-img {
@@ -429,8 +436,11 @@
                             <div class="col-lg-6">
                                 <div class="product-gallery">
                                     <div class="main-img-container shadow-sm">
-                                        <img id="main-product-img" src="https://placehold.co/600x800?text=Product+Image"
-                                            alt="Product">
+                                        <a id="main-product-img-link" data-fslightbox="gallery"
+                                            href="https://placehold.co/600x800?text=Product+Image">
+                                            <img id="main-product-img"
+                                                src="https://placehold.co/600x800?text=Product+Image" alt="Product">
+                                        </a>
                                     </div>
                                     <div class="d-flex gap-3 justify-content-center" id="thumb-container">
                                         <!-- Thumbnails will be loaded here -->
