@@ -447,6 +447,11 @@
                                 </div>
                                 <h1 class="product-title" id="product-name">Product Name</h1>
 
+                                <div id="product-rating-display" class="mb-4 d-flex align-items-center gap-2"
+                                    style="font-size: 1.1rem; min-height: 24px;">
+                                    <!-- Dynamic Stars -->
+                                </div>
+
                                 <div class="price-row">
                                     <span class="current-price" id="selling-price">₹0</span>
                                     <span class="old-price" id="mrp">₹0</span>
@@ -489,43 +494,38 @@
                         </div>
                     </div>
 
-                    <!-- Tabs Section -->
-                    <div class="product-tabs">
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="desc-tab" data-bs-toggle="tab"
-                                    data-bs-target="#desc-pane" type="button" role="tab">Description</button>
-                            </li>
-
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="reviews-tab" data-bs-toggle="tab"
-                                    data-bs-target="#reviews-pane" type="button" role="tab">Reviews (0)</button>
-                            </li>
-                        </ul>
-                        <div class="tab-content pb-5" id="myTabContent">
-                            <div class="tab-pane fade show active" id="desc-pane" role="tabpanel">
-                                <div class="text-muted" id="tab-description" style="line-height: 2;">
-                                    Product full description goes here.
+                    <!-- Description & Reviews Stacking -->
+                    <div class="product-info-stacked mt-5">
+                        <div class="row">
+                            <div class="col-lg-10 mx-auto">
+                                <!-- Description Section -->
+                                <div class="description-section mb-5">
+                                    <h3 class="fw-bold mb-4" style="font-size: 1.5rem; letter-spacing: -0.5px;">Product
+                                        Description</h3>
+                                    <div class="text-muted" id="tab-description"
+                                        style="line-height: 2; font-size: 1.05rem;">
+                                        Product full description goes here.
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane fade" id="additional-pane" role="tabpanel">
-                                <table class="table table-bordered">
-                                    <tbody id="additional-info-body">
-                                        <tr>
-                                            <th class="bg-light" style="width: 200px;">Weight</th>
-                                            <td>---</td>
-                                        </tr>
-                                        <tr>
-                                            <th class="bg-light">Dimensions</th>
-                                            <td>---</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="tab-pane fade" id="reviews-pane" role="tabpanel">
-                                <div class="text-center py-5">
-                                    <div class="spinner-border text-primary mb-3"></div>
-                                    <p class="text-muted">Loading reviews...</p>
+
+                                <!-- Reviews Section -->
+                                <div class="reviews-section pt-5 border-top" id="reviews-anchor">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h3 class="fw-bold" style="font-size: 1.5rem; letter-spacing: -0.5px;">Customer
+                                            Reviews</h3>
+                                        <div id="reviews-count-badge"
+                                            class="badge bg-light text-dark px-3 py-2 rounded-pill border fw-normal"
+                                            style="font-size: 0.85rem;">0 Reviews</div>
+                                        <!-- Keep hidden reviews-tab for compatibility with existing JS if needed -->
+                                        <button id="reviews-tab" style="display: none;"></button>
+                                    </div>
+                                    <div id="reviews-pane">
+                                        <div class="text-center py-5">
+                                            <div class="spinner-border text-primary mb-3"
+                                                style="width: 2rem; height: 2rem;"></div>
+                                            <p class="text-muted">Loading reviews...</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
