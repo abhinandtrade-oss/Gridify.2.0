@@ -1,5 +1,5 @@
 /**
- * Notification System
+ * Notification System for Admin Portal
  * Replaces native browser alerts and confirms with Bootstrap Toasts and Modals.
  */
 
@@ -114,14 +114,8 @@ const NotificationSystem = {
         }
 
         const toastElement = document.getElementById(toastId);
-        if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
-            const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
-            toast.show();
-        } else {
-            // Fallback for when bootstrap is not loaded correctly
-            toastElement.classList.add('show');
-            setTimeout(() => toastElement.classList.remove('show'), 5000);
-        }
+        const toast = new bootstrap.Toast(toastElement, { delay: 5000 });
+        toast.show();
 
         // Cleanup after hidden
         toastElement.addEventListener('hidden.bs.toast', () => {
@@ -148,26 +142,15 @@ const NotificationSystem = {
         btnEl.parentNode.replaceChild(newBtn, btnEl);
 
         newBtn.addEventListener('click', () => {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                if (modalInstance) modalInstance.hide();
-            } else {
-                modalEl.classList.remove('show');
-                modalEl.style.display = 'none';
-            }
-
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance.hide();
             if (typeof onConfirm === 'function') {
                 onConfirm();
             }
         });
 
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
-        } else {
-            modalEl.classList.add('show');
-            modalEl.style.display = 'block';
-        }
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
     },
 
     /**
@@ -192,26 +175,15 @@ const NotificationSystem = {
 
         newBtn.addEventListener('click', () => {
             const val = inputEl.value;
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                if (modalInstance) modalInstance.hide();
-            } else {
-                modalEl.classList.remove('show');
-                modalEl.style.display = 'none';
-            }
-
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance.hide();
             if (typeof onSubmit === 'function') {
                 onSubmit(val);
             }
         });
 
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = new bootstrap.Modal(modalEl);
-            modal.show();
-        } else {
-            modalEl.classList.add('show');
-            modalEl.style.display = 'block';
-        }
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
     }
 };
 
