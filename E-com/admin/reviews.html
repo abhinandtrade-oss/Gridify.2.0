@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Reviews | House of Pachu Admin</title>
+
+    <!-- External CSS -->
+    <link rel="stylesheet" href="../assets/vendor/bootstrap/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom Admin CSS -->
+    <link rel="stylesheet" href="css/admin.css">
+    <style>
+        .review-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s;
+        }
+
+        .review-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .stars {
+            color: #f59e0b;
+        }
+
+        .reply-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            background: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+    </style>
+
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide/dist/umd/lucide.min.js"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase-config.js"></script>
+    <script src="js/auth-check.js"></script>
+</head>
+
+<body>
+
+    <button class="sidebar-toggle">
+        <i data-lucide="menu"></i>
+    </button>
+
+    <div class="sidebar-overlay"></div>
+
+    <main class="admin-main">
+        <header class="page-header">
+            <div class="page-title">
+                <h1>Product Reviews</h1>
+                <p>Manage customer feedback and respond to reviews.</p>
+            </div>
+        </header>
+
+        <div class="table-filters mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="search-box position-relative">
+                        <i data-lucide="search" class="search-icon"
+                            style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #64748b; width: 18px;"></i>
+                        <input type="text" id="search-reviews" class="form-control ps-5"
+                            placeholder="Search by SKU, Comment or Customer...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="filter-rating" class="form-select">
+                        <option value="">All Ratings</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select id="filter-replied" class="form-select">
+                        <option value="">All Status</option>
+                        <option value="no">Needs Reply</option>
+                        <option value="yes">Replied</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="reviews-container">
+            <div class="text-center p-5">
+                <div class="spinner-border spinner-border-sm text-primary"></div>
+                <p class="mt-2 text-muted mb-0">Loading reviews...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Reply Modal -->
+    <div class="modal fade" id="replyModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reply to Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reply-form">
+                        <input type="hidden" id="review-id-input">
+                        <div class="mb-3">
+                            <label class="form-label">Review Comment</label>
+                            <p id="customer-comment-text" class="text-muted p-2 bg-light rounded small"></p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reply-text" class="form-label">Your Reply</label>
+                            <textarea id="reply-text" class="form-control" rows="4"
+                                placeholder="Write your response..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btn-save-reply" class="btn btn-primary">Send Reply</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/reviews.js"></script>
+</body>
+
+</html>
