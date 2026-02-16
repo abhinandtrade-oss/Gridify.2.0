@@ -72,7 +72,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 .from('products')
                 .select(`
                     *,
-                    categories!inner(name)
+                    categories!inner(name),
+                    sellers(store_name)
                 `)
                 .eq('status', 'active');
 
@@ -159,7 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     <div class="ul-product-txt text-center">
                         <h4 class="ul-product-title"><a href="shop-details.html?id=${product.id}">${product.name}</a></h4>
-                        <h5 class="ul-product-category"><a href="shop.html?category=${encodeURIComponent(product.categories.name)}">${product.categories.name}</a></h5>
+                        <div class="d-flex justify-content-center gap-2 align-items-center mb-1">
+                            <h5 class="ul-product-category mb-0"><a href="shop.html?category=${encodeURIComponent(product.categories.name)}">${product.categories.name}</a></h5>
+                            <span class="text-muted" style="font-size: 0.7rem;">•</span>
+                            <a href="store.html?id=${product.seller_id}" class="text-muted text-decoration-none" style="font-size: 0.75rem; font-weight: 500;">
+                                <i class="flaticon-shopping-bag me-1" style="font-size: 0.7rem;"></i>${product.sellers?.store_name || 'Store'}
+                            </a>
+                        </div>
                         
                         <div class="ul-product-price-wrapper mt-2">
                             <span class="ul-product-price text-dark fw-bold" style="font-size: 1.1rem;">₹${sellingPrice.toLocaleString()}</span>
