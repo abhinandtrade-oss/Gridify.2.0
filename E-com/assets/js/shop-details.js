@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const skeleton = document.getElementById('product-details-skeleton');
     const content = document.getElementById('product-details-content');
     const mainImg = document.getElementById('main-product-img');
+    const mainImgLink = document.getElementById('main-product-img-link');
     const thumbContainer = document.getElementById('thumb-container');
     const productName = document.getElementById('product-name');
     const breadcrumbName = document.getElementById('breadcrumb-product-name');
@@ -131,11 +132,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const sortedImages = images.sort((a, b) => (a.arrangement || 0) - (b.arrangement || 0));
             mainImg.src = sortedImages[0].url;
 
+            // Setup main link and gallery
+            if (mainImgLink) {
+                mainImgLink.href = sortedImages[0].url;
+
+                // Add hidden gallery links for other images
+                const galleryContainer = document.createElement('div');
+                galleryContainer.id = 'extra-gallery-links';
+                galleryContainer.style.display = 'none';
+
+                // Add all other images as hidden links for the lightbox gallery
+                sortedImages.slice(1).forEach(img => {
+                    const link = document.createElement('a');
+                    link.setAttribute('data-fslightbox', 'gallery');
+                    link.href = img.url;
+                    galleryContainer.appendChild(link);
+                });
+
+                // Clear old extra links if any and append new ones
+                const oldGallery = document.getElementById('extra-gallery-links');
+                if (oldGallery) oldGallery.remove();
+                mainImgLink.parentNode.appendChild(galleryContainer);
+            }
+
             thumbContainer.innerHTML = sortedImages.map((img, idx) => `
                 <div class="thumb-img ${idx === 0 ? 'active' : ''}" onclick="updateMainImage('${img.url}', this)">
                     <img src="${img.url}" alt="Thumbnail">
                 </div>
             `).join('');
+
+            // Initialize or refresh fslightbox
+            if (typeof refreshFsLightbox === 'function') {
+                refreshFsLightbox();
+            }
         }
 
         document.title = `${product.name} - House of Pachu`;
@@ -238,6 +267,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global update image function
     window.updateMainImage = (url, thumbEl) => {
         mainImg.src = url;
+        if (mainImgLink) {
+            mainImgLink.href = url;
+            // No need to refresh fslightbox here if we only want to show the current main image
+            // However, fslightbox might need a refresh to pick up the new href
+            if (typeof refreshFsLightbox === 'function') {
+                refreshFsLightbox();
+            }
+        }
         document.querySelectorAll('.thumb-img').forEach(el => el.classList.remove('active'));
         thumbEl.classList.add('active');
     };
