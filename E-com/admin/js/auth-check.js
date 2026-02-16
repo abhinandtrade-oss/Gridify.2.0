@@ -11,7 +11,8 @@
         document.head.appendChild(script);
     }
 
-    // 0. Remove .html extension from URL immediately
+    // 0. Remove .html extension from URL immediately (REMOVED)
+    /* 
     if (window.location.protocol !== 'file:') {
         if (window.location.pathname.endsWith('index.html')) {
             const newPath = window.location.pathname.replace(/index\.html$/, '');
@@ -21,6 +22,7 @@
             window.history.replaceState(null, '', newPath + window.location.search);
         }
     }
+    */
 
     // 0. Prevent FOUC (Flash of Unauthenticated Content)
     // We inject a style to hide the body immediately until auth is resolved.
