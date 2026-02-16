@@ -29,13 +29,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!productId) return;
 
     // Global Image Viewer
-    window.viewImage = (url) => {
-        const viewerHtml = `
-            <div id="image-viewer" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);z-index:99999;display:flex;justify-content:center;align-items:center;cursor:pointer;" onclick="this.remove()">
-                <img src="${url}" style="max-width:90%;max-height:90%;object-fit:contain;border-radius:10px;box-shadow:0 0 50px rgba(0,0,0,0.5);">
-            </div>
-        `;
-        document.body.insertAdjacentHTML('beforeend', viewerHtml);
+    // Global Image Viewer - Now using fslightbox
+    window.refreshLightbox = () => {
+        if (typeof refreshFsLightbox === 'function') {
+            refreshFsLightbox();
+        }
     };
 
     // 1. Initial Load
@@ -313,6 +311,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         reviewsPane.innerHTML = reviewsHtml;
         renderAddReviewButton();
+        window.refreshLightbox();
     }
 
     window.handleEditClick = (reviewId) => {
@@ -328,7 +327,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const initial = name.charAt(0).toUpperCase();
 
         const imagesHtml = (review.images || []).map(img => `
-            <img src="${img}" class="review-img" onclick="window.viewImage('${img}')" onerror="this.style.display='none'">
+            <a data-fslightbox="review-${review.id}" href="${img}">
+                <img src="${img}" class="review-img" onerror="this.style.display='none'">
+            </a>
         `).join('');
 
         const isMine = review.user_id === currentUserId;
