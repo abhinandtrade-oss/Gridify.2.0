@@ -627,3 +627,161 @@ body.auth-restricted .sidebar-overlay,
 body.auth-restricted .admin-main {
     display: none !important;
 }
+
+/* =========================================
+   Mobile Optimization / Responsiveness
+   ========================================= */
+
+@media (max-width: 1024px) {
+
+    /* Ensure sidebar toggle is visible and positioned correctly */
+    .sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    /* Adjust main content padding */
+    .admin-main {
+        padding: 4rem 1rem 1rem;
+        /* Top padding clears the toggle button */
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* Global layout adjustments */
+    .admin-main {
+        padding: 5rem 1rem 2rem;
+        /* More space for fixed toggle if needed */
+    }
+
+    /* Page Header stacking */
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .page-actions {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .page-actions .btn {
+        flex: 1;
+        /* Buttons take available width */
+        justify-content: center;
+    }
+
+    /* Section Title Wrappers (found in orders.html etc) */
+    .section-title-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .section-title-wrapper .d-flex {
+        width: 100%;
+        flex-direction: column;
+        /* Stack filters/actions */
+    }
+
+    .section-title-wrapper select,
+    .section-title-wrapper .btn {
+        width: 100% !important;
+        /* Full width controls */
+    }
+
+    /* Table Containers - Force Horizontal Scroll */
+    .product-table-container,
+    .order-table-container,
+    .content-card .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* Smooth scroll on iOS */
+        display: block;
+        width: 100%;
+    }
+
+    /* Table Styling for Mobile */
+    .table th,
+    .table td,
+    .product-table th,
+    .product-table td,
+    .order-table th,
+    .order-table td {
+        padding: 0.75rem 1rem;
+        /* Reduce padding */
+        white-space: nowrap;
+        /* Prevent wrapping implies scrolling */
+    }
+
+    /* Table Filters */
+    .table-filters {
+        padding: 1rem;
+    }
+
+    .table-filters .row {
+        gap: 1rem;
+    }
+
+    /* Ensure buttons in tables are touch-friendly */
+    .btn-sm {
+        padding: 0.4rem 0.6rem;
+    }
+
+    /* Card Padding Optimization */
+    .product-card,
+    .content-card {
+        padding: 1rem;
+    }
+
+    /* Modal Adjustments */
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+
+    /* Stats Grid - 1 Column */
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Quick Access Grid - Smaller items allowed, maybe 2 per row min */
+    .quick-access-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* Force 2 columns min */
+    }
+}
+
+@media (max-width: 480px) {
+
+    /* even smaller screens adjustments */
+    .page-title h1 {
+        font-size: 1.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+
+    .quick-access-grid {
+        gap: 0.75rem;
+    }
+
+    .quick-access-card {
+        padding: 1rem 0.5rem;
+    }
+}
