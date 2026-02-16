@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalTrackingNumber = document.getElementById('modal-tracking-number');
 
     let currentOrderId = null;
+    let currentOrderData = null;
+    let currentSellerData = null;
+    const btnPrintLabel = document.getElementById('btn-print-label');
 
     // Initial load
     const urlParams = new URLSearchParams(window.location.search);
@@ -79,6 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnSaveStatus.addEventListener('click', updateOrderStatus);
+    if (btnPrintLabel) {
+        btnPrintLabel.addEventListener('click', printOrderLabel);
+    }
 
     async function fetchOrders(status = 'all') {
         ordersList.innerHTML = `
@@ -159,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr>
                     <td><span class="fw-bold text-primary">#${order.id.substring(0, 8)}</span></td>
                     <td>
-                        <div class="fw-medium">${order.customer_first_name} ${order.customer_last_name}</div>
+                        <div class="fw-medium">${(order.customer_first_name || '') + ' ' + (order.customer_last_name || '') || 'Guest Customer'}</div>
                         <div class="small text-muted">${order.customer_email}</div>
                     </td>
                     <td>${date}</td>
@@ -208,17 +214,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (orderError) throw orderError;
 
-            // Fetch Order Items with Product details
-            // Assuming there is a relation setup, otherwise we might need to fetch manually.
-            // Let's try fetching with relation first. If it fails, we fetch items then products.
+            // Fetch profile phone separately as fallback
+            let profile = null;
+            if (order.user_id) {
+                const { data: p } = await client
+                    .from('profiles')
+                    .select('phone')
+                    .eq('id', order.user_id)
+                    .single();
+                profile = p;
+            }
+
+            // Fetch Order Items with Product details (need seller_id from product)
             const { data: items, error: itemsError } = await client
                 .from('order_items')
-                .select('*, products(name, images, sku)')
+                .select('*, products(name, images, sku, seller_id)')
                 .eq('order_id', orderId);
 
             if (itemsError) throw itemsError;
 
-            populateModal(order, items);
+            // Fetch seller details for print label
+            let seller = null;
+            if (items && items.length > 0 && items[0].products) {
+                const sId = items[0].products.seller_id;
+                const { data: s } = await client
+                    .from('sellers')
+                    .select('*')
+                    .eq('id', sId)
+                    .single();
+                seller = s;
+            }
+
+            currentOrderData = order;
+            currentSellerData = seller;
+
+            populateModal(order, items, profile);
 
         } catch (err) {
             console.error('Error fetching order details:', err);
@@ -227,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    function populateModal(order, items) {
+    function populateModal(order, items, profile = null) {
         // Status Flow Logic
         const currentStatus = order.status;
         const statusFlow = {
@@ -298,13 +328,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         modalOrderDate.textContent = date;
 
+        const displayPhone = order.customer_phone || (profile ? profile.phone : null) || 'No phone';
         modalCustomerInfo.innerHTML = `
-            <p class="mb-1 fw-bold">${order.customer_first_name} ${order.customer_last_name}</p>
+            <p class="mb-1 fw-bold">${(order.customer_first_name || '') + ' ' + (order.customer_last_name || '') || 'Guest Customer'}</p>
             <p class="mb-1"><a href="mailto:${order.customer_email}" class="text-decoration-none">${order.customer_email}</a></p>
-            <p class="mb-0 text-muted">${order.customer_phone || 'No phone'}</p>
+            <p class="mb-0 text-muted">${displayPhone}</p>
         `;
 
         modalShippingAddress.innerHTML = `
+            <p class="mb-1 fw-bold text-dark">${(order.customer_first_name || '') + ' ' + (order.customer_last_name || '')}</p>
             <p class="mb-1">${order.shipping_address || ''}</p>
             <p class="mb-1">${order.shipping_city || ''}, ${order.shipping_state || ''}</p>
             <p class="mb-0">${order.shipping_pincode || ''}</p>
@@ -464,5 +496,218 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
             btn.textContent = 'Update Status';
         }
+    }
+
+    function printOrderLabel() {
+        if (!currentOrderData) return;
+
+        const order = currentOrderData;
+        const seller = currentSellerData;
+
+        const websiteName = "House of Pachu";
+        const logoUrl = "../assets/img/logo.png";
+
+        const customerName = (order.customer_first_name || '') + ' ' + (order.customer_last_name || '');
+        const customerAddress = `${order.shipping_address}, ${order.shipping_city}, ${order.shipping_state} - ${order.shipping_pincode}`;
+        const customerPhone = order.customer_phone || (order.profiles ? order.profiles.phone : 'N/A');
+
+        const sellerName = seller ? seller.store_name : websiteName;
+        const sellerAddress = seller ? `${seller.address_line1}, ${seller.address_line2 ? seller.address_line2 + ', ' : ''}${seller.city}, ${seller.state} - ${seller.pincode}` : "Default Warehouse";
+        const sellerPhone = seller ? seller.phone : "N/A";
+
+        const printWindow = window.open('', '_blank', 'width=900,height=800');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Shipping Label - #${order.id.substring(0, 8)}</title>
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 0;
+                    }
+                    body { 
+                        font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+                        margin: 0; 
+                        padding: 0;
+                        background-color: #f5f5f5;
+                    }
+                    .page-container {
+                        width: 210mm;
+                        min-height: 297mm;
+                        margin: 0 auto;
+                        background: white;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .label-half {
+                        height: 148.5mm; /* Exactly half of A4 297mm */
+                        width: 210mm;
+                        padding: 15mm;
+                        box-sizing: border-box;
+                        position: relative;
+                        border-bottom: 1px dashed #ccc;
+                    }
+                    .label-container { 
+                        border: 3px solid #000; 
+                        padding: 30px; 
+                        width: 100%;
+                        height: 100%;
+                        position: relative;
+                        background: #fff;
+                        box-sizing: border-box;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    .header { 
+                        display: flex; 
+                        justify-content: space-between; 
+                        align-items: flex-start; 
+                        border-bottom: 2px solid #000; 
+                        padding-bottom: 12px; 
+                        margin-bottom: 20px; 
+                    }
+                    .logo-section { display: flex; align-items: center; gap: 10px; }
+                    .logo { width: 40px; height: 40px; object-fit: contain; }
+                    .site-name { font-size: 20px; font-weight: 800; color: #000; margin: 0; text-transform: uppercase; }
+                    .order-info { text-align: right; }
+                    .order-id { font-size: 15px; font-weight: 700; color: #000; }
+                    .order-date { font-size: 11px; color: #444; }
+                    
+                    .address-section { margin-bottom: 15px; }
+                    .section-label { 
+                        font-size: 10px; 
+                        font-weight: 800; 
+                        text-transform: uppercase; 
+                        background: #000;
+                        color: #fff;
+                        padding: 3px 8px;
+                        display: inline-block;
+                        margin-bottom: 8px;
+                    }
+                    .address-content { font-size: 18px; line-height: 1.3; color: #000; }
+                    .phone-box {
+                        margin-top: 5px;
+                        font-size: 16px;
+                        font-weight: 700;
+                    }
+                    
+                    .from-section {
+                        margin-top: auto; /* Push to bottom */
+                        padding-top: 15px;
+                        border-top: 1px solid #eee;
+                    }
+                    .from-content { font-size: 13px; color: #333; line-height: 1.3; }
+                    
+                    .badge-cod { 
+                        position: absolute; 
+                        top: 70px; 
+                        right: 30px; 
+                        border: 4px solid #000; 
+                        padding: 10px 20px; 
+                        font-weight: 900; 
+                        font-size: 32px; 
+                        transform: rotate(-12deg);
+                        background: #fff;
+                        z-index: 10;
+                    }
+                    
+                    .footer-note { 
+                        margin-top: 15px; 
+                        text-align: center; 
+                        font-size: 10px; 
+                        color: #777;
+                    }
+
+                    @media print {
+                        body { background: none; }
+                        .page-container { margin: 0; border: none; }
+                        .label-half { border-bottom: 1px dashed #000; }
+                        .label-half:last-child { border-bottom: none; }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="page-container">
+                    <!-- Slip 1 (Top Half) -->
+                    <div class="label-half">
+                        <div class="label-container">
+                            <div class="header">
+                                <div class="logo-section">
+                                    <img src="${logoUrl}" class="logo" onerror="this.style.display='none'">
+                                    <h1 class="site-name">${websiteName}</h1>
+                                </div>
+                                <div class="order-info">
+                                    <div class="order-id">#${order.id.substring(0, 8).toUpperCase()}</div>
+                                    <div class="order-date">${new Date(order.created_at).toLocaleDateString('en-IN')}</div>
+                                </div>
+                            </div>
+                            ${order.payment_method === 'cod' ? '<div class="badge-cod">C.O.D</div>' : ''}
+                            <div class="address-section">
+                                <div class="section-label">SHIP TO (CUSTOMER)</div>
+                                <div class="address-content">
+                                    <strong>${customerName.toUpperCase()}</strong><br>
+                                    ${order.shipping_address}<br>
+                                    ${order.shipping_city}, ${order.shipping_state}<br>
+                                    <strong>PIN: ${order.shipping_pincode}</strong>
+                                    <div class="phone-box">CONTACT: ${customerPhone}</div>
+                                </div>
+                            </div>
+                            <div class="from-section">
+                                <div class="section-label" style="background:none; color:#000; padding:0; border:none; font-size: 9px;">FROM (REMITTER)</div>
+                                <div class="from-content">
+                                    <strong>${sellerName}</strong><br>
+                                    ${sellerAddress} | <strong>PH: ${sellerPhone}</strong>
+                                </div>
+                            </div>
+                            <div class="footer-note">Merchant Copy / Shipping Slip</div>
+                        </div>
+                    </div>
+
+                    <!-- Slip 2 (Bottom Half) -->
+                    <div class="label-half">
+                        <div class="label-container">
+                            <div class="header">
+                                <div class="logo-section">
+                                    <img src="${logoUrl}" class="logo" onerror="this.style.display='none'">
+                                    <h1 class="site-name">${websiteName}</h1>
+                                </div>
+                                <div class="order-info">
+                                    <div class="order-id">#${order.id.substring(0, 8).toUpperCase()}</div>
+                                    <div class="order-date">${new Date(order.created_at).toLocaleDateString('en-IN')}</div>
+                                </div>
+                            </div>
+                            ${order.payment_method === 'cod' ? '<div class="badge-cod">C.O.D</div>' : ''}
+                            <div class="address-section">
+                                <div class="section-label">SHIP TO (CUSTOMER)</div>
+                                <div class="address-content">
+                                    <strong>${customerName.toUpperCase()}</strong><br>
+                                    ${order.shipping_address}<br>
+                                    ${order.shipping_city}, ${order.shipping_state}<br>
+                                    <strong>PIN: ${order.shipping_pincode}</strong>
+                                    <div class="phone-box">CONTACT: ${customerPhone}</div>
+                                </div>
+                            </div>
+                            <div class="from-section">
+                                <div class="section-label" style="background:none; color:#000; padding:0; border:none; font-size: 9px;">FROM (REMITTER)</div>
+                                <div class="from-content">
+                                    <strong>${sellerName}</strong><br>
+                                    ${sellerAddress} | <strong>PH: ${sellerPhone}</strong>
+                                </div>
+                            </div>
+                            <div class="footer-note">Courier Copy / Shipping Slip</div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(() => {
+                           window.print();
+                        }, 500);
+                    };
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 });
