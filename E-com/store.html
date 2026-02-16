@@ -25,7 +25,7 @@
 
     <style>
         .store-header {
-            padding: 100px 0 60px;
+            padding: 120px 0 80px;
             background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
             color: white;
             position: relative;
@@ -50,26 +50,14 @@
             z-index: 1;
         }
 
-        .store-logo-wrapper {
-            width: 120px;
-            height: 120px;
-            background: white;
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            font-size: 3rem;
-            color: var(--ul-primary);
-            font-weight: 800;
-        }
+
 
         .store-name {
-            font-size: 3.5rem;
+            font-size: clamp(2.5rem, 8vw, 4rem);
             font-weight: 900;
             margin-bottom: 10px;
             letter-spacing: -1px;
+            line-height: 1.1;
         }
 
         .store-meta {
@@ -99,11 +87,11 @@
 
         .shop-filter-bar {
             background: #fff;
-            padding: 20px;
+            padding: 20px 30px;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             margin-bottom: 40px;
-            margin-top: -30px;
+            margin-top: -40px;
             position: relative;
             z-index: 2;
             display: flex;
@@ -121,15 +109,15 @@
         }
 
         .filter-label {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #495057;
             margin-bottom: 0;
         }
 
         .custom-select {
-            padding: 8px 15px;
-            border-radius: 10px;
+            padding: 10px 20px;
+            border-radius: 12px;
             border: 1px solid #ddd;
             font-size: 0.9rem;
             color: #212529;
@@ -137,6 +125,12 @@
             cursor: pointer;
             outline: none;
             transition: all 0.3s;
+        }
+
+        .results-count {
+            font-weight: 500;
+            color: #666;
+            font-size: 0.95rem;
         }
 
         .no-products {
@@ -151,13 +145,77 @@
             display: block;
         }
 
-        @media (max-width: 768px) {
-            .store-name {
-                font-size: 2.5rem;
+        /* Mobile Responsive Fixes */
+        @media (max-width: 991px) {
+            .store-header {
+                padding: 100px 0 60px;
+                text-align: center;
+            }
+
+            .store-header-content .breadcrumb {
+                justify-content: center;
+            }
+
+            .mobile-header-flex {
+                justify-content: center;
+                flex-direction: column;
+                gap: 15px !important;
+            }
+
+
+
+            .store-meta {
+                justify-content: center;
+                gap: 15px 25px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .store-header {
+                padding: 80px 0 50px;
+                border-radius: 0 0 30px 30px;
             }
 
             .shop-filter-bar {
-                margin-top: 20px;
+                margin-top: -25px;
+                padding: 15px 20px;
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .filter-group {
+                justify-content: center;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .ul-product-title {
+                font-size: 0.9rem !important;
+            }
+
+            .ul-product-price {
+                font-size: 1rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .store-meta {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .store-header {
+                padding: 70px 0 40px;
             }
         }
     </style>
@@ -183,8 +241,9 @@
                         </ol>
                     </nav>
 
-                    <div class="d-flex align-items-center gap-4 flex-wrap">
-                        <div>
+                    <div class="d-flex align-items-center gap-4 flex-wrap mobile-header-flex">
+
+                        <div class="store-info-text">
                             <h1 class="store-name" id="store-display-name">Loading Store...</h1>
                             <div class="store-meta">
                                 <span class="store-meta-item">
