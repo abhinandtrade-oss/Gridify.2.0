@@ -22,8 +22,22 @@ const initHeaderAuth = async () => {
         const sidebarAuthDropdown = document.getElementById('sidebar-auth-dropdown');
 
         if (session) {
+            // Fetch profile data for accurate name
+            const { data: profile } = await window.supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+            const displayName = profile?.full_name || session.user.user_metadata.full_name || 'User';
+
             // User is logged in
-            if (userIcon) userIcon.style.display = 'inline-flex';
+            if (userIcon) {
+                userIcon.style.display = 'inline-flex';
+                userIcon.style.alignItems = 'center';
+                userIcon.style.gap = '8px';
+                userIcon.innerHTML = `<span class="header-user-name" style="font-weight: 500; font-size: 14px; color: var(--black);">Hi, ${displayName}</span> <i class="flaticon-user"></i>`;
+            }
             if (loginBtn) loginBtn.style.display = 'none';
             if (wishlistBtn) wishlistBtn.style.display = 'inline-flex';
             if (cartBtn) cartBtn.style.display = 'inline-flex';
@@ -31,7 +45,7 @@ const initHeaderAuth = async () => {
             // Sidebar toggles
             if (sidebarUserIcon) {
                 sidebarUserIcon.style.display = 'flex';
-                sidebarUserIcon.innerHTML = `<span class="me-2">Hi, ${session.user.user_metadata.full_name || 'User'}</span> <i class="flaticon-user"></i>`;
+                sidebarUserIcon.innerHTML = `<span class="me-2">Hi, ${displayName}</span> <i class="flaticon-user"></i>`;
             }
             if (sidebarLoginBtn) sidebarLoginBtn.style.display = 'none';
             if (sidebarAuthDropdown) sidebarAuthDropdown.style.display = 'block';
