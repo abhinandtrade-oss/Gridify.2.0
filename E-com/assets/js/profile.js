@@ -130,6 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="address-card">
                         ${addr.is_default ? '<span class="badge bg-primary">Default</span>' : ''}
                         <h6 class="fw-bold mb-2">${addr.title}</h6>
+                        <p class="small fw-bold mb-1">${addr.full_name || ''}</p>
                         <p class="small text-muted mb-1">${addr.address_line1}</p>
                         ${addr.address_line2 ? `<p class="small text-muted mb-1">${addr.address_line2}</p>` : ''}
                         <p class="small text-muted mb-2">${addr.city}, ${addr.state} - ${addr.pincode}</p>
@@ -151,6 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     addressForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('address-id').value;
+        const full_name = document.getElementById('address-name').value;
         const title = document.getElementById('address-title').value;
         const address_line1 = document.getElementById('address-line1').value;
         const address_line2 = document.getElementById('address-line2').value;
@@ -178,6 +180,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const addrData = {
                 user_id: currentUser.id,
+                full_name,
                 title,
                 address_line1,
                 address_line2,
@@ -218,6 +221,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         document.getElementById('address-id').value = addr.id;
+        document.getElementById('address-name').value = addr.full_name || '';
         document.getElementById('address-title').value = addr.title;
         document.getElementById('address-line1').value = addr.address_line1;
         document.getElementById('address-line2').value = addr.address_line2 || '';
@@ -555,6 +559,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (orderError) throw orderError;
 
+            // Fetch profile separately for phone fallback
+            let profile = null;
+            if (order.user_id) {
+                const { data: p } = await client
+                    .from('profiles')
+                    .select('phone')
+                    .eq('id', order.user_id)
+                    .single();
+                profile = p;
+            }
+
             const { data: items, error: itemsError } = await client
                 .from('order_items')
                 .select('*, products(name, images)')
@@ -569,9 +584,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('track-total').innerText = '₹' + order.total_amount.toLocaleString('en-IN');
 
             document.getElementById('track-address').innerHTML = `
-                <div class="fw-bold mb-1">${order.shipping_address}</div>
+                <div class="fw-bold text-dark mb-1">${(order.customer_first_name || '') + ' ' + (order.customer_last_name || '')}</div>
+                <div class="mb-1">${order.shipping_address}</div>
                 <div>${order.shipping_city}, ${order.shipping_state} - ${order.shipping_pincode}</div>
-                <div class="mt-1">Phone: ${order.customer_phone || 'N/A'}</div>
+                <div class="mt-1">Phone: ${order.customer_phone || (profile ? profile.phone : 'N/A')}</div>
             `;
 
             document.getElementById('track-payment').innerText = order.payment_method ? order.payment_method.replace('_', ' ').toUpperCase() : 'N/A';
