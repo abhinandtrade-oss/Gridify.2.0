@@ -66,7 +66,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // 3. Render each category section
+            // 3. Fetch Ratings for all these products
+            const skus = products.map(p => p.sku);
+            const { data: ratingsData } = await client
+                .from('product_reviews')
+                .select('product_sku, rating')
+                .in('product_sku', skus);
+
+            const ratingsMap = {};
+            if (ratingsData) {
+                const stats = {};
+                ratingsData.forEach(r => {
+                    if (!stats[r.product_sku]) stats[r.product_sku] = { sum: 0, count: 0 };
+                    stats[r.product_sku].sum += r.rating;
+                    stats[r.product_sku].count += 1;
+                });
+                Object.keys(stats).forEach(sku => {
+                    ratingsMap[sku] = {
+                        avg: (stats[sku].sum / stats[sku].count).toFixed(1),
+                        count: stats[sku].count
+                    };
+                });
+            }
+
+            // 4. Render each category section
             const shownProductIds = new Set();
             let html = '';
 
@@ -101,7 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                     </div>
 
                                     <div class="row row-cols-lg-4 row-cols-md-3 row-cols-2 row-cols-xxs-1 ul-bs-row">
-                                        ${catProducts.map(product => renderProductCard(product, cat.name)).join('')}
+                                        ${catProducts.map(product => {
+                        // Pass ratingsMap implicitly or just use the global scope since it's defined in loadTopCategories
+                        window.ratingsMapGlobal = ratingsMap;
+                        return renderProductCard(product, cat.name);
+                    }).join('')}
                                     </div>
                                 </div>
                             </div>
@@ -131,6 +158,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const images = product.images || [];
         const mainImg = images.length > 0 ? images.sort((a, b) => a.arrangement - b.arrangement)[0].url : 'https://placehold.co/600x800?text=No+Image';
 
+        const ratingData = window.ratingsMapGlobal?.[product.sku] || { avg: 0, count: 0 };
+
         return `
             <div class="col">
                 <div class="ul-product">
@@ -147,6 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h4 class="ul-product-title"><a href="shop-details.html?id=${product.id}">${product.name}</a></h4>
                         <h5 class="ul-product-category"><a href="shop.html?category=${encodeURIComponent(categoryName)}">${categoryName}</a></h5>
                         
+                        <div class="ul-product-rating mt-1" style="font-size: 0.75rem;">
+                            ${generateStarsHtml(ratingData.avg)}
+                            <span class="text-muted ms-1">(${ratingData.count})</span>
+                        </div>
+                        
                         <div class="ul-product-price-wrapper mt-2">
                             <span class="ul-product-price text-dark fw-bold">₹${sellingPrice.toLocaleString()}</span>
                             ${mrp > sellingPrice ? `
@@ -158,6 +192,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
         `;
+    }
+
+    function generateStarsHtml(rating) {
+        let stars = '';
+        const filledStars = Math.floor(rating || 0);
+        for (let i = 1; i <= 5; i++) {
+            if (i <= filledStars) {
+                stars += '<i class="flaticon-star text-warning"></i>';
+            } else if (i - 0.5 <= rating) {
+                stars += '<i class="flaticon-star text-warning" style="opacity: 0.6;"></i>';
+            } else {
+                stars += '<i class="flaticon-star" style="color: #e0e0e0;"></i>';
+            }
+        }
+        return stars;
     }
 
     loadTopCategories();
