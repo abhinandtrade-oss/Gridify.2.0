@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="section-label" style="background:none; color:#000; padding:0; border:none; font-size: 9px;">FROM (REMITTER)</div>
                                 <div class="from-content">
                                     <strong>${sellerName}</strong><br>
-                                    ${sellerAddress} | <strong>PH: ${sellerPhone}</strong>
+                                    ${sellerAddress}
                                 </div>
                             </div>
                             <div class="footer-note">Merchant Copy / Shipping Slip</div>
@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <div class="section-label" style="background:none; color:#000; padding:0; border:none; font-size: 9px;">FROM (REMITTER)</div>
                                 <div class="from-content">
                                     <strong>${sellerName}</strong><br>
-                                    ${sellerAddress} | <strong>PH: ${sellerPhone}</strong>
+                                    ${sellerAddress}
                                 </div>
                             </div>
                             <div class="footer-note">Courier Copy / Shipping Slip</div>
