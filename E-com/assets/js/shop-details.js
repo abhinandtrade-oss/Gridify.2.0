@@ -100,7 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Meta Info
         productSku.textContent = product.sku || 'N/A';
         if (productSeller) {
-            productSeller.textContent = product.sellers?.store_name || 'House of Pachu';
+            const storeName = product.sellers?.store_name || 'House of Pachu';
+            if (product.seller_id) {
+                productSeller.innerHTML = `<a href="store.html?id=${product.seller_id}" class="text-decoration-none text-primary fw-bold">${storeName}</a>`;
+            } else {
+                productSeller.textContent = storeName;
+            }
         }
         const stockCount = product.stock_quantity || 0;
         if (stockCount > 0) {
