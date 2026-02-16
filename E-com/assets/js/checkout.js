@@ -317,7 +317,96 @@ document.addEventListener('commonComponentsLoaded', () => {
     }
 
 
-    function renderSummary() {
+    async function renderSummary() {
+        if (cart.length === 0) return;
+
+        // Fetch seller info for each item to group them
+        const productIds = cart.map(item => item.id);
+        const { data: products, error } = await client
+            .from('products')
+            .select('id, seller_id, sellers(store_name)')
+            .in('id', productIds);
+
+        if (error) {
+            console.error('Error fetching product sellers:', error);
+            renderSimpleSummary();
+            return;
+        }
+
+        const sellerMap = {};
+        products.forEach(p => {
+            sellerMap[p.id] = {
+                id: p.seller_id,
+                name: (p.sellers && p.sellers.store_name) ? p.sellers.store_name : 'Unknown Seller'
+            };
+        });
+
+        cart.forEach(item => {
+            item.seller = sellerMap[item.id] || { id: null, name: 'Unknown Seller' };
+        });
+
+        const grouped = cart.reduce((acc, item) => {
+            const sId = item.seller.id || 'none';
+            if (!acc[sId]) acc[sId] = { name: item.seller.name, items: [] };
+            acc[sId].items.push(item);
+            return acc;
+        }, {});
+
+        let subtotal = 0;
+        let html = '';
+
+        for (const sId in grouped) {
+            const group = grouped[sId];
+            const groupSubtotal = group.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            subtotal += groupSubtotal;
+
+            html += `
+                <div class="seller-group mb-4">
+                    <div class="seller-title fw-bold">
+                        Seller: ${group.name}
+                    </div>
+            `;
+
+            group.items.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                html += `
+                    <div class="product-mini-item">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="flex-grow-1">
+                            <div class="fw-bold small">${item.name}</div>
+                            <div class="text-muted small">Qty: ${item.quantity} × ₹${item.price.toLocaleString()}</div>
+                        </div>
+                        <div class="fw-bold small">₹${itemTotal.toLocaleString()}</div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+        }
+
+        checkoutItems.innerHTML = html;
+
+        let discount = 0;
+        if (appliedCoupon) {
+            if (appliedCoupon.type === 'percentage') {
+                discount = (subtotal * appliedCoupon.value) / 100;
+            } else {
+                discount = appliedCoupon.value;
+            }
+            discount = Math.min(discount, subtotal);
+
+            discountRow.classList.remove('d-none');
+            discountEl.textContent = `-₹${discount.toLocaleString()}`;
+        } else {
+            discountRow.classList.add('d-none');
+        }
+
+        const total = subtotal - discount;
+        subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
+        totalEl.textContent = `₹${total.toLocaleString()}`;
+    }
+
+    function renderSimpleSummary() {
         let subtotal = 0;
         checkoutItems.innerHTML = cart.map(item => {
             const itemTotal = item.price * item.quantity;
@@ -334,25 +423,8 @@ document.addEventListener('commonComponentsLoaded', () => {
             `;
         }).join('');
 
-        let discount = 0;
-        if (appliedCoupon) {
-            if (appliedCoupon.type === 'percentage') {
-                discount = (subtotal * appliedCoupon.value) / 100;
-            } else {
-                discount = appliedCoupon.value;
-            }
-            // Cap discount at subtotal
-            discount = Math.min(discount, subtotal);
-
-            discountRow.classList.remove('d-none');
-            discountEl.textContent = `-₹${discount.toLocaleString()}`;
-        } else {
-            discountRow.classList.add('d-none');
-        }
-
-        const total = subtotal - discount;
         subtotalEl.textContent = `₹${subtotal.toLocaleString()}`;
-        totalEl.textContent = `₹${total.toLocaleString()}`;
+        totalEl.textContent = `₹${subtotal.toLocaleString()}`;
     }
 
     function setupEventListeners() {
@@ -454,103 +526,128 @@ document.addEventListener('commonComponentsLoaded', () => {
         const formData = new FormData(checkoutForm);
         const customerData = Object.fromEntries(formData.entries());
 
-        // Ensure user is logged in for record
         const { data: { session } } = await client.auth.getSession();
+        if (!session) throw new Error('You must be logged in to place an order.');
 
-        // 0. Stock Validation
+        // 0. Fetch fresh product data (Stock, Seller ID)
+        const productIds = cart.map(item => item.id);
+        const { data: dbProducts, error: fetchError } = await client
+            .from('products')
+            .select('id, name, stock_quantity, seller_id')
+            .in('id', productIds);
+
+        if (fetchError) throw fetchError;
+
+        // Validate stock and attach seller_id
+        const productDataMap = {};
+        dbProducts.forEach(p => {
+            productDataMap[p.id] = p;
+        });
+
         for (const item of cart) {
-            const { data: product, error } = await client
-                .from('products')
-                .select('stock_quantity, name')
-                .eq('id', item.id)
+            const dbP = productDataMap[item.id];
+            if (!dbP) throw new Error(`Product "${item.name}" not found.`);
+            if (dbP.stock_quantity < item.quantity) {
+                throw new Error(`Insufficient stock for "${item.name}". Available: ${dbP.stock_quantity}, Requested: ${item.quantity}`);
+            }
+            item.seller_id = dbP.seller_id;
+        }
+
+        const totalSubtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        // Group items by seller
+        const sellerGroups = cart.reduce((acc, item) => {
+            const sId = item.seller_id || 'none';
+            if (!acc[sId]) acc[sId] = [];
+            acc[sId].push(item);
+            return acc;
+        }, {});
+
+        const createdOrderIds = [];
+
+        // 1. Process each seller group as a separate order
+        for (const sId in sellerGroups) {
+            const groupItems = sellerGroups[sId];
+            const groupSubtotal = groupItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Calculate proportional discount for this group
+            let groupDiscount = 0;
+            if (appliedCoupon) {
+                if (appliedCoupon.seller_id) {
+                    // If coupon is seller-specific
+                    if (appliedCoupon.seller_id === sId) {
+                        groupDiscount = appliedCoupon.type === 'percentage'
+                            ? (groupSubtotal * appliedCoupon.value) / 100
+                            : appliedCoupon.value;
+                    }
+                } else {
+                    // Site-wide coupon: Proportional split
+                    const totalDiscount = appliedCoupon.type === 'percentage'
+                        ? (totalSubtotal * appliedCoupon.value) / 100
+                        : appliedCoupon.value;
+
+                    groupDiscount = (groupSubtotal / totalSubtotal) * totalDiscount;
+                }
+                groupDiscount = Math.min(groupDiscount, groupSubtotal);
+            }
+
+            const groupTotal = groupSubtotal - groupDiscount;
+
+            // Create Order
+            const orderData = {
+                user_id: session.user.id,
+                customer_email: customerData.email,
+                customer_first_name: customerData.first_name,
+                customer_last_name: customerData.last_name,
+                customer_phone: customerData.phone,
+                shipping_address: customerData.address,
+                shipping_city: customerData.city,
+                shipping_state: customerData.state,
+                shipping_pincode: customerData.pincode,
+                subtotal: groupSubtotal,
+                discount_amount: groupDiscount,
+                total_amount: groupTotal,
+                coupon_id: (appliedCoupon && (appliedCoupon.seller_id === sId || !appliedCoupon.seller_id)) ? appliedCoupon.id : null,
+                payment_method: customerData.payment_method,
+                status: 'pending'
+            };
+
+            const { data: order, error: orderError } = await client
+                .from('orders')
+                .insert([orderData])
+                .select()
                 .single();
 
-            if (error || !product) {
-                throw new Error(`Product "${item.name}" not found.`);
-            }
+            if (orderError) throw orderError;
+            createdOrderIds.push(order.id);
 
-            if (product.stock_quantity < item.quantity) {
-                throw new Error(`Insufficient stock for "${item.name}". Available: ${product.stock_quantity}, Requested: ${item.quantity}`);
-            }
+            // Create Order Items for this order
+            const orderItemsEntries = groupItems.map(item => ({
+                order_id: order.id,
+                product_id: item.id,
+                quantity: item.quantity,
+                price_per_item: item.price,
+                total_price: item.price * item.quantity
+            }));
+
+            const { error: itemsError } = await client
+                .from('order_items')
+                .insert(orderItemsEntries);
+
+            if (itemsError) throw itemsError;
         }
 
-        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        let discount = 0;
-        if (appliedCoupon) {
-            discount = appliedCoupon.type === 'percentage'
-                ? (subtotal * appliedCoupon.value) / 100
-                : appliedCoupon.value;
-            discount = Math.min(discount, subtotal);
-        }
-
-        const total = subtotal - discount;
-
-        // 1. Create Order
-        const orderData = {
-            user_id: session?.user?.id || null,
-            customer_email: customerData.email,
-            customer_first_name: customerData.first_name,
-            customer_last_name: customerData.last_name,
-            customer_phone: customerData.phone,
-            shipping_address: customerData.address,
-            shipping_city: customerData.city,
-            shipping_state: customerData.state,
-            shipping_pincode: customerData.pincode,
-            subtotal: subtotal,
-            discount_amount: discount,
-            total_amount: total,
-            coupon_id: appliedCoupon?.id || null,
-            payment_method: customerData.payment_method,
-            status: 'pending'
-        };
-
-        const { data: order, error: orderError } = await client
-            .from('orders')
-            .insert([orderData])
-            .select()
-            .single();
-
-        if (orderError) throw orderError;
-
-        // 2. Create Order Items
-        const orderItems = cart.map(item => ({
-            order_id: order.id,
-            product_id: item.id,
-            quantity: item.quantity,
-            price_per_item: item.price,
-            total_price: item.price * item.quantity
-        }));
-
-        const { error: itemsError } = await client
-            .from('order_items')
-            .insert(orderItems);
-
-        if (itemsError) throw itemsError;
-
-        // 3. Update Stock and Coupon Usage
+        // 2. Update Stock and Coupon Usage
         const updatePromises = [];
 
-        // Decrease Stock Logic
         for (const item of cart) {
-            try {
-                // Fetch fresh stock again to be sure (optional but safer)
-                const { data: product } = await client
-                    .from('products')
-                    .select('stock_quantity')
+            const dbP = productDataMap[item.id];
+            const newStock = Math.max(0, dbP.stock_quantity - item.quantity);
+            updatePromises.push(
+                client.from('products')
+                    .update({ stock_quantity: newStock })
                     .eq('id', item.id)
-                    .single();
-
-                if (product) {
-                    const newStock = Math.max(0, product.stock_quantity - item.quantity);
-                    updatePromises.push(
-                        client.from('products')
-                            .update({ stock_quantity: newStock })
-                            .eq('id', item.id)
-                    );
-                }
-            } catch (err) {
-                console.error(`Failed to update stock for item ${item.id}`, err);
-            }
+            );
         }
 
         if (appliedCoupon) {
@@ -559,10 +656,17 @@ document.addEventListener('commonComponentsLoaded', () => {
 
         await Promise.all(updatePromises);
 
-        // 4. Success!
+        // 3. Success!
         window.CartManager.saveCart([]); // Clear cart
-        alert('Order placed successfully! Order ID: #' + order.id.substring(0, 8));
-        window.location.href = 'index.html'; // Or a success page
+
+        let msg = 'Order placed successfully!';
+        if (createdOrderIds.length > 1) {
+            msg = `Your items were from multiple sellers, so we've placed ${createdOrderIds.length} separate orders for you.`;
+        } else {
+            msg = 'Order placed successfully! Order ID: #' + createdOrderIds[0].substring(0, 8);
+        }
+        alert(msg);
+        window.location.href = 'profile.html'; // Redirect to profile to see orders
     }
 
     function showCouponError(msg) {
