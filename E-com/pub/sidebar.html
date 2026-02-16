@@ -1,0 +1,66 @@
+<div class="ul-sidebar">
+    <!-- header -->
+    <div class="ul-sidebar-header">
+        <div class="ul-sidebar-header-logo">
+            <a href="index.html">
+                <img src="assets/img/logo.png" alt="House of Pachu Logo" class="logo">
+            </a>
+        </div>
+        <!-- sidebar closer -->
+        <button class="ul-sidebar-closer"><i class="flaticon-close"></i></button>
+    </div>
+
+
+
+    <!-- Sidebar Actions (Mobile Only) -->
+    <div class="ul-sidebar-actions d-flex d-lg-none gap-3 align-items-start px-4 py-2 border-bottom">
+        <!-- Auth -->
+        <div class="ul-header-auth-wrapper">
+            <a href="auth/login.html" id="sidebar-user-icon"
+                style="display: none; align-items: center; text-decoration: none; color: inherit;">
+                <i class="flaticon-user fs-4"></i>
+            </a>
+            <a href="auth/login.html" id="sidebar-login-btn" class="ul-btn ul-btn-sm"
+                style="padding: 8px 15px; font-size: 12px;">Login</a>
+
+            <!-- Auth Dropdown for Sidebar -->
+            <div class="ul-sidebar-auth-dropdown mt-1 p-2 border rounded bg-light" id="sidebar-auth-dropdown"
+                style="display: none; width: 100%;">
+                <a href="profile.html" class="d-block p-2 text-dark"><i class="flaticon-user me-2"></i> Profile</a>
+                <a href="profile.html?tab=orders" class="d-block p-2 text-dark"><i
+                        class="flaticon-shopping-bag me-2"></i>
+                    Orders</a>
+                <button id="sidebar-logout-btn"
+                    class="d-block w-100 text-start p-2 text-danger border-0 bg-transparent"><i
+                        class="flaticon-logout me-2"></i> Logout</button>
+            </div>
+        </div>
+
+        <div class="flex-grow-1"></div>
+
+        <!-- Wishlist -->
+        <a href="wishlist.html" class="position-relative text-dark" id="sidebar-wishlist-btn">
+            <i class="flaticon-heart fs-4"></i>
+            <span class="wishlist-count-badge badge-count">0</span>
+        </a>
+
+        <!-- Cart -->
+        <a href="cart.html" class="position-relative text-dark" id="sidebar-cart-btn">
+            <i class="flaticon-shopping-bag fs-4"></i>
+            <span class="cart-count-badge badge-count">0</span>
+        </a>
+    </div>
+
+    <div class="ul-sidebar-header-nav-wrapper d-block d-lg-none"></div>
+    <!-- sidebar footer -->
+    <div class="ul-sidebar-footer">
+        <span class="ul-sidebar-footer-title">Follow us</span>
+
+        <div class="ul-sidebar-footer-social">
+            <a href="#"><i class="flaticon-facebook-app-symbol"></i></a>
+            <a href="#"><i class="flaticon-twitter"></i></a>
+            <a href="#"><i class="flaticon-instagram"></i></a>
+            <a href="#"><i class="flaticon-youtube"></i></a>
+        </div>
+    </div>
+</div>

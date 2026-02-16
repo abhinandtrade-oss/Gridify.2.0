@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist - House of Pachu</title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="assets/img/logo.png" type="image/png">
+
+    <link rel="stylesheet" href="assets/icon/flaticon_glamer.css">
+    <link rel="stylesheet" href="assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/vendor/splide/splide.min.css">
+    <link rel="stylesheet" href="assets/vendor/swiper/swiper-bundle.min.css">
+    <link rel="stylesheet" href="assets/vendor/slim-select/slimselect.css">
+    <link rel="stylesheet" href="assets/vendor/animate-wow/animate.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+    <style>
+        .wishlist-page {
+            padding: 120px 0 80px;
+        }
+
+        .wishlist-table img {
+            width: 80px;
+            border-radius: 10px;
+        }
+
+        .remove-btn {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .remove-btn:hover {
+            color: #a71d2a;
+        }
+
+        .empty-wishlist {
+            text-align: center;
+            padding: 100px 0;
+        }
+
+        .empty-wishlist i {
+            font-size: 4rem;
+            color: #dee2e6;
+            margin-bottom: 20px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="sidebar-placeholder"></div>
+    <div id="header-placeholder"></div>
+
+    <main class="wishlist-page">
+        <div class="ul-container">
+            <div class="ul-inner-container">
+                <h1 class="mb-5 fw-bold">My Wishlist</h1>
+
+                <div id="wishlist-content">
+                    <div class="table-responsive">
+                        <table class="table align-middle wishlist-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Action</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="wishlist-items-body">
+                                <!-- Items will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="empty-wishlist-msg" class="empty-wishlist" style="display: none;">
+                    <i class="flaticon-heart"></i>
+                    <h3>Your wishlist is empty</h3>
+                    <p class="text-muted">Save items you like to see them here.</p>
+                    <a href="shop.html" class="ul-btn mt-3">Go to Shop</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/splide/splide.min.js"></script>
+    <script src="assets/vendor/splide/splide-extension-auto-scroll.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/slim-select/slimselect.min.js"></script>
+    <script src="assets/vendor/animate-wow/wow.min.js"></script>
+    <script src="assets/vendor/splittype/index.min.js"></script>
+    <script src="assets/vendor/mixitup/mixitup.min.js"></script>
+    <script src="assets/vendor/fslightbox/fslightbox.js"></script>
+
+    <!-- custom JS -->
+    <script src="assets/js/common-loader.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        document.addEventListener('commonComponentsLoaded', () => {
+            const itemsBody = document.getElementById('wishlist-items-body');
+            const content = document.getElementById('wishlist-content');
+            const emptyMsg = document.getElementById('empty-wishlist-msg');
+
+            function render() {
+                const wishlist = window.CartManager.getWishlist();
+                if (wishlist.length === 0) {
+                    content.style.display = 'none';
+                    emptyMsg.style.display = 'block';
+                    return;
+                }
+
+                content.style.display = 'block';
+                emptyMsg.style.display = 'none';
+                itemsBody.innerHTML = wishlist.map(item => `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <img src="${item.image}" alt="${item.name}">
+                                <a href="shop-details.html?id=${item.id}" class="text-dark fw-bold">${item.name}</a>
+                            </div>
+                        </td>
+                        <td>₹${item.price.toLocaleString()}</td>
+                        <td>
+                            <button class="ul-btn py-2 px-3" onclick="moveToCart('${item.id}')">Add to Cart</button>
+                        </td>
+                        <td>
+                            <i class="flaticon-close remove-btn" onclick="removeFromWishlist('${item.id}')"></i>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            window.removeFromWishlist = (id) => {
+                window.CartManager.removeFromWishlist(id);
+                render();
+            };
+
+            window.moveToCart = async (id) => {
+                const { data: product } = await window.supabase.from('products').select('*').eq('id', id).single();
+                if (product) {
+                    const added = window.CartManager.addToCart(product);
+                    if (added) {
+                        window.CartManager.removeFromWishlist(id);
+                        render();
+                    }
+                }
+            };
+
+            render();
+        });
+    </script>
+</body>
+
+</html>
