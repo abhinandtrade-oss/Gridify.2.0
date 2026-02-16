@@ -414,6 +414,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 updates.tracking_number = tracking;
             }
 
+            // If status is cancelled, restore stock
+            if (newStatus === 'cancelled') {
+                const { data: items, error: itemsError } = await client
+                    .from('order_items')
+                    .select('product_id, quantity')
+                    .eq('order_id', currentOrderId);
+
+                if (itemsError) throw itemsError;
+
+                if (items && items.length > 0) {
+                    for (const item of items) {
+                        // Fetch current stock
+                        const { data: product, error: prodError } = await client
+                            .from('products')
+                            .select('stock_quantity')
+                            .eq('id', item.product_id)
+                            .single();
+
+                        if (!prodError && product) {
+                            const newStock = (product.stock_quantity || 0) + item.quantity;
+                            await client
+                                .from('products')
+                                .update({ stock_quantity: newStock })
+                                .eq('id', item.product_id);
+                        }
+                    }
+                }
+            }
+
             const { error } = await client
                 .from('orders')
                 .update(updates)
