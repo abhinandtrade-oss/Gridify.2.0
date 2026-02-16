@@ -36,13 +36,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await fetchPricingConfig();
 
+        await refreshDashboardData();
+        setupChartListeners();
+        setupRealtime();
+    }
+
+    async function refreshDashboardData() {
+        const period = Number(document.getElementById('revenue-period')?.value || 30);
         await Promise.all([
             fetchStats(),
-            fetchRevenueChart(30), // Default to 30 days (matches UI selection)
+            fetchRevenueChart(period),
             fetchOrderStatusChart(),
             fetchRecentOrders()
         ]);
-        setupChartListeners();
+        console.log("Dashboard: Data refreshed.");
+    }
+
+    function setupRealtime() {
+        console.log("Dashboard: Setting up real-time listeners...");
+
+        // Watch orders for main dashboard updates (Stats, Charts, Recent Orders)
+        client.channel('dashboard-orders')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, payload => {
+                console.log('Real-time order change:', payload.event);
+                refreshDashboardData();
+            })
+            .subscribe();
+
+        // Watch customers table for the total customers stat
+        client.channel('dashboard-customers')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'customers' }, () => {
+                fetchStats();
+            })
+            .subscribe();
+
+        // Watch tables used in Quick Actions bubbles
+        const quickActionTables = ['returns', 'sellers', 'products', 'seller_payouts'];
+        quickActionTables.forEach(table => {
+            client.channel(`dashboard-bubbles-${table}`)
+                .on('postgres_changes', { event: '*', schema: 'public', table: table }, () => {
+                    initQuickLinks(); // Re-runs counts and updates bubbles
+                })
+                .subscribe();
+        });
+
+        // Watch site settings for pricing config changes
+        client.channel('dashboard-settings')
+            .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'site_settings'
+            }, async (payload) => {
+                if (payload.new && payload.new.key === 'pricing_config') {
+                    console.log('Real-time pricing config update');
+                    await fetchPricingConfig();
+                    refreshDashboardData();
+                }
+            })
+            .subscribe();
     }
 
     async function fetchPricingConfig() {
