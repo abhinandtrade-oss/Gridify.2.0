@@ -169,7 +169,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                     <td>
                         <span class="status-badge ${statusClass}">
-                        <span class="status-badge ${statusClass}">
                             ${statusLabel}
                         </span>
                     </td>
@@ -260,6 +259,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Disable Save Button if Status is Terminal (Cancelled or Return Refund)
+        const allowedNextSteps = statusFlow[currentStatus] || [];
+        if (allowedNextSteps.length === 0) {
+            btnSaveStatus.disabled = true;
+            btnSaveStatus.classList.add('btn-secondary');
+            btnSaveStatus.classList.remove('btn-primary');
+            btnSaveStatus.innerHTML = '<i data-lucide="lock" style="width: 16px; height: 16px;" class="me-1"></i> Status Locked';
+        } else {
+            btnSaveStatus.disabled = false;
+            btnSaveStatus.classList.remove('btn-secondary');
+            btnSaveStatus.classList.add('btn-primary');
+            btnSaveStatus.textContent = 'Update Status';
+        }
+
+        if (window.lucide) lucide.createIcons();
+
         // Store current order for reference in event listeners
         window.currentOrder = order;
 
@@ -273,9 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             trackingInfoWrapper.classList.add('d-none');
         }
-
-        // Remove old onchange if any (not needed as buttons handle logic now)
-        // modalStatusSelect.onchange removed as we use buttons
 
         modalOrderId.textContent = '#' + order.id.substring(0, 8);
         modalStatusSelect.value = order.status;
@@ -367,6 +379,22 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.textContent = 'Updating...';
 
         try {
+            // Double check current status from DB to prevent race conditions (like customer cancelling while modal open)
+            const { data: latestOrder, error: checkError } = await client
+                .from('orders')
+                .select('status')
+                .eq('id', currentOrderId)
+                .single();
+
+            if (checkError) throw checkError;
+
+            if (latestOrder.status === 'cancelled') {
+                showAlert('This order has been cancelled and cannot be modified.', 'error');
+                fetchOrders(statusFilter.value);
+                orderModal.hide();
+                return;
+            }
+
             const updates = {
                 status: newStatus,
                 updated_at: new Date().toISOString()
