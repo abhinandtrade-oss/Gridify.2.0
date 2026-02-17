@@ -1677,12 +1677,6 @@ button {
   transform: scale(1.05);
 }
 
-.ul-product:hover .ul-product-actions {
-  top: 50%;
-  pointer-events: all;
-  opacity: 1;
-}
-
 .ul-product-heading {
   display: flex;
   justify-content: space-between;
@@ -1726,14 +1720,13 @@ button {
 }
 
 .ul-product-actions {
-  position: absolute;
   display: flex;
-  gap: clamp(7px, 3.73vw, 10px);
-  top: 60%;
-  transform: translateY(-50%);
-  transition: 0.4s ease;
-  pointer-events: none;
-  opacity: 0;
+  justify-content: center;
+  gap: clamp(10px, 1vw, 15px);
+  margin-top: 15px;
+  opacity: 1;
+  pointer-events: all;
+  transition: 0.3s ease;
 }
 
 .ul-product-actions a,
@@ -1750,8 +1743,11 @@ button {
 }
 
 .ul-product-actions a i,
-.ul-product-actions button i {
-  padding-top: 5px;
+.ul-product-actions button i,
+.ul-product-actions a svg,
+.ul-product-actions button svg {
+  width: 18px;
+  height: 18px;
 }
 
 .ul-product-actions a:hover,
