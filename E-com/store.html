@@ -85,73 +85,105 @@
             margin-bottom: 80px;
         }
 
-        .shop-filter-bar {
-            background: #fff;
-            padding: 20px 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            margin-bottom: 40px;
-            margin-top: -40px;
+        .shop-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 40px;
+            align-items: start;
+            margin-top: -50px;
             position: relative;
-            z-index: 2;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            border: 1px solid #eee;
+            z-index: 10;
+            margin-bottom: 80px;
         }
 
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .shop-sidebar {
+            position: sticky;
+            top: 100px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid #f0f0f0;
         }
 
-        .filter-label {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #495057;
+        .sidebar-widget {
+            margin-bottom: 35px;
+        }
+
+        .sidebar-widget:last-child {
             margin-bottom: 0;
         }
 
+        .widget-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f8f9fa;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .widget-title i {
+            font-size: 1.2rem;
+            color: #000;
+        }
+
+        .shop-main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 25px;
+            background: #fff;
+            border-radius: 18px;
+            border: 1px solid #eee;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
         .custom-select {
-            padding: 10px 20px;
+            width: 100%;
+            padding: 12px 15px;
             border-radius: 12px;
-            border: 1px solid #ddd;
+            border: 1.5px solid #eee;
             font-size: 0.9rem;
             color: #212529;
-            background-color: #f8f9fa;
+            background-color: #fcfcfc;
             cursor: pointer;
             outline: none;
             transition: all 0.3s;
         }
 
+        .custom-select:focus {
+            border-color: #000;
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+        }
+
         .results-count {
-            font-weight: 500;
-            color: #666;
             font-size: 0.95rem;
+            font-weight: 500;
+            color: #495057;
         }
 
-        .no-products {
-            padding: 100px 0;
-            text-align: center;
+        .results-count span {
+            color: #000;
+            font-weight: 700;
         }
 
-        .no-products i {
-            font-size: 4rem;
-            color: #dee2e6;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        /* Mobile Responsive Fixes */
         @media (max-width: 991px) {
-            .store-header {
-                padding: 100px 0 60px;
-                text-align: center;
-            }
-
             .store-header-content .breadcrumb {
                 justify-content: center;
             }
@@ -267,64 +299,91 @@
 
         <!-- Products Section -->
         <div class="ul-container">
-            <section class="ul-inner-container">
-                <!-- Filter Bar -->
-                <div class="shop-filter-bar shadow-sm">
-                    <div class="filter-group">
-                        <div class="d-flex align-items-center gap-3">
-                            <label class="filter-label">Sort By:</label>
-                            <select id="sort-select" class="custom-select">
-                                <option value="newest">Newest Arrivals</option>
-                                <option value="price-low">Price: Low to High</option>
-                                <option value="price-high">Price: High to Low</option>
-                                <option value="oldest">Oldest</option>
-                            </select>
+            <div class="shop-layout">
+                <!-- Sidebar -->
+                <aside class="shop-sidebar">
+                    <div class="sidebar-widgets">
+                        <!-- Filters Widget -->
+                        <div class="sidebar-widget">
+                            <h3 class="widget-title"><i class="flaticon-filter"></i> Filters</h3>
+
+                            <div class="mb-4">
+                                <label class="filter-label">Sort Products By</label>
+                                <select id="sort-select" class="custom-select">
+                                    <option value="newest">Newest Arrivals</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="rating-high">Rating: High to Low</option>
+                                    <option value="offer-high">Offer: High to Low</option>
+                                    <option value="oldest">Oldest</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Store Search Widget (Simple UI) -->
+                        <div class="sidebar-widget">
+                            <h3 class="widget-title"><i class="flaticon-shopping-bag"></i> Store Info</h3>
+                            <p class="text-muted small">Browsing products from <strong
+                                    id="sidebar-store-name">...</strong>. All items are shipped directly from this
+                                seller.</p>
                         </div>
                     </div>
-                    <div class="results-count">
-                        <span id="store-product-count">0</span> products from this store
-                    </div>
-                </div>
+                </aside>
 
-                <div id="products-loading" class="product-grid">
-                    <!-- Skeletons -->
-                    <div class="ul-product skeleton">
-                        <div class="ul-product-img"></div>
-                        <div class="ul-product-title"></div>
-                        <div class="ul-product-category"></div>
-                        <div class="ul-product-price"></div>
+                <!-- main content -->
+                <div class="shop-main">
+                    <div class="shop-main-header">
+                        <div class="results-count">
+                            <span id="store-product-count">0</span> products from this store
+                        </div>
+                        <div class="d-lg-none">
+                            <button class="btn btn-sm btn-outline-dark"
+                                onclick="document.querySelector('.shop-sidebar').scrollIntoView({behavior: 'smooth'})">
+                                <i class="flaticon-filter"></i> Filters
+                            </button>
+                        </div>
                     </div>
-                    <div class="ul-product skeleton">
-                        <div class="ul-product-img"></div>
-                        <div class="ul-product-title"></div>
-                        <div class="ul-product-category"></div>
-                        <div class="ul-product-price"></div>
-                    </div>
-                    <div class="ul-product skeleton">
-                        <div class="ul-product-img"></div>
-                        <div class="ul-product-title"></div>
-                        <div class="ul-product-category"></div>
-                        <div class="ul-product-price"></div>
-                    </div>
-                    <div class="ul-product skeleton">
-                        <div class="ul-product-img"></div>
-                        <div class="ul-product-title"></div>
-                        <div class="ul-product-category"></div>
-                        <div class="ul-product-price"></div>
-                    </div>
-                </div>
 
-                <div id="products-grid" class="product-grid" style="display: none;">
-                    <!-- Products will be loaded here -->
-                </div>
+                    <div id="products-loading" class="product-grid">
+                        <!-- Skeletons -->
+                        <div class="ul-product skeleton">
+                            <div class="ul-product-img"></div>
+                            <div class="ul-product-title"></div>
+                            <div class="ul-product-category"></div>
+                            <div class="ul-product-price"></div>
+                        </div>
+                        <div class="ul-product skeleton">
+                            <div class="ul-product-img"></div>
+                            <div class="ul-product-title"></div>
+                            <div class="ul-product-category"></div>
+                            <div class="ul-product-price"></div>
+                        </div>
+                        <div class="ul-product skeleton">
+                            <div class="ul-product-img"></div>
+                            <div class="ul-product-title"></div>
+                            <div class="ul-product-category"></div>
+                            <div class="ul-product-price"></div>
+                        </div>
+                        <div class="ul-product skeleton">
+                            <div class="ul-product-img"></div>
+                            <div class="ul-product-title"></div>
+                            <div class="ul-product-category"></div>
+                            <div class="ul-product-price"></div>
+                        </div>
+                    </div>
 
-                <div id="no-products" class="no-products" style="display: none;">
-                    <i class="flaticon-shopping-bag"></i>
-                    <h3>No products found</h3>
-                    <p class="text-muted">This store hasn't uploaded any products yet.</p>
-                    <a href="shop.html" class="ul-btn mt-3">Browse Other Stores</a>
+                    <div id="products-grid" class="product-grid" style="display: none;">
+                        <!-- Products will be loaded here -->
+                    </div>
+
+                    <div id="no-products" class="no-products" style="display: none;">
+                        <i class="flaticon-shopping-bag"></i>
+                        <h3>No products found</h3>
+                        <p class="text-muted">This store hasn't uploaded any products yet.</p>
+                        <a href="shop.html" class="ul-btn mt-3">Browse Other Stores</a>
+                    </div>
                 </div>
-            </section>
+            </div>
         </div>
     </main>
 
