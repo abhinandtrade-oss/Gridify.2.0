@@ -52,8 +52,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (comp.id === 'header-placeholder' || (comp.position === 'afterbegin' && html.includes('ul-header'))) {
                     setTimeout(() => initHeaderLogic(), 0);
                 }
+
+                // If it's the footer, initialize its logic
+                if (comp.id === 'footer-placeholder' || (comp.position === 'beforeend' && html.includes('ul-footer'))) {
+                    setTimeout(() => initFooterLogic(), 0);
+                }
             })
             .catch(err => console.error(`Error loading ${comp.file}:`, err));
+    };
+
+    const initFooterLogic = () => {
+        // Fix paths if in subfolder
+        if (isSubFolder) {
+            const footer = document.querySelector('.ul-footer');
+            if (footer) {
+                footer.querySelectorAll('a').forEach(a => {
+                    const href = a.getAttribute('href');
+                    if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('..')) {
+                        a.setAttribute('href', basePath + href);
+                    }
+                });
+                footer.querySelectorAll('img').forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (src && !src.startsWith('http') && !src.startsWith('..')) {
+                        img.setAttribute('src', basePath + src);
+                    }
+                });
+            }
+        }
     };
 
     const initHeaderLogic = () => {
