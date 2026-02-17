@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update UI with seller info
             storeDisplayName.textContent = seller.store_name;
             breadcrumbStoreName.textContent = seller.store_name;
+            const sidebarStoreName = document.getElementById('sidebar-store-name');
+            if (sidebarStoreName) sidebarStoreName.textContent = seller.store_name;
             document.title = `${seller.store_name} - House of Pachu`;
 
             storeState.textContent = seller.state || 'India';
@@ -99,6 +101,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (error) throw error;
 
+            // Client-side sorting for Rating and Offer
+            if (sortValue === 'offer-high') {
+                products.sort((a, b) => {
+                    const discA = a.mrp > a.selling_price ? ((a.mrp - a.selling_price) / a.mrp) : 0;
+                    const discB = b.mrp > b.selling_price ? ((b.mrp - b.selling_price) / b.mrp) : 0;
+                    return discB - discA;
+                });
+            } else if (sortValue === 'rating-high') {
+                const skus = products.map(p => p.sku);
+                const ratingsMap = await getProductRatings(skus);
+                products.sort((a, b) => {
+                    const rateA = parseFloat(ratingsMap[a.sku]?.avg || 0);
+                    const rateB = parseFloat(ratingsMap[b.sku]?.avg || 0);
+                    if (rateB !== rateA) return rateB - rateA;
+                    // Secondary sort by count
+                    return (ratingsMap[b.sku]?.count || 0) - (ratingsMap[a.sku]?.count || 0);
+                });
+                renderProducts(products, ratingsMap);
+                return;
+            }
+
             renderProducts(products);
         } catch (err) {
             console.error('Error loading products:', err);
@@ -151,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return stars;
     }
 
-    async function renderProducts(products) {
+    async function renderProducts(products, preFetchedRatings = null) {
         productsLoading.style.display = 'none';
 
         if (!products || products.length === 0) {
@@ -161,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const skus = products.map(p => p.sku);
-        const ratingsMap = await getProductRatings(skus);
+        const ratingsMap = preFetchedRatings || await getProductRatings(skus);
 
         productCount.textContent = products.length;
         productsGrid.style.display = 'grid';
