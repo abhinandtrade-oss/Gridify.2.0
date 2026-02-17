@@ -165,11 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="ul-product">
                     <div class="ul-product-img">
                         <img src="${mainImg}" alt="${product.name}" onerror="this.src='https://placehold.co/600x800?text=No+Image'">
-                        <div class="ul-product-actions">
-                            <button class="add-to-cart-btn-trigger" data-id="${product.id}" title="Add to Cart"><i class="flaticon-shopping-bag"></i></button>
-                            <a href="shop-details.html?id=${product.id}" title="Quick View"><i class="flaticon-hide"></i></a>
-                            <button class="add-to-wishlist-btn-trigger" data-id="${product.id}" title="Add to Wishlist"><i class="flaticon-heart"></i></button>
-                        </div>
                     </div>
 
                     <div class="ul-product-txt text-center">
@@ -188,10 +183,22 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <span class="text-success ms-1" style="font-size: 0.8rem; font-weight: 600;">(${discount}% off)</span>
                             ` : ''}
                         </div>
+
+                        <div class="ul-product-actions mt-auto">
+                            <button class="add-to-cart-btn-trigger" data-id="${product.id}" title="Add to Cart"><i class="flaticon-shopping-bag"></i></button>
+                            <a href="shop-details.html?id=${product.id}" title="Quick View"><i data-lucide="eye"></i></a>
+                            <button class="add-to-wishlist-btn-trigger" data-id="${product.id}" title="Add to Wishlist"><i class="flaticon-heart"></i></button>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
+
+        setTimeout(() => {
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }, 0);
+
+        return html;
     }
 
     function generateStarsHtml(rating) {
